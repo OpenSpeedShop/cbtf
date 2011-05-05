@@ -1,0 +1,13 @@
+g++ -I/opt/libcbtf/include -shared -o ExampleComponentA.so -fPIC  ExampleComponentA.cpp
+g++ -I/opt/libcbtf/include -shared -o ExampleComponentB.so -fPIC  ExampleComponentB.cpp
+
+# testing the xml version
+g++ -I/opt/libcbtf/include -I/opt/libcbtf-xml/include -L/opt/libcbtf/lib -lcbtf -L/opt/libcbtf-xml/lib -lcbtf-xml tool_test.cpp 
+export CBTF_PLUGIN_PATH=.
+export LD_LIBRARY_PATH=/opt/libcbtf-xml/lib:$LD_LIBRARY_PATH
+./a.out
+
+
+
+
+

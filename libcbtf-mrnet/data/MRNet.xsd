@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright (c) 2010 Krell Institute. All Rights Reserved.
+    
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option)
+any later version.
+    
+This library is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+details.
+    
+You should have received a copy of the GNU Lesser General Public License
+along with this library; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+<xs:schema elementFormDefault="qualified"
+           targetNamespace="http://www.krellinst.org/CBTF/MRNet.xsd"
+           xmlns="http://www.krellinst.org/CBTF/MRNet.xsd"
+           xmlns:cbtf="http://www.krellinst.org/CBTF/Network.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:import namespace="http://www.krellinst.org/CBTF/Network.xsd"
+             schemaLocation="Network.xsd"/>
+
+
+
+  <!-- Type describing a MRNet backends' component configuration -->
+  <xs:complexType name="BackendType">
+    <xs:sequence>
+      
+      <!-- Component network for the backend -->
+      <xs:element name="Network" type="cbtf:NetworkType"/>
+
+      <!-- List of the backend's incoming downstreams -->
+      <xs:element name="IncomingDownstream" type="InputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- List of the backend's outgoing upstreams -->
+      <xs:element name="OutgoingUpstream" type="OutputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+  <!-- Type describing the depth of a filter within the MRNet tree -->
+  <xs:complexType name="DepthType">
+    <xs:choice>
+
+      <!-- Filter is at all levels -->
+      <xs:element name="AllOther"/>
+
+      <!-- Filter is at a single level relative to the leaves -->
+      <xs:element name="LeafRelative">
+        <xs:complexType>
+          <xs:attribute name="offset" type="xs:integer"/>
+        </xs:complexType>
+      </xs:element>
+
+      <!-- Filter is at a single level relative to the root -->
+      <xs:element name="RootRelative">
+        <xs:complexType>
+          <xs:attribute name="offset" type="xs:integer"/>
+        </xs:complexType>
+      </xs:element>
+      
+    </xs:choice>
+  </xs:complexType>
+
+
+
+  <!-- Type describing a MRNet filters' component configuration -->
+  <xs:complexType name="FilterType">
+    <xs:sequence>
+
+      <!-- Depth of the filter -->
+      <xs:element name="Depth" type="DepthType"/>
+      
+      <!-- Component network for the filter -->
+      <xs:element name="Network" type="cbtf:NetworkType"/>
+
+      <!-- List of the filter's incoming downstreams -->
+      <xs:element name="IncomingDownstream" type="InputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- List of the filter's outgoing downstreams -->
+      <xs:element name="OutgoingDownstream" type="OutputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- List of the filter's incoming upstreams -->
+      <xs:element name="IncomingUpstream" type="InputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- List of the filter's outgoing upstreams -->
+      <xs:element name="OutgoingUpstream" type="OutputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+  <!-- Type describing a MRNet frontend's component configuration -->
+  <xs:complexType name="FrontendType">
+    <xs:sequence>
+
+      <!-- Component network for the frontend -->
+      <xs:element name="Network" type="cbtf:NetworkType"/>
+
+      <!-- List of the frontend's incoming upstreams -->
+      <xs:element name="IncomingUpstream" type="InputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- List of the frontend's outgoing downstreams -->
+      <xs:element name="OutgoingDownstream" type="OutputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+  <!-- Type describing an input connection -->
+  <xs:complexType name="InputType">
+    <xs:sequence>
+      
+      <!-- Name of the input -->
+      <xs:element name="Name" type="xs:string"/>
+      
+      <!-- Source of the input -->
+      <xs:element name="To">
+        <xs:element name="Input" type="xs:string"/>
+      </xs:element>
+      
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+  <!-- Type describing a MRNet distributed component network -->
+  <xs:complexType name="MRNetType">
+    <xs:sequence>
+
+      <!-- Type of the network -->
+      <xs:element name="Type" type="xs:string"/>
+
+      <!-- Version of the network -->
+      <xs:element name="Version" type="VersionType"/>
+
+      <!-- List of the network's inputs -->
+      <xs:element name="Input" type="InputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- List of the network's outputs -->
+      <xs:element name="Output" type="OutputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- List of the network's stream declarations -->
+      <xs:element name="Stream" type="StreamDeclarationType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- Frontend of the network -->
+      <xs:element name="Frontend" type="FrontendType"/>
+
+      <!-- List of the network's filters -->
+      <xs:element name="Filter" type="FilterType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+
+      <!-- Backends of the network -->
+      <xs:element name="Backend" type="BackendType"/>
+
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+  <!-- Type describing an output connection -->
+  <xs:complexType name="OutputType">
+    <xs:sequence>
+      
+      <!-- Name of the output -->
+      <xs:element name="Name" type="xs:string"/>
+      
+      <!-- Source of the output -->
+      <xs:element name="From">
+        <xs:element name="Output" type="xs:string"/>
+      </xs:element>
+      
+    </xs:sequence>
+  </xs:complexType>
+
+
+  
+  <!-- Type declaring a named stream and its associated MRNet message tag -->
+  <xs:complexType name="StreamDeclarationType">
+    <xs:sequence>
+
+      <!-- Name of the stream -->
+      <xs:element name="Name" type="xs:string"/>
+
+      <!-- MRNet message tag of the stream -->
+      <xs:element name="Tag" type="xs:nonNegativeInteger"/>
+
+    </xs:sequence>
+  </xs:complexType>
+
+
+
+</xs:schema>

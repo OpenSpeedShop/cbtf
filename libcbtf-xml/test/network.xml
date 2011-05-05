@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Copyright (c) 2010 Krell Institute. All Rights Reserved.
+    
+This library is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the Free
+Software Foundation; either version 2.1 of the License, or (at your option)
+any later version.
+    
+This library is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+details.
+    
+You should have received a copy of the GNU Lesser General Public License
+along with this library; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+<Network xmlns="http://www.krellinst.org/CBTF/Network.xsd">
+
+  <Type>TestNetwork</Type>
+  <Version>1.2.3</Version>
+
+  <SearchPath>.</SearchPath>
+  <Plugin>plugin</Plugin>
+  
+  <Component>
+    <Name>Stage1</Name>
+    <Type>Doubler</Type>
+  </Component>
+  
+  <Component>
+    <Name>Stage2</Name>
+    <Type>Incrementer</Type>
+  </Component>
+  
+  <Component>
+    <Name>Stage3</Name>
+    <Type>Doubler</Type>
+    <Version minimum="0.0.1" maximum="0.0.5"/>
+  </Component>
+
+  <Input>
+    <Name>in</Name>
+    <To>
+      <Name>Stage1</Name>
+      <Input>in</Input>
+    </To>
+  </Input>
+  
+  <Connection>
+    <From>
+      <Name>Stage1</Name>
+      <Output>out</Output>
+    </From>
+    <To>
+      <Name>Stage2</Name>
+      <Input>in</Input>
+    </To>
+  </Connection>
+  
+  <Connection>
+    <From>
+      <Name>Stage2</Name>
+      <Output>out</Output>
+    </From>
+    <To>
+      <Name>Stage3</Name>
+      <Input>in</Input>
+    </To>
+  </Connection>
+
+  <Output>
+    <Name>out</Name>
+    <From>
+      <Name>Stage3</Name>
+      <Output>out</Output>
+    </From>
+  </Output>
+  
+</Network>
