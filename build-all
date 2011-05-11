@@ -40,11 +40,16 @@ cd ..
 
 cd libcbtf-mrnet
 ./bootstrap
-if [ -f $CBTF_PREFIX/bin/mrnet_commnode ]; then
+if [ -z $MRNET_PREFIX ]; then
+  if [ -f $CBTF_PREFIX/bin/mrnet_commnode ]; then
     mrnet_option="--with-mrnet=$CBTF_PREFIX"
-else
+  else
     mrnet_option=""
+  fi
+else
+    mrnet_option="--with-mrnet=$MRNET_PREFIX"
 fi
+
 ./configure --prefix=$CBTF_PREFIX $mrnet_option \
     --with-cbtf=$CBTF_PREFIX \
     --with-cbtf-xml=$CBTF_PREFIX
