@@ -39,11 +39,11 @@ make install
 cd ..
 
 if [ -z $MRNET_PREFIX ]; then
-  if [ -f $CBTF_PREFIX/bin/mrnet_commnode ]; then
-    mrnet_option="--with-mrnet=$CBTF_PREFIX"
-  else
-    mrnet_option=""
-  fi
+    if [ -f $CBTF_PREFIX/bin/mrnet_commnode ]; then
+        mrnet_option="--with-mrnet=$CBTF_PREFIX"
+    else
+        mrnet_option=""
+    fi
 else
     mrnet_option="--with-mrnet=$MRNET_PREFIX"
 fi
