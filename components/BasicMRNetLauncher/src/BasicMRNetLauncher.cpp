@@ -50,7 +50,7 @@ private:
 
     /** Default constructor. */
     BasicMRNetLauncher() :
-        Component(Type(typeid(BasicMRNetLauncher)), Version(0, 0, 1))
+        Component(Type(typeid(BasicMRNetLauncher)), Version(0, 0, 0))
     {
         // TODO: Declare inputs & outputs
     }
