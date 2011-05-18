@@ -1,4 +1,3 @@
-#! /bin/sh
 ################################################################################
 # Copyright (c) 2011 Krell Institute. All Rights Reserved.
 #
@@ -17,45 +16,28 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-if [ -z $CBTF_PREFIX ]; then
-    export CBTF_PREFIX=$HOME/INSTALL
-fi
+AC_DEFUN([AX_XERCESC_VERSION], [
 
-echo "    "
-echo "Building and installing the CBTF Framework into $CBTF_PREFIX ..."
-echo "    "
+    AC_MSG_CHECKING([for libxerces-c >= 3.0.0])
+    
+    AC_LANG_PUSH(C++)
 
-cd libcbtf
-./bootstrap
-./configure --prefix=$CBTF_PREFIX
-make install
-cd ..
+    xerces_saved_CPPFLAGS=$CPPFLAGS
+    CPPFLAGS="$CPPFLAGS $LIBXERCES_C_CPPFLAGS"
 
-cd libcbtf-xml
-./bootstrap
-./configure --prefix=$CBTF_PREFIX \
-    --with-cbtf=$CBTF_PREFIX
-make install
-cd ..
+    AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[
+        #include "xercesc/util/XercesVersion.hpp"
+        ]], [[
+        #if _XERCES_VERSION < 3000
+            #error "libxerces-c version is too old!"
+        #endif
+        ]]), AC_MSG_RESULT(yes), [ AC_MSG_RESULT(no)
+        AC_MSG_FAILURE(libxerces-c version isn't 3.0.0 or higher.)
+        ]
+    )
 
-if [ -z $MRNET_PREFIX ]; then
-  if [ -f $CBTF_PREFIX/bin/mrnet_commnode ]; then
-    mrnet_option="--with-mrnet=$CBTF_PREFIX"
-  else
-    mrnet_option=""
-  fi
-else
-    mrnet_option="--with-mrnet=$MRNET_PREFIX"
-fi
+    CPPFLAGS=$xerces_saved_CPPFLAGS
 
-cd libcbtf-mrnet
-./bootstrap
-./configure --prefix=$CBTF_PREFIX $mrnet_option \
-    --with-cbtf=$CBTF_PREFIX \
-    --with-cbtf-xml=$CBTF_PREFIX
-make install
-cd ..
+    AC_LANG_POP(C++)
 
-echo "    "
-echo "Finished building and installing CBTF Framework into $CBTF_PREFIX !"
-echo "    "
+])
