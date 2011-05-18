@@ -19,18 +19,26 @@
 bin_PROGRAMS = libcbtf-mrnet-backend
 
 libcbtf_mrnet_backend_CXXFLAGS = \
-	-I$(top_srcdir)/include -I$(top_srcdir)/src \
-	@BOOST_CPPFLAGS@ @CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@ @MRNET_CPPFLAGS@ @LIBXERCES_C_CPPFLAGS@
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src \
+	@BOOST_CPPFLAGS@ \
+	@CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@ \
+	@LIBXERCES_C_CPPFLAGS@ \
+	@MRNET_CPPFLAGS@
 
 libcbtf_mrnet_backend_LDFLAGS = \
 	-L$(top_srcdir)/src \
-	@BOOST_LDFLAGS@ @CBTF_LDFLAGS@ @CBTF_XML_LDFLAGS@ @MRNET_LDFLAGS@ 
+	@BOOST_LDFLAGS@ \
+	@CBTF_LDFLAGS@ @CBTF_XML_LDFLAGS@ \
+	@LIBXERCES_C_LDFLAGS@ \
+	@MRNET_LDFLAGS@ 
 
 libcbtf_mrnet_backend_LDADD = \
 	-lcbtf-mrnet \
 	@BOOST_DATE_TIME_LIB@ @BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ \
-	@LIBXERCES_C_LDFLAGS@ @LIBXERCES_C@ \
-	@CBTF_LIBS@ @CBTF_XML_LIBS@ @MRNET_LIBS@ @LIBXERCES_C_LDFLAGS@ 
+	@CBTF_LIBS@ @CBTF_XML_LIBS@ \
+	@LIBXERCES_C@ \
+	@MRNET_LIBS@
 
 libcbtf_mrnet_backend_SOURCES = \
 	Backend.hpp Backend.cpp \

@@ -1,3 +1,4 @@
+#! /bin/sh
 ################################################################################
 # Copyright (c) 2010 Krell Institute. All Rights Reserved.
 #
@@ -16,25 +17,9 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-lib_LTLIBRARIES = libcbtf.la
-
-libcbtf_la_CXXFLAGS = \
-	-I$(top_srcdir)/include \
-	@BOOST_CPPFLAGS@ \
-	@LTDLINCL@ 
-
-libcbtf_la_LDFLAGS = \
-	-version-info 0:0:0 \
-	@BOOST_LDFLAGS@
-
-libcbtf_la_LIBADD = \
-	@BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ \
-	@LIBLTDL@
-
-libcbtf_la_SOURCES = \
-	Component.cpp \
-	ComponentImpl.hpp ComponentImpl.cpp \
-	Type.cpp \
-	TypeImpl.hpp TypeImpl.cpp \
-	Version.cpp \
-	VersionImpl.hpp VersionImpl.cpp
+touch config.rpath
+aclocal --force -I m4
+libtoolize --copy --force
+autoheader --force
+automake --add-missing --copy --force-missing --foreign
+autoconf

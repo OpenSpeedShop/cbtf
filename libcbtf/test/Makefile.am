@@ -19,15 +19,30 @@
 noinst_PROGRAMS = test
 
 test_CXXFLAGS = \
-	-I$(top_srcdir)/include -DBUILDDIR="\"$(abs_builddir)\"" @BOOST_CPPFLAGS@
-test_LDFLAGS = -L$(top_srcdir)/src @BOOST_LDFLAGS@
-test_LDADD = -lcbtf @BOOST_UNIT_TEST_FRAMEWORK_LIB@
+	-I$(top_srcdir)/include \
+	-DBUILDDIR="\"$(abs_builddir)\"" \
+	@BOOST_CPPFLAGS@
+
+test_LDFLAGS = \
+	-L$(top_srcdir)/src \
+	@BOOST_LDFLAGS@
+
+test_LDADD = \
+	-lcbtf \
+	@BOOST_UNIT_TEST_FRAMEWORK_LIB@
+
 test_SOURCES = test.cpp
 
 noinst_LTLIBRARIES = plugin.la
 
-plugin_la_CXXFLAGS = -I$(top_srcdir)/include @BOOST_CPPFLAGS@
-plugin_la_LDFLAGS = \
-	-L$(top_srcdir)/src -module -avoid-version -rpath /ForceShared
+plugin_la_CXXFLAGS = \
+	-I$(top_srcdir)/include \
+	@BOOST_CPPFLAGS@
+
+plugin_la_LDFLAGS = 
+	-L$(top_srcdir)/src \
+	-module -avoid-version -rpath /ForceShared
+
 plugin_la_LIBADD = -lcbtf
+
 plugin_la_SOURCES = plugin.cpp

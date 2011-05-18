@@ -20,18 +20,25 @@ lib_LTLIBRARIES = libcbtf-mrnet.la
 
 libcbtf_mrnet_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
-	-DBINDIR="\"$(bindir)\"" -DLIBDIR="\"$(libdir)\"" \
-	@BOOST_CPPFLAGS@ @MRNET_CPPFLAGS@ @LIBXERCES_C_CPPFLAGS@ \
-	@CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@
+	-DBINDIR="\"$(bindir)\"" \
+	-DLIBDIR="\"$(libdir)\"" \
+	@BOOST_CPPFLAGS@ \
+	@CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@ \
+	@LIBXERCES_C_CPPFLAGS@ \
+	@MRNET_CPPFLAGS@
 
 libcbtf_mrnet_la_LDFLAGS = \
 	-version-info 0:0:0 \
-	@BOOST_LDFLAGS@ @MRNET_LDFLAGS@ @LIBXERCES_C_LDFLAGS@ \
-	@CBTF_LDFLAGS@ @CBTF_XML_LDFLAGS@ 
+	@BOOST_LDFLAGS@ \
+	@CBTF_LDFLAGS@ @CBTF_XML_LDFLAGS@ \
+	@LIBXERCES_C_LDFLAGS@ \
+	@MRNET_LDFLAGS@
 
 libcbtf_mrnet_la_LIBADD = \
-	@BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ @LIBXERCES_C@ @MRNET_LIBS@ \
-	@CBTF_LIBS@ @CBTF_XML_LIBS@ 
+	@BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ \
+	@CBTF_LIBS@ @CBTF_XML_LIBS@ \
+	@LIBXERCES_C@ \
+	@MRNET_LIBS@
 
 libcbtf_mrnet_la_SOURCES = \
 	AtomicCounter.hpp \

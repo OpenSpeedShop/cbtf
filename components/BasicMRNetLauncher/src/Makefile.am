@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2010 Krell Institute. All Rights Reserved.
+# Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -16,25 +16,23 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-lib_LTLIBRARIES = libcbtf.la
+plugindir = $(libdir)/KrellInstitute/CBTF
 
-libcbtf_la_CXXFLAGS = \
-	-I$(top_srcdir)/include \
+plugin_LTLIBRARIES = BasicMRNetLauncher.la
+
+BasicMRNetLauncher_la_CXXFLAGS = \
 	@BOOST_CPPFLAGS@ \
-	@LTDLINCL@ 
+	@CBTF_CPPFLAGS@ \
+	@MRNET_CPPFLAGS@
 
-libcbtf_la_LDFLAGS = \
-	-version-info 0:0:0 \
-	@BOOST_LDFLAGS@
+BasicMRNetLauncher_la_LDFLAGS = \
+	-module -avoid-version -rpath /ForceShared \
+	@CBTF_LDFLAGS@ \
+	@MRNET_LDFLAGS@
 
-libcbtf_la_LIBADD = \
-	@BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ \
-	@LIBLTDL@
+BasicMRNetLauncher_la_LIBADD = \
+	@CBTF_LIBS@ \
+	@MRNET_LIBS@
 
-libcbtf_la_SOURCES = \
-	Component.cpp \
-	ComponentImpl.hpp ComponentImpl.cpp \
-	Type.cpp \
-	TypeImpl.hpp TypeImpl.cpp \
-	Version.cpp \
-	VersionImpl.hpp VersionImpl.cpp
+BasicMRNetLauncher_la_SOURCES = \
+	BasicMRNetLauncher.cpp

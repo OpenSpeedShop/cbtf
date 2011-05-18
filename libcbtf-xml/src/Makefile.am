@@ -20,18 +20,22 @@ lib_LTLIBRARIES = libcbtf-xml.la
 
 libcbtf_xml_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
-	@LIBXERCES_C_CPPFLAGS@ \
-	-DDATADIR="\"$(datadir)\"" -DLIBDIR="\"$(libdir)\"" \
-	@BOOST_CPPFLAGS@ @CBTF_CPPFLAGS@
+	-DDATADIR="\"$(datadir)\"" \
+	-DLIBDIR="\"$(libdir)\"" \
+	@BOOST_CPPFLAGS@ \
+	@CBTF_CPPFLAGS@ \
+	@LIBXERCES_C_CPPFLAGS@
 
 libcbtf_xml_la_LDFLAGS = \
 	-version-info 0:0:0 \
-	@LIBXERCES_C_LDFLAGS@ \
-	@LTLIBXERCES_C@ \
-	@BOOST_LDFLAGS@ @CBTF_LDFLAGS@
+	@BOOST_LDFLAGS@ \
+	@CBTF_LDFLAGS@ \
+	@LIBXERCES_C_LDFLAGS@
 
 libcbtf_xml_la_LIBADD = \
-	@BOOST_FILESYSTEM_LIB@ @CBTF_LIBS@ @LIBXERCES_C_LDFLAGS@ @LTLIBXERCES_C@
+	@BOOST_FILESYSTEM_LIB@ \
+	@CBTF_LIBS@ \
+	@LTLIBXERCES_C@
 
 libcbtf_xml_la_SOURCES = \
 	Network.hpp Network.cpp \

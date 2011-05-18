@@ -21,18 +21,24 @@ noinst_PROGRAMS = test
 test_CXXFLAGS = \
 	-I$(top_srcdir)/include \
 	-DBUILDDIR="\"$(abs_builddir)\"" \
+	@BOOST_CPPFLAGS@ \
+	@CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@ \
+	@LIBXERCES_C_CPPFLAGS@ \
 	@MRNET_CPPFLAGS@ \
-	@BOOST_CPPFLAGS@ @LIBXERCES_C_CPPFLAGS@ @CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@
 
 test_LDFLAGS = \
 	-L$(top_srcdir)/src \
-	@MRNET_LDFLAGS@ \
-	@BOOST_LDFLAGS@ @LIBXERCES_C_LDFLAGS@ @CBTF_LDFLAGS@ @CBTF_XML_LDFLAGS@
+	@BOOST_LDFLAGS@ \
+	@CBTF_LDFLAGS@ @CBTF_XML_LDFLAGS@ \
+	@LIBXERCES_C_LDFLAGS@ \
+	@MRNET_LDFLAGS@
 
 test_LDADD = \
 	-lcbtf-mrnet \
-	@MRNET_LIBS@ \
-	@BOOST_UNIT_TEST_FRAMEWORK_LIB@ @LIBXERCES_C@ @CBTF_LIBS@ @CBTF_XML_LIBS@
+	@BOOST_UNIT_TEST_FRAMEWORK_LIB@ \
+	@CBTF_LIBS@ @CBTF_XML_LIBS@ \
+	@LIBXERCES_C@ \
+	@MRNET_LIBS@
 
 test_SOURCES = \
 	messages.x messages.h messages.c \
@@ -49,13 +55,17 @@ messages.h messages.c : messages.x
 noinst_LTLIBRARIES = plugin.la
 
 plugin_la_CXXFLAGS = \
-	@BOOST_CPPFLAGS@ @MRNET_CPPFLAGS@ @CBTF_CPPFLAGS@
+	@BOOST_CPPFLAGS@ \
+	@CBTF_CPPFLAGS@ \
+	@MRNET_CPPFLAGS@
 
 plugin_la_LDFLAGS = \
 	-module -avoid-version -rpath /ForceShared \
-	@MRNET_LDFLAGS@ @CBTF_LDFLAGS@
+	@CBTF_LDFLAGS@ \
+	@MRNET_LDFLAGS@
 
 plugin_la_LIBADD = \
-	@MRNET_LIBS@ @CBTF_LIBS@
+	@CBTF_LIBS@ \
+	@MRNET_LIBS@
 
 plugin_la_SOURCES = plugin.cpp

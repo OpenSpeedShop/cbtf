@@ -21,10 +21,22 @@ noinst_PROGRAMS = test
 test_CXXFLAGS = \
 	-I$(top_srcdir)/include \
 	-DBUILDDIR="\"$(abs_builddir)\"" \
-	@BOOST_CPPFLAGS@ @CBTF_CPPFLAGS@ @LIBXERCES_C_CPPFLAGS@
+	@BOOST_CPPFLAGS@ \
+	@CBTF_CPPFLAGS@ \
+	@LIBXERCES_C_CPPFLAGS@
 
-test_LDFLAGS = -L$(top_srcdir)/src @BOOST_LDFLAGS@ @CBTF_LDFLAGS@ @LIBXERCES_C_LDFLAGS@
-test_LDADD = -lcbtf-xml @BOOST_UNIT_TEST_FRAMEWORK_LIB@ @CBTF_LIBS@ @LIBXERCES_C@
+test_LDFLAGS = \
+	-L$(top_srcdir)/src \
+	@BOOST_LDFLAGS@ \
+	@CBTF_LDFLAGS@ \
+	@LIBXERCES_C_LDFLAGS@
+
+test_LDADD = \
+	-lcbtf-xml \
+	@BOOST_UNIT_TEST_FRAMEWORK_LIB@ \
+	@CBTF_LIBS@ \
+	@LIBXERCES_C@
+
 test_SOURCES = test.cpp
 
 noinst_LTLIBRARIES = plugin.la
