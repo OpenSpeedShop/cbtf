@@ -39,7 +39,7 @@ plugin_la_CXXFLAGS = \
 	-I$(top_srcdir)/include \
 	@BOOST_CPPFLAGS@
 
-plugin_la_LDFLAGS = 
+plugin_la_LDFLAGS = \
 	-L$(top_srcdir)/src \
 	-module -avoid-version -rpath /ForceShared
 
