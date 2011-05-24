@@ -52,10 +52,22 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * Invoke the handler with the specified value.
          *
          * @param value    Value to pass to the handler.
+         *
+         * @note    It would be better to use boost::any_cast below instead of
+         *          boost::unsafe_any_cast. Unfortunately boost::any_cast uses
+         *          (as of Boost 1.40 anyway) direct equality comparisons of
+         *          typeinfo objects. Doing so is not supported across shared
+         *          library boundaries by GCC, and packaging components into
+         *          shared libraries is a rather important feature... So until
+         *          either the Boost or GCC folks fix this, the unsafe cast is
+         *          going to be necessary.
+         *
+         * @sa http://gcc.gnu.org/faq.html#dso
          */
         virtual void operator()(const boost::any& value) const
         {
-            dm_handler(boost::any_cast<T>(value));
+            // dm_handler(boost::any_cast<T>(value));
+            dm_handler(*boost::unsafe_any_cast<T>(&value));
         }
 
         /** Handler being invoked. */
