@@ -21,6 +21,7 @@ noinst_PROGRAMS = test
 test_CXXFLAGS = \
 	-I$(top_srcdir)/include \
 	-DBUILDDIR="\"$(abs_builddir)\"" \
+	-DTOPDIR="\"$(top_srcdir)\"" \
 	@BOOST_CPPFLAGS@ \
 	@CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@ \
 	@LIBXERCES_C_CPPFLAGS@ \

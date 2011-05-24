@@ -17,4 +17,5 @@
 ################################################################################
 
 nobase_include_HEADERS = \
+	KrellInstitute/CBTF/Impl/MRNet.hpp \
 	KrellInstitute/CBTF/XDR.hpp

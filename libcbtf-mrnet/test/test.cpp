@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
     BOOST_CHECK_NE(available_types.find(Type("TestNetwork")),
                    available_types.end());
     
-    // Test component network instantiation and metadata
+    // Test distributed component network instantiation and metadata
     Component::Instance network;
     BOOST_CHECK_NO_THROW(
         network = Component::instantiate(Type("TestNetwork"))
@@ -106,25 +106,40 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
     BOOST_CHECK_NE(inputs.find("in"), inputs.end());
     std::map<std::string, Type> outputs = network->getOutputs();
     BOOST_CHECK_NE(outputs.find("out"), outputs.end());
+
+    // Test instantiation of the basic launcher component
+
+    BOOST_REQUIRE_NO_THROW(Component::registerPlugin(
+        boost::filesystem::path(TOPDIR) / "launchers" / "BasicMRNetLaunchers"
+        ));
+    Component::Instance launcher;
+    BOOST_CHECK_NO_THROW(
+        launcher = Component::instantiate(Type("SimpleMRNetLauncher"))
+        );
     
-    // Test component network intercommunication
+    // Test distributed component network intercommunication
+
     boost::shared_ptr<ValueSource<boost::filesystem::path> > topology_value =
         ValueSource<boost::filesystem::path>::instantiate();
     boost::shared_ptr<ValueSource<int> > input_value = 
         ValueSource<int>::instantiate();
     boost::shared_ptr<ValueSink<int> > output_value = 
         ValueSink<int>::instantiate();
+
     Component::Instance topology_value_component = 
         boost::reinterpret_pointer_cast<Component>(topology_value);
     Component::Instance input_value_component = 
         boost::reinterpret_pointer_cast<Component>(input_value);
     Component::Instance output_value_component = 
         boost::reinterpret_pointer_cast<Component>(output_value);
+
     Component::connect(
-        topology_value_component, "value", network, "TopologyFile"
+        topology_value_component, "value", launcher, "TopologyFile"
         );
+    Component::connect(launcher, "Network", network, "Network");
     Component::connect(input_value_component, "value", network, "in");
     Component::connect(network, "out", output_value_component, "value");
+
     *topology_value = boost::filesystem::path(BUILDDIR) / "test.topology";
     *input_value = 10;
     BOOST_CHECK_EQUAL(26, *output_value);

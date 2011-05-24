@@ -56,13 +56,6 @@ cd libcbtf-mrnet
 make install
 cd ..
 
-cd components/BasicMRNetLauncher
-./bootstrap
-./configure --prefix=$CBTF_PREFIX $mrnet_option \
-    --with-cbtf=$CBTF_PREFIX
-make install
-cd ..
-
 echo "    "
 echo "Finished building and installing CBTF Framework into $CBTF_PREFIX !"
 echo "    "

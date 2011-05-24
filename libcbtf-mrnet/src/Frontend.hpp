@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/utility.hpp>
@@ -48,17 +48,16 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
     public:
 
         /**
-         * Construct the frontend for a new instance of the network described by
-         * the specified MRNet topology file. Establishes the stream used by the
-         * backends to pass data to the frontend, then starts a thread executing
-         * this frontend's message pump.
+         * Construct the frontend for the given MRNet network. Establishes the
+         * stream used by backends to pass data to the frontend, then starts a
+         * thread executing this frontend's message pump.
          *
-         * @param path    Path of the MRNet topology file.
+         * @param network    MRNet network containing this frontend.
          *
          * @throw std::runtime_error    Unable to initialize MRNet.
          */
-        Frontend(const boost::filesystem::path& path);
-
+        Frontend(const boost::shared_ptr<MRN::Network>& network);
+        
         /**
          * Destroy this frontend. Instructs all of the corresponding network's
          * backends to exit, waits for them to do so, and then terminates this
@@ -104,10 +103,10 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
         boost::shared_mutex dm_message_handlers_mutex;
         
         /** MRNet network containing this frontend. */
-        MRN::Network* dm_mrnet_network;
+        boost::shared_ptr<MRN::Network> dm_network;
 
         /** MRNet stream used to pass data within this network. */
-        MRN::Stream* dm_mrnet_stream;
+        MRN::Stream* dm_stream;
         
         /** Thread executing this frontend's message pump. */
         boost::thread dm_message_pump_thread;

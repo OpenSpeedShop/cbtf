@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -18,21 +18,24 @@
 
 plugindir = $(libdir)/KrellInstitute/CBTF
 
-plugin_LTLIBRARIES = BasicMRNetLauncher.la
+plugin_LTLIBRARIES = BasicMRNetLaunchers.la
 
-BasicMRNetLauncher_la_CXXFLAGS = \
+BasicMRNetLaunchers_la_CXXFLAGS = \
+	-I$(top_srcdir)/include \
 	@BOOST_CPPFLAGS@ \
 	@CBTF_CPPFLAGS@ \
 	@MRNET_CPPFLAGS@
 
-BasicMRNetLauncher_la_LDFLAGS = \
-	-module -avoid-version -rpath /ForceShared \
+BasicMRNetLaunchers_la_LDFLAGS = \
+	-module -avoid-version \
+	-L$(top_srcdir)/src \
 	@CBTF_LDFLAGS@ \
 	@MRNET_LDFLAGS@
 
-BasicMRNetLauncher_la_LIBADD = \
+BasicMRNetLaunchers_la_LIBADD = \
+	-lcbtf-mrnet \
 	@CBTF_LIBS@ \
 	@MRNET_LIBS@
 
-BasicMRNetLauncher_la_SOURCES = \
-	BasicMRNetLauncher.cpp
+BasicMRNetLaunchers_la_SOURCES = \
+	SimpleMRNetLauncher.cpp

@@ -21,6 +21,7 @@
 #include <boost/bind.hpp>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
 #include <KrellInstitute/CBTF/Impl/InputMediator.hpp>
+#include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <KrellInstitute/CBTF/Impl/OutputMediator.hpp>
 #include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
@@ -61,6 +62,43 @@ namespace {
     }
     
 } // namespace <anonymous>
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+boost::filesystem::path Impl::getMRNetBackendPath()
+{
+    return boost::filesystem::path(BINDIR) /
+        boost::filesystem::path("libcbtf-mrnet-backend");
+}
+
+
+
+//------------------------------------------------------------------------------
+// Determine the type of debugging that should be enabled, construct the
+// arguments to the MRNet backend executable, and return those arguments.
+//------------------------------------------------------------------------------
+std::vector<std::string> Impl::getMRNetBackendArguments()
+{
+    bool is_backend_debug_enabled =
+        ((getenv("CBTF_DEBUG_MRNET") != NULL) ||
+         (getenv("CBTF_DEBUG_MRNET_BACKEND") != NULL));
+    bool is_tracing_debug_enabled = 
+        (getenv("CBTF_DEBUG_MRNET_TRACING") != NULL);
+    
+    std::vector<std::string> arguments;
+    if (is_backend_debug_enabled)
+    {
+        arguments.push_back("--debug");
+    }
+    if (is_tracing_debug_enabled)
+    {
+        arguments.push_back("--tracing");
+    }
+    
+    return arguments;
+}
 
 
 
@@ -140,8 +178,8 @@ MRNet::MRNet(const Type& type, const Version& version,
     xercesc::selectNodes(root, "./Output",
                          boost::bind(&MRNet::parseOutput, this, _1));
 
-    declareInput<boost::filesystem::path>(
-        "TopologyFile", boost::bind(&MRNet::handleTopologyFile, this, _1)
+    declareInput<boost::shared_ptr<MRN::Network> >(
+        "Network", boost::bind(&MRNet::handleNetwork, this, _1)
         );    
 }
 
@@ -164,20 +202,18 @@ void MRNet::bindIncomingUpstream(
 
 
 //------------------------------------------------------------------------------
-// Create a new MRNet frontend using the specified topology file, create the
+// Create a new MRNet frontend using the specified MRNet network, create the
 // necessary stream mediators, and then send the named streams, filters, and
 // backend specifications.
 //------------------------------------------------------------------------------
-void MRNet::handleTopologyFile(const boost::filesystem::path& path)
+void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
 {
     if (dm_frontend)
     {
-        raise<std::runtime_error>(
-            "Only one topology file may be specified."
-            );
+        raise<std::runtime_error>("Only one MRNet network may be specified.");
     }
     
-    dm_frontend.reset(new Frontend(path));
+    dm_frontend.reset(new Frontend(network));
 
     dm_local_component_network.initializeStepThree(
         boost::bind(&MRNet::bindIncomingUpstream, this, _1),

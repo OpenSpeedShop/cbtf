@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/thread/locks.hpp>
 #include <iostream>
 #include <KrellInstitute/CBTF/Impl/Raise.hpp>
@@ -38,12 +39,12 @@ using namespace KrellInstitute::CBTF::Impl;
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Frontend::Frontend(const boost::filesystem::path& topologyFilePath) :
+Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
     dm_is_debug_enabled(false),
     dm_message_handlers(),
     dm_message_handlers_mutex(),
-    dm_mrnet_network(NULL),
-    dm_mrnet_stream(NULL),
+    dm_network(network),
+    dm_stream(NULL),
     dm_message_pump_thread()
 {
     // Determine the type of debugging that should be enabled
@@ -53,52 +54,17 @@ Frontend::Frontend(const boost::filesystem::path& topologyFilePath) :
     bool is_filter_debug_enabled =
         ((getenv("CBTF_DEBUG_MRNET") != NULL) ||
          (getenv("CBTF_DEBUG_MRNET_FILTER") != NULL));
-    bool is_backend_debug_enabled =
-        ((getenv("CBTF_DEBUG_MRNET") != NULL) ||
-         (getenv("CBTF_DEBUG_MRNET_BACKEND") != NULL));
     bool is_tracing_debug_enabled = 
         (getenv("CBTF_DEBUG_MRNET_TRACING") != NULL);
-    
-    // Construct the arguments to the MRNet backend
-    std::vector<std::string> arguments;
-    if (is_backend_debug_enabled)
-    {
-        arguments.push_back("--debug");
-    }
-    if (is_tracing_debug_enabled)
-    {
-        arguments.push_back("--tracing");
-    }
-    
-    // Translate the arguments into an argv-style argument list
-    const char** argv = new const char*[arguments.size() + 1];
-    for (std::vector<std::string>::size_type i = 0; i < arguments.size(); ++i)
-    {
-        argv[i] = arguments[i].c_str();
-    }
-    argv[arguments.size()] = NULL;
-    
-    // Initialize the MRNet library (participating as the frontend)
+
+    // Enable tracing in the MRNet library (if appropriate)
     if (is_tracing_debug_enabled)
     {
         MRN::set_OutputLevel(MRN::MAX_OUTPUT_LEVEL);
     }
-    dm_mrnet_network = MRN::Network::CreateNetworkFE(
-        topologyFilePath.string().c_str(),
-        (boost::filesystem::path(BINDIR) /
-         boost::filesystem::path("libcbtf-mrnet-backend")).string().c_str(),
-        argv
-        );
-    if (dm_mrnet_network->has_Error())
-    {
-        raise<std::runtime_error>("Unable to initialize MRNet.");
-    }
-    
-    // Destroy the argv-style argument list
-    delete [] argv;
 
     // Load the upstream filter
-    int upstream_filter = dm_mrnet_network->load_FilterFunc(
+    int upstream_filter = dm_network->load_FilterFunc(
         (boost::filesystem::path(LIBDIR) / 
          boost::filesystem::path("libcbtf-mrnet-filter.so")).string().c_str(),
         "libcbtf_mrnet_upstream_filter"
@@ -112,7 +78,7 @@ Frontend::Frontend(const boost::filesystem::path& topologyFilePath) :
     }
 
     // Load the downstream filter
-    int downstream_filter = dm_mrnet_network->load_FilterFunc(
+    int downstream_filter = dm_network->load_FilterFunc(
         (boost::filesystem::path(LIBDIR) / 
          boost::filesystem::path("libcbtf-mrnet-filter.so")).string().c_str(),
         "libcbtf_mrnet_downstream_filter"
@@ -126,29 +92,29 @@ Frontend::Frontend(const boost::filesystem::path& topologyFilePath) :
     }
 
     // Establish the stream used to pass data within this network
-    dm_mrnet_stream = dm_mrnet_network->new_Stream(
-        dm_mrnet_network->get_BroadcastCommunicator(),
+    dm_stream = dm_network->new_Stream(
+        dm_network->get_BroadcastCommunicator(),
         upstream_filter, MRN::SFILTER_DONTWAIT, downstream_filter
         );
-    if ((dm_mrnet_stream == NULL) ||
-        (dm_mrnet_stream->send(MessageTags::EstablishUpstream, 0) != 0) ||
-        (dm_mrnet_stream->flush() != 0))
+    if ((dm_stream == NULL) ||
+        (dm_stream->send(MessageTags::EstablishUpstream, 0) != 0) ||
+        (dm_stream->flush() != 0))
     {
         raise<std::runtime_error>("Unable to connect to the backends.");
     }
 
     // Configure the upstream and downstream filters
-    if (dm_mrnet_stream->set_FilterParameters(
+    if (dm_stream->set_FilterParameters(
             MRN::FILTER_UPSTREAM_TRANS, "%ud %d %d", 
-            dm_mrnet_stream->get_Id(),
+            dm_stream->get_Id(),
             is_filter_debug_enabled ? 1 : 0,
             is_tracing_debug_enabled ? 1 : 0) != 0)
     {
         raise<std::runtime_error>("Unable to configure the upstream filter.");
     }
-    if (dm_mrnet_stream->set_FilterParameters(
+    if (dm_stream->set_FilterParameters(
             MRN::FILTER_DOWNSTREAM_TRANS, "%ud %d %d", 
-            dm_mrnet_stream->get_Id(),
+            dm_stream->get_Id(),
             is_filter_debug_enabled ? 1 : 0,
             is_tracing_debug_enabled ? 1 : 0) != 0)
     {
@@ -180,13 +146,13 @@ Frontend::~Frontend()
     
     // Iterate until all backends are ready to shutdown
     int remaining_endpoints =
-        dm_mrnet_network->get_BroadcastCommunicator()->get_EndPoints().size();
+        dm_network->get_BroadcastCommunicator()->get_EndPoints().size();
     while (remaining_endpoints > 0)
     {
         // Receive the next available message
         int tag = -1;
         MRN::PacketPtr packet;
-        int retval = dm_mrnet_stream->recv(&tag, packet, false);
+        int retval = dm_stream->recv(&tag, packet, false);
         if (retval == 0)
         {
             continue;
@@ -215,10 +181,7 @@ Frontend::~Frontend()
     }
 
     // Destroy the stream used to pass data within this network
-    delete dm_mrnet_stream;
-    
-    // Finalize the MRNet library
-    delete dm_mrnet_network;
+    delete dm_stream;
 }
 
 
@@ -247,23 +210,19 @@ void Frontend::sendToBackends(const MRN::PacketPtr& packet)
     }
 
     // Insure the packet containing the message has the correct stream ID
-    if (dm_mrnet_stream == NULL)
+    if (dm_stream == NULL)
     {
-        raise<std::runtime_error>(
-            "The MRNet stream hasn't been created yet."
-            );
+        raise<std::runtime_error>("The MRNet stream hasn't been created yet.");
     }
-    packet->set_StreamId(dm_mrnet_stream->get_Id());
+    packet->set_StreamId(dm_stream->get_Id());
 
     // Send the message
-    int retval = dm_mrnet_stream->send(
-        const_cast<MRN::PacketPtr&>(packet)
-        );
+    int retval = dm_stream->send(const_cast<MRN::PacketPtr&>(packet));
     if (retval != 0)
     {
         raise<std::runtime_error>("Failed to send the specified message.");
     }
-    retval = dm_mrnet_stream->flush();
+    retval = dm_stream->flush();
     if (retval != 0)
     {
         raise<std::runtime_error>("Failed to send the specified message.");
@@ -281,9 +240,7 @@ void Frontend::sendToBackends(const MRN::PacketPtr& packet)
 void Frontend::doMessagePump()
 {
     // Get the file descriptor for MRNet data event notification
-    int mrnet_fd = dm_mrnet_network->get_EventNotificationFd(
-        MRN::Event::DATA_EVENT
-        );
+    int mrnet_fd = dm_network->get_EventNotificationFd(MRN::Event::DATA_EVENT);
     
     // Run the message pump until instructed to exit
     try
@@ -314,7 +271,7 @@ void Frontend::doMessagePump()
                     // Receive the next available message
                     int tag = -1;
                     MRN::PacketPtr packet;
-                    int retval = dm_mrnet_stream->recv(&tag, packet, false);
+                    int retval = dm_stream->recv(&tag, packet, false);
                     if (retval == 0)
                     {
                         break;
@@ -363,7 +320,7 @@ void Frontend::doMessagePump()
                     }
                     
                     // Reset MRNet data event notification
-                    dm_mrnet_network->clear_EventNotificationFd(
+                    dm_network->clear_EventNotificationFd(
                         MRN::Event::DATA_EVENT
                         );
                 }

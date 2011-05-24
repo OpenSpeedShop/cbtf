@@ -16,45 +16,30 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
 
-/** @file Plugin providing the basic MRNet launcher. */
+/** @file Declaration of MRNet implementation functions. */
 
-#include <boost/bind.hpp>
-#include <typeinfo>
+#pragma once
 
-#include <KrellInstitute/CBTF/Component.hpp>
-#include <KrellInstitute/CBTF/Type.hpp>
-#include <KrellInstitute/CBTF/Version.hpp>
+#include <boost/filesystem.hpp>
+#include <string>
+#include <vector>
 
-using namespace KrellInstitute::CBTF;
+namespace KrellInstitute { namespace CBTF { namespace Impl {
 
+    /**
+     * Get the path of the MRNet backend executable. Typically used by MRNet
+     * launcher components when starting backend processes.
+     *
+     * @return    Path of the MRNet backend executable.
+     */
+    boost::filesystem::path getMRNetBackendPath();
 
-
-/**
- * ...
- */
-class __attribute__ ((visibility ("hidden"))) BasicMRNetLauncher :
-    public Component
-{
-
-public:
-
-    /** Factory function for this component type. */
-    static Component::Instance factoryFunction()
-    {
-        return Component::Instance(
-            reinterpret_cast<Component*>(new BasicMRNetLauncher())
-            );
-    }
-
-private:
-
-    /** Default constructor. */
-    BasicMRNetLauncher() :
-        Component(Type(typeid(BasicMRNetLauncher)), Version(0, 0, 0))
-    {
-        // TODO: Declare inputs & outputs
-    }
-
-}; // class BasicMRNetLauncher
-
-KRELL_INSTITUTE_CBTF_REGISTER_FACTORY_FUNCTION(BasicMRNetLauncher)
+    /**
+     * Get the arguments to the MRNet backend executable. Typically used by
+     * MRNet launcher components when starting backend processes.
+     *
+     * @return    Arguments to the MRNet backend executable.
+     */
+    std::vector<std::string> getMRNetBackendArguments();
+            
+} } } // namespace KrellInstitute::CBTF::Impl

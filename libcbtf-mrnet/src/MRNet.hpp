@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <KrellInstitute/CBTF/Component.hpp>
 #include <KrellInstitute/CBTF/Type.hpp>
 #include <KrellInstitute/CBTF/Version.hpp>
+#include <mrnet/MRNet.h>
 #include <vector>
 #include <xercesc/dom/DOM.hpp>
 
@@ -103,9 +103,9 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
             boost::shared_ptr<IncomingStreamMediator>& mediator
             );
         
-        /** Handler for the "TopologyFile" input. */
-        void handleTopologyFile(const boost::filesystem::path& path);
-
+        /** Handler for the "Network" input. */
+        void handleNetwork(const boost::shared_ptr<MRN::Network>& network);
+        
         /** Parse the specified BackendType node. */
         void parseBackend(const xercesc::DOMNode* node);
 

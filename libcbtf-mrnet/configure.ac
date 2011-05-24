@@ -72,6 +72,7 @@ AC_CONFIG_FILES([
     data/Makefile
     filter/Makefile
     include/Makefile
+    launchers/Makefile
     src/Makefile
     test/Makefile
 ])
