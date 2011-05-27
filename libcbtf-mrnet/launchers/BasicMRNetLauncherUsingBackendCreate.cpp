@@ -16,7 +16,7 @@
 // 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
 
-/** @file Component providing the simplest MRNet launcher. */
+/** @file Component for a basic MRNet launcher using backend-create mode. */
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -36,10 +36,11 @@ using namespace KrellInstitute::CBTF::Impl;
 
 
 /**
- * Simple MRNet launcher that instantiates the internal and backend processes
+ * Basic MRNet launcher that instantiates the internal and backend processes
  * directly using MRNet's built-in rsh/ssh based facilities for this purpose.
  */
-class __attribute__ ((visibility ("hidden"))) SimpleMRNetLauncher :
+class __attribute__ ((visibility ("hidden"))) 
+BasicMRNetLauncherUsingBackendCreate :
     public Component
 {
 
@@ -48,25 +49,29 @@ public:
     /** Factory function for this component type. */
     static Component::Instance factoryFunction()
     {
-        return Component::Instance(
-            reinterpret_cast<Component*>(new SimpleMRNetLauncher())
-            );
+        return Component::Instance(reinterpret_cast<Component*>(
+            new BasicMRNetLauncherUsingBackendCreate()
+            ));
     }
 
 private:
 
     /** Default constructor. */
-    SimpleMRNetLauncher() :
-        Component(Type(typeid(SimpleMRNetLauncher)), Version(0, 0, 0))
+    BasicMRNetLauncherUsingBackendCreate() :
+        Component(Type(typeid(BasicMRNetLauncherUsingBackendCreate)), 
+                  Version(0, 0, 0))
     {
         declareInput<boost::filesystem::path>(
             "TopologyFile",
-            boost::bind(&SimpleMRNetLauncher::handleTopologyFile, this, _1)
+            boost::bind(
+                &BasicMRNetLauncherUsingBackendCreate::handleTopologyFile,
+                this, _1
+                )
             );
 
         declareOutput<boost::shared_ptr<MRN::Network> >("Network");
     }
-
+    
     /** Handler for the "TopologyFile" input. */
     void handleTopologyFile(const boost::filesystem::path& path)
     {
@@ -99,6 +104,8 @@ private:
         emitOutput("Network", network);
     }
 
-}; // class SimpleMRNetLauncher
+}; // class BasicMRNetLauncherUsingBackendCreate
 
-KRELL_INSTITUTE_CBTF_REGISTER_FACTORY_FUNCTION(SimpleMRNetLauncher)
+KRELL_INSTITUTE_CBTF_REGISTER_FACTORY_FUNCTION(
+    BasicMRNetLauncherUsingBackendCreate
+    )

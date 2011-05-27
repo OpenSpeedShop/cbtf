@@ -38,4 +38,5 @@ BasicMRNetLaunchers_la_LIBADD = \
 	@MRNET_LIBS@
 
 BasicMRNetLaunchers_la_SOURCES = \
-	SimpleMRNetLauncher.cpp
+	BasicMRNetLauncherUsingBackendAttach.cpp \
+	BasicMRNetLauncherUsingBackendCreate.cpp

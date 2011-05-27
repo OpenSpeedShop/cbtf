@@ -114,7 +114,9 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
         ));
     Component::Instance launcher;
     BOOST_CHECK_NO_THROW(
-        launcher = Component::instantiate(Type("SimpleMRNetLauncher"))
+        launcher = Component::instantiate(
+            Type("BasicMRNetLauncherUsingBackendCreate")
+            )
         );
     
     // Test distributed component network intercommunication
