@@ -81,7 +81,7 @@ private:
         Component(Type(typeid(BasicMRNetLauncherUsingBackendAttach)), 
                   Version(0, 0, 0)),
         dm_backend_attach_count(1),
-        dm_backend_attach_file("~/.openspeedshop/attachBE_connections")
+        dm_backend_attach_file("~/.cbtf/attachBE_connections")
     {
         declareInput<unsigned int>(
             "BackendAttachCount",
@@ -118,7 +118,23 @@ private:
     /** Handler for the "BackendAttachFile" input. */
     void handleBackendAttachFile(const boost::filesystem::path& path)
     {
-        dm_backend_attach_file = path;
+	std::string mypath(path.string());
+
+	if (not mypath.empty() and mypath[0] == '~') {
+	    assert(mypath.size() == 1 or mypath[1] == '/');
+	    char const* home = getenv("HOME");
+	    if (home) {
+		mypath.replace(0, 1, home);
+	    }
+
+            boost::filesystem::path newpath(mypath);
+            dm_backend_attach_file = newpath;
+
+	} else {
+
+            dm_backend_attach_file = path;
+
+	}
     }
     
     /** Handler for the "TopologyFile" input. */
@@ -145,8 +161,23 @@ private:
         std::vector<MRN::NetworkTopology::Node*> leaves;
         network->get_NetworkTopology()->get_Leaves(leaves);
 
+	std::string mypath(dm_backend_attach_file.string());
+
+	if (not mypath.empty() and mypath[0] == '~') {
+	    assert(mypath.size() == 1 or mypath[1] == '/');
+	    char const* home = getenv("HOME");
+	    if (home) {
+		mypath.replace(0, 1, home);
+	    }
+
+            boost::filesystem::path newpath(mypath);
+            dm_backend_attach_file = newpath;
+
+	}
+
         // Write the backend-attach connection file
-        boost::filesystem::fstream stream(dm_backend_attach_file);
+        boost::filesystem::ofstream stream(dm_backend_attach_file);
+
         for (int i = 0; i < dm_backend_attach_count; ++i)
         {
             const int l = i * leaves.size() / dm_backend_attach_count;
@@ -162,7 +193,7 @@ private:
         {
             sleep(1);
         }
-        
+
         // Emit the MRNet network on this component's "Network" output
         emitOutput("Network", network);
     }
