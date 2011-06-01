@@ -27,3 +27,4 @@ stamp-h1
 test/messages.c
 test/messages.h
 test/test
+test/testBEattach
