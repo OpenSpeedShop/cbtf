@@ -16,7 +16,7 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-noinst_PROGRAMS = test
+noinst_PROGRAMS = test testBEattach
 
 test_CXXFLAGS = \
 	-I$(top_srcdir)/include \
@@ -44,6 +44,33 @@ test_LDADD = \
 test_SOURCES = \
 	messages.x messages.h messages.c \
 	test.cpp
+
+testBEattach_CXXFLAGS = \
+	-I$(top_srcdir)/include \
+	-DBUILDDIR="\"$(abs_builddir)\"" \
+	-DTOPDIR="\"$(top_srcdir)\"" \
+	@BOOST_CPPFLAGS@ \
+	@CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@ \
+	@LIBXERCES_C_CPPFLAGS@ \
+	@MRNET_CPPFLAGS@
+
+testBEattach_LDFLAGS = \
+	-L$(top_srcdir)/src \
+	@BOOST_LDFLAGS@ \
+	@CBTF_LDFLAGS@ @CBTF_XML_LDFLAGS@ \
+	@LIBXERCES_C_LDFLAGS@ \
+	@MRNET_LDFLAGS@
+
+testBEattach_LDADD = \
+	-lcbtf-mrnet \
+	@BOOST_UNIT_TEST_FRAMEWORK_LIB@ \
+	@CBTF_LIBS@ @CBTF_XML_LIBS@ \
+	@LIBXERCES_C@ \
+	@MRNET_LIBS@
+
+testBEattach_SOURCES = \
+	messages.x messages.h messages.c \
+	testBEattach.cpp
 
 SUFFIXES = .x
 CLEANFILES = messages.h messages.c
