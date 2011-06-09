@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2010 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -16,14 +16,11 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-nobase_include_HEADERS = \
-	KrellInstitute/CBTF/BoostExts.hpp \
-	KrellInstitute/CBTF/Component.hpp \
-	KrellInstitute/CBTF/Impl/InvokerFor.hpp \
-	KrellInstitute/CBTF/Impl/InvokerForAny.hpp \
-	KrellInstitute/CBTF/Impl/Invoker.hpp \
-	KrellInstitute/CBTF/Impl/Raise.hpp \
-	KrellInstitute/CBTF/Type.hpp \
-	KrellInstitute/CBTF/ValueSink.hpp \
-	KrellInstitute/CBTF/ValueSource.hpp \
-	KrellInstitute/CBTF/Version.hpp
+cmake_minimum_required(VERSION 2.8.0)
+
+project(libcbtf)
+
+add_subdirectory(include)
+add_subdirectory(src)
+#add_subdirectory(test)
+#add_subdirectory(examples)

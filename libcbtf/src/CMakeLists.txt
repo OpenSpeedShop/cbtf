@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2010 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -16,25 +16,23 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-lib_LTLIBRARIES = libcbtf.la
+find_package(Boost 1.35.0 REQUIRED COMPONENTS system thread)
 
-libcbtf_la_CXXFLAGS = \
-	-I$(top_srcdir)/include \
-	@BOOST_CPPFLAGS@ \
-	@LTDLINCL@ 
+add_library(cbtf SHARED
+    Component.cpp
+    ComponentImpl.hpp ComponentImpl.cpp
+    Type.cpp
+    TypeImpl.hpp TypeImpl.cpp
+    Version.cpp
+    VersionImpl.hpp VersionImpl.cpp
+    )
 
-libcbtf_la_LDFLAGS = \
-	-version-info 0:0:0 \
-	@BOOST_LDFLAGS@
+include_directories( ${Boost_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/include)
 
-libcbtf_la_LIBADD = \
-	@BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ \
-	@LIBLTDL@
+target_link_libraries(cbtf ${Boost_LIBRARIES})
 
-libcbtf_la_SOURCES = \
-	Component.cpp \
-	ComponentImpl.hpp ComponentImpl.cpp \
-	Type.cpp \
-	TypeImpl.hpp TypeImpl.cpp \
-	Version.cpp \
-	VersionImpl.hpp VersionImpl.cpp
+install(TARGETS cbtf
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
