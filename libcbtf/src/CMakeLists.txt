@@ -27,7 +27,7 @@ add_library(cbtf SHARED
     VersionImpl.hpp VersionImpl.cpp
     )
 
-include_directories( ${Boost_INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include ${Boost_INCLUDE_DIR})
 
 target_link_libraries(cbtf ${Boost_LIBRARIES})
 
