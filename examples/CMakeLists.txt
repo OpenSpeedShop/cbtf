@@ -16,29 +16,3 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-add_library(cbtf SHARED
-    Component.cpp
-    ComponentImpl.hpp ComponentImpl.cpp
-    Type.cpp
-    TypeImpl.hpp TypeImpl.cpp
-    Version.cpp
-    VersionImpl.hpp VersionImpl.cpp
-    )
-
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${Boost_INCLUDE_DIR}
-    )
-  
-target_link_libraries(cbtf
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
-    )
-
-install(DIRECTORY KrellInstitute DESTINATION include)
-
-install(TARGETS cbtf
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    )

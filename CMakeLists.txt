@@ -16,29 +16,15 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-add_library(cbtf SHARED
-    Component.cpp
-    ComponentImpl.hpp ComponentImpl.cpp
-    Type.cpp
-    TypeImpl.hpp TypeImpl.cpp
-    Version.cpp
-    VersionImpl.hpp VersionImpl.cpp
+cmake_minimum_required(VERSION 2.8.0)
+
+project(CBTF)
+
+find_package(Boost 1.35.0 REQUIRED
+    COMPONENTS date_time filesystem system thread unit_test_framework
     )
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${Boost_INCLUDE_DIR}
-    )
-  
-target_link_libraries(cbtf
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
-    )
+add_subdirectory(libcbtf)
 
-install(DIRECTORY KrellInstitute DESTINATION include)
-
-install(TARGETS cbtf
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    )
+#add_subdirectory(examples)
+#add_subdirectory(test)
