@@ -16,11 +16,23 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-cmake_minimum_required(VERSION 2.8.0)
+find_package(Boost 1.35.0 REQUIRED COMPONENTS system thread)
 
-project(libcbtf)
+add_library(cbtf SHARED
+    Component.cpp
+    ComponentImpl.hpp ComponentImpl.cpp
+    Type.cpp
+    TypeImpl.hpp TypeImpl.cpp
+    Version.cpp
+    VersionImpl.hpp VersionImpl.cpp
+    )
 
-add_subdirectory(include)
-add_subdirectory(src)
-#add_subdirectory(test)
-#add_subdirectory(examples)
+include_directories(${PROJECT_SOURCE_DIR}/include ${Boost_INCLUDE_DIR})
+
+target_link_libraries(cbtf ${Boost_LIBRARIES})
+
+install(TARGETS cbtf
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
