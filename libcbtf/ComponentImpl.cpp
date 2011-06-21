@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -22,8 +22,8 @@
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
 #include <boost/thread/once.hpp>
+#include <dlfcn.h>
 #include <KrellInstitute/CBTF/Impl/Raise.hpp>
-#include <ltdl.h>
 #include <stdexcept>
 
 #include "ComponentImpl.hpp"
@@ -33,41 +33,21 @@ using namespace KrellInstitute::CBTF::Impl;
 
 
 
-/** Anonymous namespace hiding implementation details. */
-namespace {
-
-    /** Flag used to insure libltdl is initialized only once. */
-    boost::once_flag is_libltdl_initialized = BOOST_ONCE_INIT;
-
-    /** Initialize libltdl. */
-    void initializeLibltdl()
-    {
-        if (lt_dlinit() != 0)
-        {
-            raise<std::runtime_error>(
-                "Libltdl failed to initialize, reporting \"%1%\".", lt_dlerror()
-                );
-        }
-    }
-    
-} // namespace <anonymous>
-
-
-
 //------------------------------------------------------------------------------
 // Load the module with the specified path. Loading the module causes all of
 // the components contained within the module to be registered with this class.
 //------------------------------------------------------------------------------
 void ComponentImpl::registerPlugin(const boost::filesystem::path& path)
 {
-    boost::call_once(is_libltdl_initialized, initializeLibltdl);
+    boost::filesystem::path real_path = path.extension().empty() ?
+        boost::filesystem::change_extension(path, ".so") : path;
 
-    if (lt_dlopenext(path.string().c_str()) == NULL)
+    if (dlopen(real_path.string().c_str(), RTLD_NOW) == NULL)
     {
         raise<std::runtime_error>(
             "The specified plugin (%1%) doesn't exist or is not "
-            "of the correct format. Libltdl reported \"%2%\".",
-            path, lt_dlerror()
+            "of the correct format. dlopen() reported \"%2%\".",
+            path, dlerror()
             );
     }
 }

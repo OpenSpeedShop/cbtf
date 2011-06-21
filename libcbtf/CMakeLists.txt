@@ -17,11 +17,18 @@
 ################################################################################
 
 add_library(cbtf SHARED
-    Component.cpp
+    KrellInstitute/CBTF/BoostExts.hpp
+    KrellInstitute/CBTF/Component.hpp Component.cpp
     ComponentImpl.hpp ComponentImpl.cpp
-    Type.cpp
+    KrellInstitute/CBTF/Impl/InvokerForAny.hpp
+    KrellInstitute/CBTF/Impl/InvokerFor.hpp
+    KrellInstitute/CBTF/Impl/Invoker.hpp
+    KrellInstitute/CBTF/Impl/Raise.hpp
+    KrellInstitute/CBTF/Type.hpp Type.cpp
     TypeImpl.hpp TypeImpl.cpp
-    Version.cpp
+    KrellInstitute/CBTF/Version.hpp Version.cpp
+    KrellInstitute/CBTF/ValueSink.hpp
+    KrellInstitute/CBTF/ValueSource.hpp
     VersionImpl.hpp VersionImpl.cpp
     )
 
@@ -33,7 +40,10 @@ include_directories(
 target_link_libraries(cbtf
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
+    ${CMAKE_DL_LIBS}
     )
+
+set_target_properties(cbtf PROPERTIES VERSION 0.0.0)
 
 install(DIRECTORY KrellInstitute DESTINATION include)
 

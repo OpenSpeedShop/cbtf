@@ -27,4 +27,4 @@ find_package(Boost 1.35.0 REQUIRED
 add_subdirectory(libcbtf)
 
 #add_subdirectory(examples)
-#add_subdirectory(test)
+add_subdirectory(test)

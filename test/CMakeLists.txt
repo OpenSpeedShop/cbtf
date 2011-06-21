@@ -16,3 +16,21 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
+add_library(plugin MODULE plugin.cpp)
+
+add_executable(test
+    test.cpp
+    )
+
+add_definitions(-DBUILDDIR="${CMAKE_CURRENT_BINARY_DIR}")
+
+include_directories(
+    ${PROJECT_SOURCE_DIR}/libcbtf
+    )
+
+target_link_libraries(test
+    cbtf
+    ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+    )
+
+set_target_properties(plugin PROPERTIES PREFIX "")
