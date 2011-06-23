@@ -62,16 +62,16 @@ BOOST_AUTO_TEST_CASE(TestXML)
     BOOST_CHECK_THROW(registerXML("non_existent_file.xml"),
                       std::runtime_error);
     std::set<Type> available_types = Component::getAvailableTypes();
-    BOOST_CHECK_EQUAL(available_types.find(Type("TestNetwork")),
+    BOOST_CHECK_EQUAL(available_types.find(Type("TestXML")),
                       available_types.end());
     BOOST_CHECK_NO_THROW(registerXML("test-xml.xml"));
     available_types = Component::getAvailableTypes();
-    BOOST_CHECK_NE(available_types.find(Type("TestNetwork")),
+    BOOST_CHECK_NE(available_types.find(Type("TestXML")),
                    available_types.end());
 
     // Test component network instantiation and metadata
     Component::Instance network;
-    BOOST_CHECK_NO_THROW(network = Component::instantiate(Type("TestNetwork")));
+    BOOST_CHECK_NO_THROW(network = Component::instantiate(Type("TestXML")));
     std::map<std::string, Type> inputs = network->getInputs();
     BOOST_CHECK_NE(inputs.find("in"), inputs.end());
     std::map<std::string, Type> outputs = network->getOutputs();

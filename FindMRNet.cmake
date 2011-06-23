@@ -1,6 +1,5 @@
-#! /bin/sh
 ################################################################################
-# Copyright (c) 2010 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -17,9 +16,19 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-touch config.rpath
-aclocal --force -I m4
-libtoolize --copy --force
-autoheader --force
-automake --add-missing --copy --force-missing --foreign
-autoconf
+include(FindPackageHandleStandardArgs)
+
+find_library(MRNet_MRNET_LIBRARY NAMES libmrnet.so)
+find_library(MRNet_XPLAT_LIBRARY NAMES libxplat.so)
+find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h)
+
+find_package_handle_standard_args(
+    MRNet DEFAULT_MSG MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR
+    )
+
+set(MRNet_LIBRARIES ${MRNet_MRNET_LIBRARY} ${MRNet_XPLAT_LIBRARY})
+set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR})
+
+set(MRNet_DEFINES "-Dos_linux")
+
+mark_as_advanced(MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR)

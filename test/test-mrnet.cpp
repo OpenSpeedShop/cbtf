@@ -18,10 +18,6 @@
 
 /** @file Unit tests for the CBTF MRNet library. */
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE libcbtf-mrnet
-
 #include <boost/shared_ptr.hpp>
 #include <boost/test/unit_test.hpp>
 #include <iostream>
@@ -37,7 +33,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "messages.h"
+#include "TestMessage.h"
 
 using namespace KrellInstitute::CBTF;
 
@@ -45,37 +41,15 @@ using namespace KrellInstitute::CBTF;
 
 namespace std {
 
-    /**
-     * Redirect a std::map<std:string, Type> const iterator to an output stream.
-     * Defined in order to allow the Boost.Test macros to work properly.
-     *
-     * @param stream      Target output stream.
-     * @param iterator    Const iterator to redirect.
-     * @return            Target output stream.
-     */
-    std::ostream& operator<<(
+    extern std::ostream& operator<<(
         std::ostream& stream,
         const std::map<std::string, Type>::const_iterator& iterator
-        )
-    {
-        stream << "std::map<std::string, Type>::const_iterator";
-        return stream;
-    }
-
-    /**
-     * Redirect a std::set<Type> const iterator to an output stream. Defined
-     * in order to allow the Boost.Test macros to work properly.
-     *
-     * @param stream      Target output stream.
-     * @param iterator    Const iterator to redirect.
-     * @return            Target output stream.
-     */
-    std::ostream& operator<<(std::ostream& stream,
-                             const std::set<Type>::const_iterator& iterator)
-    {
-        stream << "std::set<Type>::const_iterator";
-        return stream;
-    }
+        );
+    
+    extern std::ostream& operator<<(
+        std::ostream& stream,
+        const std::set<Type>::const_iterator& iterator
+        );
     
 } // namespace std
 
@@ -88,30 +62,24 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
 {
     // Test registration of distributed component network types from XML
     std::set<Type> available_types = Component::getAvailableTypes();
-    BOOST_CHECK_EQUAL(available_types.find(Type("TestNetwork")),
+    BOOST_CHECK_EQUAL(available_types.find(Type("TestMRNet")),
                       available_types.end());
-    BOOST_CHECK_NO_THROW(
-        registerXML(boost::filesystem::path(BUILDDIR) / "test.xml")
-        );
+    BOOST_CHECK_NO_THROW(registerXML("test-mrnet.xml"));
     available_types = Component::getAvailableTypes();
-    BOOST_CHECK_NE(available_types.find(Type("TestNetwork")),
+    BOOST_CHECK_NE(available_types.find(Type("TestMRNet")),
                    available_types.end());
     
     // Test distributed component network instantiation and metadata
     Component::Instance network;
-    BOOST_CHECK_NO_THROW(
-        network = Component::instantiate(Type("TestNetwork"))
-        );
+    BOOST_CHECK_NO_THROW(network = Component::instantiate(Type("TestMRNet")));
     std::map<std::string, Type> inputs = network->getInputs();
     BOOST_CHECK_NE(inputs.find("in"), inputs.end());
     std::map<std::string, Type> outputs = network->getOutputs();
     BOOST_CHECK_NE(outputs.find("out"), outputs.end());
-
+    
     // Test instantiation of the basic launcher component
 
-    BOOST_REQUIRE_NO_THROW(Component::registerPlugin(
-        boost::filesystem::path(TOPDIR) / "launchers" / "BasicMRNetLaunchers"
-        ));
+    BOOST_REQUIRE_NO_THROW(Component::registerPlugin("BasicMRNetLaunchers"));
     Component::Instance launcher;
     BOOST_CHECK_NO_THROW(
         launcher = Component::instantiate(
@@ -142,7 +110,7 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
     Component::connect(input_value_component, "value", network, "in");
     Component::connect(network, "out", output_value_component, "value");
 
-    *topology_value = boost::filesystem::path(BUILDDIR) / "test.topology";
+    *topology_value = boost::filesystem::path("test-mrnet.topology");
     *input_value = 10;
     BOOST_CHECK_EQUAL(26, *output_value);
     *input_value = 13;

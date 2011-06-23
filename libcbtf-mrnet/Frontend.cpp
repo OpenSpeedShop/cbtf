@@ -65,9 +65,7 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
 
     // Load the upstream filter
     int upstream_filter = dm_network->load_FilterFunc(
-        (boost::filesystem::path(LIBDIR) / 
-         boost::filesystem::path("libcbtf-mrnet-filter.so")).string().c_str(),
-        "libcbtf_mrnet_upstream_filter"
+        FILTER_PATH, "libcbtf_mrnet_upstream_filter"
         );
     if (upstream_filter == -1)
     {
@@ -79,9 +77,7 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
 
     // Load the downstream filter
     int downstream_filter = dm_network->load_FilterFunc(
-        (boost::filesystem::path(LIBDIR) / 
-         boost::filesystem::path("libcbtf-mrnet-filter.so")).string().c_str(),
-        "libcbtf_mrnet_downstream_filter"
+        FILTER_PATH, "libcbtf_mrnet_downstream_filter"
         );
     if (downstream_filter == -1)
     {

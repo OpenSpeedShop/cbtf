@@ -16,32 +16,87 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-if(DEFINED XERCESC_FOUND)
+if(XERCESC_FOUND)
     set(XML_SOURCES "test-xml.cpp")
-    set(XML_TARGET "cbtf-xml")
-else(DEFINED XERCESC_FOUND)
+    set(XML_LIBRARIES "cbtf-xml")
+else(XERCESC_FOUND)
     set(XML_SOURCES "")
-    set(XML_TARGET "")
-endif(DEFINED XERCESC_FOUND)
+    set(XML_LIBRARIES "")
+endif(XERCESC_FOUND)
+
+if(XERCESC_FOUND AND MRNET_FOUND)
+    set(MRNET_SOURCES "test-mrnet.cpp")
+    set(MRNET_LIBRARIES "cbtf-mrnet")
+else(XERCESC_FOUND AND MRNET_FOUND)
+    set(MRNET_SOURCES "")
+    set(MRNET_LIBRARIES "")
+endif(XERCESC_FOUND AND MRNET_FOUND)
 
 add_library(plugin MODULE plugin.cpp)
 add_library(plugin-xml MODULE plugin-xml.cpp)
-add_executable(test test.cpp ${XML_SOURCES})
 
-include_directories(${PROJECT_SOURCE_DIR}/libcbtf)
+if(XERCESC_FOUND AND MRNET_FOUND)
+    add_library(plugin-mrnet MODULE plugin-mrnet.cpp)
+    add_definitions(${MRNet_DEFINES})
+endif(XERCESC_FOUND AND MRNET_FOUND)
 
-if(DEFINED XERCESC_FOUND)
+add_executable(test
+    ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.h
+    ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.c
+    test.cpp
+    ${XML_SOURCES}
+    ${MRNET_SOURCES}
+    )
+
+add_custom_command(
+    OUTPUT
+        ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.h
+        ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.c
+    COMMAND rpcgen -h -o 
+        ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.h
+        ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.x
+    COMMAND rpcgen -c -o 
+        ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.c
+        ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.x
+    DEPENDS
+        ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.x
+    )
+
+include_directories(
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${PROJECT_SOURCE_DIR}/libcbtf
+    )
+
+if(XERCESC_FOUND)
     include_directories(${PROJECT_SOURCE_DIR}/libcbtf-xml)
-endif(DEFINED XERCESC_FOUND)
+endif(XERCESC_FOUND)
+
+if(XERCESC_FOUND AND MRNET_FOUND)
+    include_directories(
+        ${PROJECT_SOURCE_DIR}/libcbtf-mrnet
+        ${MRNet_INCLUDE_DIRS}
+        )
+endif(XERCESC_FOUND AND MRNET_FOUND)
 
 target_link_libraries(test
-    cbtf ${XML_TARGET}
+    cbtf ${XML_LIBRARIES} ${MRNET_LIBRARIES}
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
     )
 
 set_target_properties(plugin PROPERTIES PREFIX "")
 set_target_properties(plugin-xml PROPERTIES PREFIX "")
 
-if(DEFINED XERCESC_FOUND)
+if(XERCESC_FOUND AND MRNET_FOUND)
+    set_target_properties(plugin-mrnet PROPERTIES PREFIX "")
+endif(XERCESC_FOUND AND MRNET_FOUND)
+
+file(COPY TestMessage.x DESTINATION .)
+
+if(XERCESC_FOUND)
     file(COPY test-xml.xml DESTINATION .)
-endif(DEFINED XERCESC_FOUND)
+endif(XERCESC_FOUND)
+
+if(XERCESC_FOUND AND MRNET_FOUND)
+    file(COPY test-mrnet.topology DESTINATION .)
+    file(COPY test-mrnet.xml DESTINATION .)
+endif(XERCESC_FOUND AND MRNET_FOUND)

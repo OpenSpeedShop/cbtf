@@ -16,7 +16,7 @@
 ** 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *******************************************************************************/
 
-/** @file Messages used by unit tests for the CBTF MRNet library. */
+/** @file Message used by unit tests for the CBTF MRNet library. */
 
 /** Test message. */
 struct TestMessage

@@ -52,14 +52,14 @@ if(DEFINED XERCESC_FOUND AND DEFINED XercesC_INCLUDE_DIR)
         XercesC_VERSION_PATCH ${XercesC_VERSION_FILE}
         )
   
-    set(XercesC_VERSION 
+    set(XercesC_VERSION_STRING 
       ${XercesC_VERSION_MAJOR}.${XercesC_VERSION_MINOR}.${XercesC_VERSION_PATCH}
       )
   
-    message(STATUS "XercesC version: " ${XercesC_VERSION})
+    message(STATUS "XercesC version: " ${XercesC_VERSION_STRING})
 
     if(DEFINED XercesC_FIND_VERSION)
-        if(${XercesC_VERSION} VERSION_LESS ${XercesC_FIND_VERSION})
+        if(${XercesC_VERSION_STRING} VERSION_LESS ${XercesC_FIND_VERSION})
 
             set(XERCESC_FOUND FALSE)
 
@@ -75,7 +75,7 @@ if(DEFINED XERCESC_FOUND AND DEFINED XercesC_INCLUDE_DIR)
                     )
             endif(DEFINED XercesC_FIND_REQUIRED)
  
-        endif(${XercesC_VERSION} VERSION_LESS ${XercesC_FIND_VERSION})
+        endif(${XercesC_VERSION_STRING} VERSION_LESS ${XercesC_FIND_VERSION})
     endif(DEFINED XercesC_FIND_VERSION)
   
 endif(DEFINED XERCESC_FOUND AND DEFINED XercesC_INCLUDE_DIR)

@@ -20,7 +20,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 <MRNet xmlns="http://www.krellinst.org/CBTF/MRNet.xsd">
     
-  <Type>TestNetwork</Type>
+  <Type>TestMRNet</Type>
   <Version>1.0.0</Version>
 
   <Input>
@@ -46,7 +46,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Version>1.0.0</Version>
 
       <SearchPath>.</SearchPath>
-      <Plugin>plugin</Plugin>
+      <Plugin>plugin-xml</Plugin>
+      <Plugin>plugin-mrnet</Plugin>
 
       <Component>
         <Name>1A</Name>
@@ -146,7 +147,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Version>1.0.0</Version>
 
       <SearchPath>.</SearchPath>
-      <Plugin>plugin</Plugin>
+      <Plugin>plugin-xml</Plugin>
+      <Plugin>plugin-mrnet</Plugin>
 
       <Component>
         <Name>A</Name>
@@ -223,7 +225,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Version>1.0.0</Version>
       
       <SearchPath>.</SearchPath>
-      <Plugin>plugin</Plugin>
+      <Plugin>plugin-xml</Plugin>
+      <Plugin>plugin-mrnet</Plugin>
 
       <Component>
         <Name>A</Name>

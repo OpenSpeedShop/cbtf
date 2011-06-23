@@ -16,28 +16,31 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-AC_DEFUN([AX_XERCESC_VERSION], [
-
-    AC_MSG_CHECKING([for libxerces-c >= 3.0.0])
-    
-    AC_LANG_PUSH(C++)
-
-    xerces_saved_CPPFLAGS=$CPPFLAGS
-    CPPFLAGS="$CPPFLAGS $LIBXERCES_C_CPPFLAGS"
-
-    AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[
-        #include "xercesc/util/XercesVersion.hpp"
-        ]], [[
-        #if _XERCES_VERSION < 3000
-            #error "libxerces-c version is too old!"
-        #endif
-        ]]), AC_MSG_RESULT(yes), [ AC_MSG_RESULT(no)
-        AC_MSG_FAILURE(libxerces-c version isn't 3.0.0 or higher.)
-        ]
+add_executable(libcbtf-mrnet-backend
+    Backend.hpp Backend.cpp
+    main.cpp
     )
 
-    CPPFLAGS=$xerces_saved_CPPFLAGS
+add_definitions(${MRNet_DEFINES})
 
-    AC_LANG_POP(C++)
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/libcbtf
+    ${PROJECT_SOURCE_DIR}/libcbtf-xml
+    ${PROJECT_SOURCE_DIR}/libcbtf-mrnet
+    ${Boost_INCLUDE_DIRS}
+    ${MRNet_INCLUDE_DIRS}
+    ${XercesC_INCLUDE_DIRS}
+    )
 
-])
+target_link_libraries(libcbtf-mrnet-backend
+    cbtf-mrnet
+    ${Boost_DATETIME_LIBRARY}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
+    ${MRNet_LIBRARIES}
+    ${XercesC_LIBRARIES}
+    )
+
+install(TARGETS libcbtf-mrnet-backend RUNTIME DESTINATION bin)

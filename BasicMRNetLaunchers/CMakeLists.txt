@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2010 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -15,30 +15,33 @@
 # this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
-lib_LTLIBRARIES = libcbtf-mrnet-filter.la
 
-libcbtf_mrnet_filter_la_CXXFLAGS = \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src \
-	@BOOST_CPPFLAGS@ \
-	@CBTF_CPPFLAGS@ @CBTF_XML_CPPFLAGS@ \
-	@LIBXERCES_C_CPPFLAGS@ \
-	@MRNET_CPPFLAGS@
+add_library(BasicMRNetLaunchers SHARED
+    BasicMRNetLauncherUsingBackendAttach.cpp
+    BasicMRNetLauncherUsingBackendCreate.cpp
+    )
 
-libcbtf_mrnet_filter_la_LDFLAGS = \
-	-version-info 0:0:0 \
-	-L$(top_srcdir)/src \
-	@BOOST_LDFLAGS@ \
-	@CBTF_LDFLAGS@ @CBTF_XML_LDFLAGS@ \
-	@LIBXERCES_C_LDFLAGS@ \
-	@MRNET_LDFLAGS@
+add_definitions(${MRNet_DEFINES})
 
-libcbtf_mrnet_filter_la_LIBADD = \
-	-lcbtf-mrnet \
-	@BOOST_SYSTEM_LIB@ @BOOST_THREAD_LIB@ \
-	@CBTF_LIBS@ @CBTF_XML_LIBS@ \
-	@LIBXERCES_C@ \
-	@MRNET_LIBS@ 
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/libcbtf
+    ${PROJECT_SOURCE_DIR}/libcbtf-xml
+    ${PROJECT_SOURCE_DIR}/libcbtf-mrnet
+    ${Boost_INCLUDE_DIRS}
+    ${MRNet_INCLUDE_DIRS}
+    )
 
-libcbtf_mrnet_filter_la_SOURCES = \
-	main.cpp
+target_link_libraries(BasicMRNetLaunchers
+    cbtf-mrnet
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${MRNet_LIBRARIES}
+    )
+
+set_target_properties(BasicMRNetLaunchers PROPERTIES PREFIX "")
+
+install(TARGETS BasicMRNetLaunchers
+    RUNTIME DESTINATION bin/KrellInstitute/CBTF
+    LIBRARY DESTINATION lib/KrellInstitute/CBTF
+    ARCHIVE DESTINATION lib/KrellInstitute/CBTF
+    )

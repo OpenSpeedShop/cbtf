@@ -20,7 +20,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 <Network xmlns="http://www.krellinst.org/CBTF/Network.xsd">
 
-  <Type>TestNetwork</Type>
+  <Type>TestXML</Type>
   <Version>1.2.3</Version>
 
   <SearchPath>.</SearchPath>

@@ -20,7 +20,7 @@
 
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE cbtf
+#define BOOST_TEST_MODULE CBTF
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>

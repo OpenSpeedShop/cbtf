@@ -69,8 +69,7 @@ namespace {
 //------------------------------------------------------------------------------
 boost::filesystem::path Impl::getMRNetBackendPath()
 {
-    return boost::filesystem::path(BINDIR) /
-        boost::filesystem::path("libcbtf-mrnet-backend");
+    return BACKEND_PATH;
 }
 
 
