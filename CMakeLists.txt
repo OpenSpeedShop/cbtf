@@ -41,5 +41,5 @@ if(XERCESC_FOUND AND MRNET_FOUND)
     add_subdirectory(BasicMRNetLaunchers)
 endif(XERCESC_FOUND AND MRNET_FOUND)
 
-#add_subdirectory(examples)
+add_subdirectory(examples)
 add_subdirectory(test)
