@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -20,7 +20,7 @@
 
 #define BOOST_TEST_DYN_LINK
 #define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE libcbtf
+#define BOOST_TEST_MODULE cbtf
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -273,7 +273,6 @@ BOOST_AUTO_TEST_CASE(TestComponent)
 {
     // Test registration of directly-linked component types
     std::set<Type> available_types = Component::getAvailableTypes();
-    BOOST_CHECK_EQUAL(available_types.size(), 2);
     BOOST_CHECK_NE(available_types.find(Type("TestComponentA")),
                    available_types.end());
     BOOST_CHECK_NE(available_types.find(Type("TestComponentC")),
@@ -284,11 +283,8 @@ BOOST_AUTO_TEST_CASE(TestComponent)
                       std::runtime_error);
     BOOST_CHECK_EQUAL(available_types.find(Type("TestComponentB")),
                       available_types.end());
-    BOOST_REQUIRE_NO_THROW(
-        Component::registerPlugin(boost::filesystem::path(BUILDDIR) / "plugin")
-        );
+    BOOST_REQUIRE_NO_THROW(Component::registerPlugin("./plugin"));
     available_types = Component::getAvailableTypes();
-    BOOST_CHECK_EQUAL(available_types.size(), 3);
     BOOST_CHECK_NE(available_types.find(Type("TestComponentB")),
                    available_types.end());
     

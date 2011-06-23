@@ -16,21 +16,32 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
+if(DEFINED XERCESC_FOUND)
+    set(XML_SOURCES "test-xml.cpp")
+    set(XML_TARGET "cbtf-xml")
+else(DEFINED XERCESC_FOUND)
+    set(XML_SOURCES "")
+    set(XML_TARGET "")
+endif(DEFINED XERCESC_FOUND)
+
 add_library(plugin MODULE plugin.cpp)
+add_library(plugin-xml MODULE plugin-xml.cpp)
+add_executable(test test.cpp ${XML_SOURCES})
 
-add_executable(test
-    test.cpp
-    )
+include_directories(${PROJECT_SOURCE_DIR}/libcbtf)
 
-add_definitions(-DBUILDDIR="${CMAKE_CURRENT_BINARY_DIR}")
-
-include_directories(
-    ${PROJECT_SOURCE_DIR}/libcbtf
-    )
+if(DEFINED XERCESC_FOUND)
+    include_directories(${PROJECT_SOURCE_DIR}/libcbtf-xml)
+endif(DEFINED XERCESC_FOUND)
 
 target_link_libraries(test
-    cbtf
+    cbtf ${XML_TARGET}
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
     )
 
 set_target_properties(plugin PROPERTIES PREFIX "")
+set_target_properties(plugin-xml PROPERTIES PREFIX "")
+
+if(DEFINED XERCESC_FOUND)
+    file(COPY test-xml.xml DESTINATION .)
+endif(DEFINED XERCESC_FOUND)

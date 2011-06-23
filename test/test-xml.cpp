@@ -18,10 +18,6 @@
 
 /** @file Unit tests for the CBTF XML library. */
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE libcbtf-xml
-
 #include <boost/shared_ptr.hpp>
 #include <boost/test/unit_test.hpp>
 #include <iostream>
@@ -43,38 +39,16 @@ using namespace KrellInstitute::CBTF;
 
 namespace std {
 
-    /**
-     * Redirect a std::map<std:string, Type> const iterator to an output stream.
-     * Defined in order to allow the Boost.Test macros to work properly.
-     *
-     * @param stream      Target output stream.
-     * @param iterator    Const iterator to redirect.
-     * @return            Target output stream.
-     */
-    std::ostream& operator<<(
+    extern std::ostream& operator<<(
         std::ostream& stream,
         const std::map<std::string, Type>::const_iterator& iterator
-        )
-    {
-        stream << "std::map<std::string, Type>::const_iterator";
-        return stream;
-    }
-
-    /**
-     * Redirect a std::set<Type> const iterator to an output stream. Defined
-     * in order to allow the Boost.Test macros to work properly.
-     *
-     * @param stream      Target output stream.
-     * @param iterator    Const iterator to redirect.
-     * @return            Target output stream.
-     */
-    std::ostream& operator<<(std::ostream& stream,
-                             const std::set<Type>::const_iterator& iterator)
-    {
-        stream << "std::set<Type>::const_iterator";
-        return stream;
-    }
+        );
     
+    extern std::ostream& operator<<(
+        std::ostream& stream,
+        const std::set<Type>::const_iterator& iterator
+        );
+
 } // namespace std
 
 
@@ -90,18 +64,14 @@ BOOST_AUTO_TEST_CASE(TestXML)
     std::set<Type> available_types = Component::getAvailableTypes();
     BOOST_CHECK_EQUAL(available_types.find(Type("TestNetwork")),
                       available_types.end());
-    BOOST_CHECK_NO_THROW(
-        registerXML(boost::filesystem::path(BUILDDIR) / "network.xml")
-        );
+    BOOST_CHECK_NO_THROW(registerXML("test-xml.xml"));
     available_types = Component::getAvailableTypes();
     BOOST_CHECK_NE(available_types.find(Type("TestNetwork")),
                    available_types.end());
 
     // Test component network instantiation and metadata
     Component::Instance network;
-    BOOST_CHECK_NO_THROW(
-        network = Component::instantiate(Type("TestNetwork"))
-        );
+    BOOST_CHECK_NO_THROW(network = Component::instantiate(Type("TestNetwork")));
     std::map<std::string, Type> inputs = network->getInputs();
     BOOST_CHECK_NE(inputs.find("in"), inputs.end());
     std::map<std::string, Type> outputs = network->getOutputs();
@@ -111,7 +81,7 @@ BOOST_AUTO_TEST_CASE(TestXML)
     BOOST_CHECK_EQUAL(network->getVersion(), Version(1, 2, 3));
     
     // Test component network intercommunication
-    boost::shared_ptr<ValueSource<int> > input_value = 
+    boost::shared_ptr<ValueSource<int> > input_value =
         ValueSource<int>::instantiate();
     boost::shared_ptr<ValueSink<int> > output_value = 
         ValueSink<int>::instantiate();

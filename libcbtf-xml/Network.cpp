@@ -124,10 +124,7 @@ Component::Instance Network::factoryFunction(
 {
     std::vector<boost::filesystem::path> search_paths, plugin_paths;
     
-    search_paths.push_back(
-        boost::filesystem::path(LIBDIR) /
-        boost::filesystem::path("KrellInstitute/CBTF")
-        );
+    search_paths.push_back(boost::filesystem::path(PLUGIN_DIR));
     
     const char* cbtf_plugin_paths = getenv("CBTF_PLUGIN_PATH");
     if (cbtf_plugin_paths != NULL)

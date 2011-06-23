@@ -20,11 +20,19 @@ cmake_minimum_required(VERSION 2.8.0)
 
 project(CBTF)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
+
 find_package(Boost 1.35.0 REQUIRED
     COMPONENTS date_time filesystem system thread unit_test_framework
     )
 
+find_package(XercesC 3.0)
+
 add_subdirectory(libcbtf)
+
+if(DEFINED XERCESC_FOUND)
+    add_subdirectory(libcbtf-xml)
+endif(DEFINED XERCESC_FOUND)
 
 #add_subdirectory(examples)
 add_subdirectory(test)

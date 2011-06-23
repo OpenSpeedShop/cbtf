@@ -16,39 +16,40 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-add_library(cbtf SHARED
-    KrellInstitute/CBTF/BoostExts.hpp
-    KrellInstitute/CBTF/Component.hpp Component.cpp
-    ComponentImpl.hpp ComponentImpl.cpp
-    KrellInstitute/CBTF/Impl/InvokerForAny.hpp
-    KrellInstitute/CBTF/Impl/InvokerFor.hpp
-    KrellInstitute/CBTF/Impl/Invoker.hpp
-    KrellInstitute/CBTF/Impl/Raise.hpp
-    KrellInstitute/CBTF/Type.hpp Type.cpp
-    TypeImpl.hpp TypeImpl.cpp
-    KrellInstitute/CBTF/Version.hpp Version.cpp
-    KrellInstitute/CBTF/ValueSink.hpp
-    KrellInstitute/CBTF/ValueSource.hpp
-    VersionImpl.hpp VersionImpl.cpp
+add_library(cbtf-xml SHARED
+    KrellInstitute/CBTF/Impl/DOMNodeHandler.hpp
+    KrellInstitute/CBTF/Impl/InputMediator.hpp
+    Network.cpp Network.hpp
+    KrellInstitute/CBTF/Impl/OutputMediator.hpp
+    KrellInstitute/CBTF/Impl/XercesExts.hpp XercesExts.cpp
+    KrellInstitute/CBTF/XML.hpp KrellInstitute/CBTF/Impl/XML.hpp XML.cpp
+    )
+
+add_definitions(
+    -DPLUGIN_DIR="${CMAKE_INSTALL_PREFIX}/lib/KrellInstitute/CBTF"
+    -DSCHEMA_DIR="${CMAKE_INSTALL_PREFIX}/share/KrellInstitute/CBTF"
     )
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/libcbtf
     ${Boost_INCLUDE_DIRS}
+    ${XercesC_INCLUDE_DIRS}
     )
-
-target_link_libraries(cbtf
-    ${CMAKE_DL_LIBS}
+  
+target_link_libraries(cbtf-xml
+    cbtf
     ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
+    ${XercesC_LIBRARIES}
     )
 
-set_target_properties(cbtf PROPERTIES VERSION 0.0.0)
+set_target_properties(cbtf-xml PROPERTIES VERSION 0.0.0)
+
+install(FILES Network.xsd DESTINATION share/KrellInstitute/CBTF)
 
 install(DIRECTORY KrellInstitute DESTINATION include)
 
-install(TARGETS cbtf
+install(TARGETS cbtf-xml
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib

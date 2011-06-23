@@ -297,15 +297,13 @@ boost::shared_ptr<DOMDocument> XERCES_CPP_NAMESPACE_QUALIFIER loadFromFile(
     
     try
     {
-        boost::filesystem::path data_directory = 
-            boost::filesystem::path(DATADIR) /
-            boost::filesystem::path("KrellInstitute/CBTF");
+        boost::filesystem::path schema_directory = SCHEMA_DIR;
         
-        if (is_directory(data_directory))
+        if (is_directory(schema_directory))
         {
             bool found_schema = false;
 
-            for (directory_iterator i(data_directory);
+            for (directory_iterator i(schema_directory);
                  i != directory_iterator();
                  ++i)
             {
