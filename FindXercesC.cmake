@@ -38,17 +38,17 @@ if(DEFINED XERCESC_FOUND AND DEFINED XercesC_INCLUDE_DIR)
         )
   
     string(REGEX REPLACE
-        ".*#define XERCES_VERSION_MAJOR ([0-9]+)\n.*" "\\1"
+        ".*#define XERCES_VERSION_MAJOR[ ]+([0-9]+)\n.*" "\\1"
         XercesC_VERSION_MAJOR ${XercesC_VERSION_FILE}
         )
       
     string(REGEX REPLACE
-        ".*#define XERCES_VERSION_MINOR ([0-9]+)\n.*" "\\1"
+        ".*#define XERCES_VERSION_MINOR[ ]+([0-9]+)\n.*" "\\1"
         XercesC_VERSION_MINOR ${XercesC_VERSION_FILE}
         )
   
     string(REGEX REPLACE
-        ".*#define XERCES_VERSION_REVISION ([0-9]+)\n.*" "\\1"
+        ".*#define XERCES_VERSION_REVISION[ ]+([0-9]+)\n.*" "\\1"
         XercesC_VERSION_PATCH ${XercesC_VERSION_FILE}
         )
   
@@ -68,14 +68,14 @@ if(DEFINED XERCESC_FOUND AND DEFINED XercesC_INCLUDE_DIR)
                     "Could NOT find XercesC  (version < "
                     ${XercesC_FIND_VERSION} ")"
                     )
-            else(DEFINED XercesC_FIND_REQUIRED)
+            else()
                 message(STATUS
                     "Could NOT find XercesC  (version < " 
                     ${XercesC_FIND_VERSION} ")"
                     )
-            endif(DEFINED XercesC_FIND_REQUIRED)
+            endif()
  
-        endif(${XercesC_VERSION_STRING} VERSION_LESS ${XercesC_FIND_VERSION})
-    endif(DEFINED XercesC_FIND_VERSION)
+        endif()
+    endif()
   
-endif(DEFINED XERCESC_FOUND AND DEFINED XercesC_INCLUDE_DIR)
+endif()

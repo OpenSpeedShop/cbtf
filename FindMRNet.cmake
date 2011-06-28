@@ -32,3 +32,50 @@ set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR})
 set(MRNet_DEFINES "-Dos_linux")
 
 mark_as_advanced(MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR)
+
+if(DEFINED MRNET_FOUND AND DEFINED MRNet_INCLUDE_DIR)
+
+    file(READ ${MRNet_INCLUDE_DIR}/mrnet/Types.h MRNet_VERSION_FILE)
+  
+    string(REGEX REPLACE
+        ".*#define MRNET_VERSION_MAJOR[ ]+([0-9]+)\n.*" "\\1"
+        MRNet_VERSION_MAJOR ${MRNet_VERSION_FILE}
+        )
+      
+    string(REGEX REPLACE
+        ".*#define MRNET_VERSION_MINOR[ ]+([0-9]+)\n.*" "\\1"
+        MRNet_VERSION_MINOR ${MRNet_VERSION_FILE}
+        )
+  
+    string(REGEX REPLACE
+        ".*#define MRNET_VERSION_REV[ ]+([0-9]+)\n.*" "\\1"
+        MRNet_VERSION_PATCH ${MRNet_VERSION_FILE}
+        )
+  
+    set(MRNet_VERSION_STRING 
+      ${MRNet_VERSION_MAJOR}.${MRNet_VERSION_MINOR}.${MRNet_VERSION_PATCH}
+      )
+  
+    message(STATUS "MRNet version: " ${MRNet_VERSION_STRING})
+
+    if(DEFINED MRNet_FIND_VERSION)
+        if(${MRNet_VERSION_STRING} VERSION_LESS ${MRNet_FIND_VERSION})
+
+            set(MRNET_FOUND FALSE)
+
+            if(DEFINED MRNet_FIND_REQUIRED)
+                message(FATAL_ERROR
+                    "Could NOT find MRNet  (version < "
+                    ${MRNet_FIND_VERSION} ")"
+                    )
+            else()
+                message(STATUS
+                    "Could NOT find MRNet  (version < " 
+                    ${MRNet_FIND_VERSION} ")"
+                    )
+            endif()
+ 
+        endif()
+    endif()
+  
+endif()

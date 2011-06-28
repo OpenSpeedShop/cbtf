@@ -25,21 +25,21 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 find_package(Boost 1.35.0 REQUIRED
     COMPONENTS date_time filesystem system thread unit_test_framework
     )
-find_package(MRNet)
+find_package(MRNet 3.1)
 find_package(XercesC 3.0)
 
 add_subdirectory(libcbtf)
 
 if(XERCESC_FOUND)
     add_subdirectory(libcbtf-xml)
-endif(XERCESC_FOUND)
+endif()
 
 if(XERCESC_FOUND AND MRNET_FOUND)
     add_subdirectory(libcbtf-mrnet)
     add_subdirectory(libcbtf-mrnet-backend)
     add_subdirectory(libcbtf-mrnet-filter)
     add_subdirectory(BasicMRNetLaunchers)
-endif(XERCESC_FOUND AND MRNET_FOUND)
+endif()
 
 add_subdirectory(examples)
 add_subdirectory(test)
