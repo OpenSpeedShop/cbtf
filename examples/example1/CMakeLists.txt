@@ -16,5 +16,3 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-add_subdirectory(example1)
-add_subdirectory(example2)
