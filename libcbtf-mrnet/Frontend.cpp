@@ -88,10 +88,17 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
     }
 
     // Establish the stream used to pass data within this network
+#if 1
     dm_stream = dm_network->new_Stream(
         dm_network->get_BroadcastCommunicator(),
         upstream_filter, MRN::SFILTER_DONTWAIT, downstream_filter
         );
+#else
+    dm_stream = dm_network->new_Stream(
+        dm_network->get_BroadcastCommunicator(),
+        upstream_filter, MRN::SFILTER_WAITFORALL, downstream_filter
+        );
+#endif
     if ((dm_stream == NULL) ||
         (dm_stream->send(MessageTags::EstablishUpstream, 0) != 0) ||
         (dm_stream->flush() != 0))

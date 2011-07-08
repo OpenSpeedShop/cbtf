@@ -418,7 +418,7 @@ extern "C" void libcbtf_mrnet_upstream_filter(
         catch (const std::exception& error)
         {
             forward_packet = true;
-            std::cout << "[FI " << getpid() << "] EXCEPTION: "
+            std::cout << "[FI " << getpid() << "] libcbtf_mrnet_upstream_filter EXCEPTION: "
                       << error.what() << std::endl;
         }
 
@@ -522,7 +522,7 @@ extern "C" void libcbtf_mrnet_downstream_filter(
         catch (const std::exception& error)
         {
             forward_packet = true;
-            std::cout << "[FI " << getpid() << "] EXCEPTION: "
+            std::cout << "[FI " << getpid() << "] libcbtf_mrnet_downstream_filter EXCEPTION: "
                       << error.what() << std::endl;
         }
 
