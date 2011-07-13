@@ -70,6 +70,8 @@ AC_CONFIG_FILES([
     Makefile
     backend/Makefile
     data/Makefile
+    examples/Makefile
+    examples/daemonToolDemo/Makefile
     filter/Makefile
     include/Makefile
     launchers/Makefile
