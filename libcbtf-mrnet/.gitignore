@@ -11,6 +11,8 @@ backend/libcbtf-mrnet-backend
 config.*
 configure
 depcomp
+examples/daemonToolDemo/daemonToolDemo
+examples/daemonToolDemo/daemonToolDemo.xml
 install-sh
 libltdl/*
 libtool
