@@ -53,6 +53,9 @@ namespace {
     /** Flag indicating if debugging is enabled for this filter. */
     bool is_filter_debug_enabled = false;
 
+    /** Prefix to apply to all debugging statements. */
+    std::string debug_prefix;
+
     /**
      * Type of associative container used to map between the unique identifiers
      * for distributed component networks and their local component networks.
@@ -121,9 +124,11 @@ namespace {
      * Handler for the filter configuration parameters message. Decodes the
      * parameters and configures debugging settings as appropriate.
      *
-     * @param packet    Packet containing the received message.
+     * @param packet           Packet containing the received message.
+     * @param topology_info    Location of this filter instance.
      */
-    void configurationParameters(const MRN::PacketPtr& packet)
+    void configurationParameters(const MRN::PacketPtr& packet,
+                                 const MRN::TopologyLocalInfo& topology_info)
     {
         int filter_debug_enabled = -1, tracing_debug_enabled = -1;
 
@@ -140,6 +145,24 @@ namespace {
         {
             MRN::set_OutputLevel(MRN::MAX_OUTPUT_LEVEL); 
         }
+
+        std::ostringstream stream;
+        stream << "[FI/";
+        if (topology_info.get_Network()->is_LocalNodeFrontEnd())
+        {
+            stream << "FE";
+        }
+        else if (topology_info.get_Network()->is_LocalNodeBackEnd())
+        {
+            stream << "BE";
+        }
+        else
+        {
+            stream << "CP";
+        }
+        stream << " " << getpid() << "] ";
+
+        debug_prefix = stream.str();
     }
     
     /**
@@ -151,9 +174,8 @@ namespace {
     {
         if (is_filter_debug_enabled)
         {
-            std::cout << "[FI " << getpid() << "] "
-                      << "Sending (upward) " << packet->get_Tag() << "."
-                      << std::endl;
+            std::cout << debug_prefix << "Sending (upward) "  
+                      << packet->get_Tag() << "." << std::endl;
         }
 
         packet->set_StreamId(mrnet_stream_id);
@@ -171,9 +193,8 @@ namespace {
     {
         if (is_filter_debug_enabled)
         {
-            std::cout << "[FI " << getpid() << "] "
-                      << "Sending (downward) " << packet->get_Tag() << "."
-                      << std::endl;
+            std::cout << debug_prefix << "Sending (downward) " 
+                      << packet->get_Tag() << "." << std::endl;
         }
 
         packet->set_StreamId(mrnet_stream_id);
@@ -195,7 +216,7 @@ namespace {
         
         if (networks.find(named_streams->uid()) != networks.end())
         {
-            std::cout << "[FI " << getpid() << "] WARNING: "
+            std::cout << debug_prefix << "WARNING: "
                       << "Received SpecifyNamedStreams for distributed "
                       << "component network UID " << named_streams->uid()
                       << " more than once." << std::endl;
@@ -204,7 +225,7 @@ namespace {
 
         if (is_filter_debug_enabled)
         {
-            std::cout << "[FI " << getpid() << "] "
+            std::cout << debug_prefix
                       << "Received SpecifyNamedStreams for distributed "
                       << "component network UID " << named_streams->uid()
                       << "." << std::endl;
@@ -285,7 +306,7 @@ namespace {
 
         if (use_filter == false)
         {
-            std::cout << "[FI " << getpid() << "] "
+            std::cout << debug_prefix
                       << "Received, and ignored, SpecifyFilter for distributed "
                       << "component network UID " << uid << "." << std::endl;
             return;
@@ -295,7 +316,7 @@ namespace {
         
         if (i == networks.end())
         {
-            std::cout << "[FI " << getpid() << "] WARNING: "
+            std::cout << debug_prefix << "WARNING: "
                       << "Received SpecifyFilter for distributed "
                       << "component network UID " << uid << " more than once."
                       << std::endl;
@@ -304,7 +325,7 @@ namespace {
         
         if (is_filter_debug_enabled)
         {
-            std::cout << "[FI " << getpid() << "] "
+            std::cout << debug_prefix
                       << "Received SpecifyFilter for distributed "
                       << "component network UID " << uid << "." << std::endl;
             std::cout << std::endl << xml << std::endl << std::endl;
@@ -335,7 +356,7 @@ namespace {
         
         if (networks.find(uid) == networks.end())
         {
-            std::cout << "[FI " << getpid() << "] WARNING: "
+            std::cout << debug_prefix << "WARNING: "
                       << "Received DestroyNetwork for non-existent distributed "
                       << "component network UID " << uid << "." << std::endl;
             return;
@@ -343,7 +364,7 @@ namespace {
 
         if (is_filter_debug_enabled)
         {
-            std::cout << "[FI " << getpid() << "] "
+            std::cout << debug_prefix
                       << "Received DestroyNetwork for distributed "
                       << "component network UID " << uid << "." << std::endl;
         }
@@ -385,7 +406,7 @@ extern "C" void libcbtf_mrnet_upstream_filter(
     const MRN::TopologyLocalInfo& topology_info
     )
 {
-    configurationParameters(config_params);
+    configurationParameters(config_params, topology_info);
 
     std::vector<MRN::PacketPtr> packets_to_forward;
 
@@ -407,7 +428,7 @@ extern "C" void libcbtf_mrnet_upstream_filter(
                 
                 if (is_filter_debug_enabled)
                 {
-                    std::cout << "[FI " << getpid() << "] "
+                    std::cout << debug_prefix
                               << "Received (upward) and handling "
                               << (*i)->get_Tag() << "." << std::endl;
                 }
@@ -418,19 +439,18 @@ extern "C" void libcbtf_mrnet_upstream_filter(
         catch (const std::exception& error)
         {
             forward_packet = true;
-            std::cout << "[FI " << getpid() << "] libcbtf_mrnet_upstream_filter EXCEPTION: "
+            std::cout << debug_prefix << "EXCEPTION: "
                       << error.what() << std::endl;
         }
-
+        
         if (forward_packet)
         {
             if (is_filter_debug_enabled)
             {
-                std::cout << "[FI " << getpid() << "] "
-                          << "Received (upward) and forwarding "
+                std::cout << debug_prefix << "Received (upward) and forwarding "
                           << (*i)->get_Tag() << "." << std::endl;
             }
-
+            
             packets_to_forward.push_back(*i);
         }
     }
@@ -474,7 +494,7 @@ extern "C" void libcbtf_mrnet_downstream_filter(
     const MRN::TopologyLocalInfo& topology_info
     )
 {
-    configurationParameters(config_params);
+    configurationParameters(config_params, topology_info);
 
     std::vector<MRN::PacketPtr> packets_to_forward;
 
@@ -510,7 +530,7 @@ extern "C" void libcbtf_mrnet_downstream_filter(
 
                     if (is_filter_debug_enabled)
                     {
-                        std::cout << "[FI " << getpid() << "] "
+                        std::cout << debug_prefix
                                   << "Received (downward) and handling "
                                   << (*i)->get_Tag() << "." << std::endl;
                     }
@@ -522,15 +542,15 @@ extern "C" void libcbtf_mrnet_downstream_filter(
         catch (const std::exception& error)
         {
             forward_packet = true;
-            std::cout << "[FI " << getpid() << "] libcbtf_mrnet_downstream_filter EXCEPTION: "
+            std::cout << debug_prefix << "EXCEPTION: "
                       << error.what() << std::endl;
         }
-
+        
         if (forward_packet)
         {
             if (is_filter_debug_enabled)
             {
-                std::cout << "[FI " << getpid() << "] "
+                std::cout << debug_prefix
                           << "Received (downward) and forwarding "
                           << (*i)->get_Tag() << "." << std::endl;
             }
