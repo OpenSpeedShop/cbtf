@@ -18,4 +18,4 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = data include src filter backend launchers examples test
+SUBDIRS = data include src filter backend launchers test
