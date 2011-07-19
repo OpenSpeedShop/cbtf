@@ -30,7 +30,7 @@ set(XercesC_INCLUDE_DIRS ${XercesC_INCLUDE_DIR})
 
 mark_as_advanced(XercesC_LIBRARY XercesC_INCLUDE_DIR)
 
-if(DEFINED XERCESC_FOUND AND DEFINED XercesC_INCLUDE_DIR)
+if(XERCESC_FOUND AND DEFINED XercesC_INCLUDE_DIR)
   
     file(READ
         ${XercesC_INCLUDE_DIR}/xercesc/util/XercesVersion.hpp
