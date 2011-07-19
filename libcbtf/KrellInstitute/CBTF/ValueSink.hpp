@@ -97,10 +97,6 @@ namespace KrellInstitute { namespace CBTF {
         void valueHandler(const T& value)
         {
             boost::unique_lock<boost::mutex> guard_this(dm_mutex);
-            while (dm_has_value == true)
-            {
-                dm_cv.wait(guard_this);
-            }
             dm_value = value;
             dm_has_value = true;
             dm_cv.notify_all();
