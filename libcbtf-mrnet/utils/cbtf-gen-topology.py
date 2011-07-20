@@ -38,13 +38,11 @@ from os import path
 debug = False
 
 #Flag indicating if a topology file update is needed
-topFileUpdateNeeded = False
+topFileUpdateNeeded = True
 
 # Regular expression string utilized to help parse qstat output.
 # jeg commented this out and replaced it with a scheme that takes the 
 # output of uname -n and strips all numeric characters off the right side.
-
-#frontEndQstatRegEx = 'yra[^/*]*'
 
 hostnodeName = os.uname()[1].split('.')[0]
 

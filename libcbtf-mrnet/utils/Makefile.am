@@ -16,6 +16,4 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-ACLOCAL_AMFLAGS = -I m4
-
-SUBDIRS = data include src filter backend launchers test utils
+dist_bin_SCRIPTS = cbtf-gen-topology.py

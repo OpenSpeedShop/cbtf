@@ -75,6 +75,7 @@ AC_CONFIG_FILES([
     launchers/Makefile
     src/Makefile
     test/Makefile
+    utils/Makefile
 ])
 
 AC_OUTPUT
