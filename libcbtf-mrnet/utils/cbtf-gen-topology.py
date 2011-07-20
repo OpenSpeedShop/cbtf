@@ -222,40 +222,45 @@ def generateSimpleBETopologyString():
     topstring += ' ;'
     return topstring
 
-#TODO:FIXME 
+TODO:FIXME
 def generateSimpleSLURMBETopologyString():
     if debug:
        print "generateSimpleSLURMBETopologyString, hostnodeName=" + hostnodeName
-    slurmnodescmdstr = "srun " + "/bin/hostname" + " | sort | uniq"
+    #slurmnodescmdstr = "srun " + "/bin/hostname" + " | sort | uniq"
+    if os.getenv('SLURM_JOB_NUM_NODES'):
+       num_nodes = os.environ['SLURM_JOB_NUM_NODES']
+
+    slurmnodescmdstr = "srun " + " -N " + num_nodes + " -n " + num_nodes + " uname -n " + " | sort | uniq"
     if debug:
        print "generateSimpleSLURMBETopologyString, slurmnodescmdstr=" + slurmnodescmdstr
     nodelist = commands.getoutput(slurmnodescmdstr).split('\n')
     if debug:
-       print "generateSimpleSLURMBETopologyString, begin nodelist=" 
+       print "generateSimpleSLURMBETopologyString, begin nodelist="
        print nodelist
-       print "generateSimpleSLURMBETopologyString, end nodelist" 
-    
+       print "generateSimpleSLURMBETopologyString, end nodelist"
+
     if debug:
-       print "generateSimpleSLURMBETopologyString, first reference, begin topstring=" 
+       print "generateSimpleSLURMBETopologyString, first reference, begin topstring="
     topstring = hostnodeName + ':0 =>\n  ' + hostnodeName + ':1'
     if debug:
        print topstring
-       print "generateSimpleSLURMBETopologyString, first reference, end topstring" 
+       print "generateSimpleSLURMBETopologyString, first reference, end topstring"
 
     for node in nodelist[0::1]:
-        if (node != hostnodeName):
+        #if (node != hostnodeName):
+        if (not node.startswith(hostnodeName)):
           if debug:
-             print "generateSimpleSLURMBETopologyString, in for loop, begin topstring=" 
+             print "generateSimpleSLURMBETopologyString, in for loop, begin topstring="
              print topstring
-             print "generateSimpleSLURMBETopologyString, in for loop, end topstring" 
+             print "generateSimpleSLURMBETopologyString, in for loop, end topstring"
           topstring += '\n  ' + node + ':0'
-    
+
     topstring += ' ;'
 
     if debug:
-       print "generateSimpleSLURMBETopologyString, RETURN begin topstring=" 
+       print "generateSimpleSLURMBETopologyString, RETURN begin topstring="
        print topstring
-       print "generateSimpleSLURMBETopologyString, RETURN end topstring" 
+       print "generateSimpleSLURMBETopologyString, RETURN end topstring"
 
     return topstring
 
