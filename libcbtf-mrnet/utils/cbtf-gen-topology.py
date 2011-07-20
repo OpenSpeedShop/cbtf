@@ -32,6 +32,7 @@ from sets import Set
 warnings.resetwarnings()
 from sys import stdout
 import os
+import sys
 from os import path
 
 # Flag indicating if debugging output will be displayed.
