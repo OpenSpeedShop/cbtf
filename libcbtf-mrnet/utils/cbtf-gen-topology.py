@@ -222,7 +222,7 @@ def generateSimpleBETopologyString():
     topstring += ' ;'
     return topstring
 
-TODO:FIXME
+#TODO:FIXME
 def generateSimpleSLURMBETopologyString():
     if debug:
        print "generateSimpleSLURMBETopologyString, hostnodeName=" + hostnodeName
