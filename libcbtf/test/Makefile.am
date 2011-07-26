@@ -29,6 +29,7 @@ test_LDFLAGS = \
 
 test_LDADD = \
 	-lcbtf \
+	@BOOST_FILESYSTEM_LIB@ \
 	@BOOST_UNIT_TEST_FRAMEWORK_LIB@
 
 test_SOURCES = test.cpp

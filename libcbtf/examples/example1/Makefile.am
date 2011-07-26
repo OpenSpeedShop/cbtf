@@ -20,7 +20,7 @@ noinst_PROGRAMS = test
 
 test_CXXFLAGS = -I$(top_srcdir)/include -DBUILDDIR="\"$(abs_builddir)\"" @BOOST_CPPFLAGS@
 test_LDFLAGS = -L$(top_srcdir)/src @BOOST_LDFLAGS@
-test_LDADD = -lcbtf @BOOST_UNIT_TEST_FRAMEWORK_LIB@
+test_LDADD = -lcbtf @BOOST_FILESYSTEM_LIB@ @BOOST_UNIT_TEST_FRAMEWORK_LIB@
 test_SOURCES = test.cpp
 
 noinst_LTLIBRARIES = ExampleComponentA.la ExampleComponentB.la
