@@ -24,6 +24,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
+#include <deque>
 #include <KrellInstitute/CBTF/Component.hpp>
 #include <KrellInstitute/CBTF/Type.hpp>
 #include <KrellInstitute/CBTF/Version.hpp>
@@ -68,12 +69,12 @@ namespace KrellInstitute { namespace CBTF {
         operator T()
         {
             boost::unique_lock<boost::mutex> guard_this(dm_mutex);
-            while (dm_has_value == false)
+            while (dm_values.empty())
             {
                 dm_cv.wait(guard_this);
             }
-            T value = dm_value;
-            dm_has_value = false;
+            T value = dm_values.front();
+            dm_values.pop_front();
             return value;
         }
         
@@ -81,9 +82,8 @@ namespace KrellInstitute { namespace CBTF {
 
         /** Default constructor. */
         ValueSink() :
-            Component(Type(typeid(ValueSink)), Version(1, 0, 0)),
-            dm_value(),
-            dm_has_value(false),
+            Component(Type(typeid(ValueSink)), Version(1, 1, 0)),
+            dm_values(),
             dm_mutex(),
             dm_cv()
         {
@@ -96,16 +96,12 @@ namespace KrellInstitute { namespace CBTF {
         void valueHandler(const T& value)
         {
             boost::unique_lock<boost::mutex> guard_this(dm_mutex);
-            dm_value = value;
-            dm_has_value = true;
+            dm_values.push_back(value);
             dm_cv.notify_one();
         }
-
-        /** Current value of this sink. */
-        T dm_value;
-
-        /** Flag indicating if the sink has a valid value. */
-        bool dm_has_value;
+        
+        /** Current values of this sink. */
+        std::deque<T> dm_values;
 
         /** Mutual exclusion lock for this sink. */
         boost::mutex dm_mutex;
