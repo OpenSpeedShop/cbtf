@@ -379,7 +379,9 @@ BOOST_AUTO_TEST_CASE(TestComponent)
     Component::connect(input_value_component, "value", instance_of_a, "in");
     Component::connect(instance_of_b, "half", output_value_component, "value");
     *input_value = 10;
-    BOOST_CHECK_EQUAL(10, *output_value);
+    int first_output_value = *output_value;
+    BOOST_CHECK_EQUAL(first_output_value, 10);
     *input_value = 42;
-    BOOST_CHECK_EQUAL(42, *output_value);
+    int second_output_value = *output_value;
+    BOOST_CHECK_EQUAL(second_output_value, 42);
 }

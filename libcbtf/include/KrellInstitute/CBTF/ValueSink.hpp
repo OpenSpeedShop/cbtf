@@ -65,7 +65,7 @@ namespace KrellInstitute { namespace CBTF {
          *
          * @return    Current value of this sink.
          */
-        operator T() const
+        operator T()
         {
             boost::unique_lock<boost::mutex> guard_this(dm_mutex);
             while (dm_has_value == false)
@@ -74,7 +74,6 @@ namespace KrellInstitute { namespace CBTF {
             }
             T value = dm_value;
             dm_has_value = false;
-            dm_cv.notify_all();
             return value;
         }
         
@@ -82,7 +81,7 @@ namespace KrellInstitute { namespace CBTF {
 
         /** Default constructor. */
         ValueSink() :
-            Component(Type(typeid(ValueSink)), Version(0, 1, 0)),
+            Component(Type(typeid(ValueSink)), Version(1, 0, 0)),
             dm_value(),
             dm_has_value(false),
             dm_mutex(),
@@ -99,20 +98,20 @@ namespace KrellInstitute { namespace CBTF {
             boost::unique_lock<boost::mutex> guard_this(dm_mutex);
             dm_value = value;
             dm_has_value = true;
-            dm_cv.notify_all();
+            dm_cv.notify_one();
         }
 
         /** Current value of this sink. */
         T dm_value;
 
         /** Flag indicating if the sink has a valid value. */
-        mutable bool dm_has_value;
+        bool dm_has_value;
 
         /** Mutual exclusion lock for this sink. */
-        mutable boost::mutex dm_mutex;
+        boost::mutex dm_mutex;
 
         /** Condition variable for this sink. */
-        mutable boost::condition_variable dm_cv;
+        boost::condition_variable dm_cv;
                 
     }; // class ValueSink<T>
 

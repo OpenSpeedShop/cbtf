@@ -122,5 +122,6 @@ BOOST_AUTO_TEST_CASE(TestXML)
     Component::connect(input_value_component, "value", network, "in");
     Component::connect(network, "out", output_value_component, "value");
     *input_value = 10;
-    BOOST_CHECK_EQUAL(42, *output_value);
+    int the_output_value = *output_value;
+    BOOST_CHECK_EQUAL(the_output_value, 42);
 }

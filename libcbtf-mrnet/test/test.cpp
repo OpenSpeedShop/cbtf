@@ -143,10 +143,14 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
     Component::connect(network, "out", output_value_component, "value");
 
     *topology_value = boost::filesystem::path(BUILDDIR) / "test.topology";
+
     *input_value = 10;
-    BOOST_CHECK_EQUAL(26, *output_value);
+    int first_output_value = *output_value;
+    BOOST_CHECK_EQUAL(first_output_value, 26);
+
     *input_value = 13;
-    BOOST_CHECK_EQUAL(32, *output_value);
+    int second_output_value = *output_value;
+    BOOST_CHECK_EQUAL(second_output_value, 32);
 }
 
 
