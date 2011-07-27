@@ -178,7 +178,9 @@ namespace {
             std::cout << std::endl << xml << std::endl << std::endl;
         }
         
-        i->second->initializeStepTwo(document, document.get()->getFirstChild());
+        i->second->initializeStepTwo(
+            document, document.get()->getDocumentElement()
+            );
         
         i->second->initializeStepThree(
             LocalComponentNetwork::IncomingBinder(), // No Incoming Upstreams

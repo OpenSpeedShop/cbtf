@@ -275,25 +275,26 @@ namespace {
         
         boost::tribool use_filter = boost::indeterminate;
 
-        if (use_filter == boost::indeterminate)
+        if (boost::indeterminate(use_filter))
         {
             std::string offset = xercesc::selectValue(
-                document.get(), "./Depth/LeafRelative/offset"
+                document.get()->getDocumentElement(),
+                "./Depth/LeafRelative/@offset"
                 );
 
             if (!offset.empty())
             {
                 use_filter =
-                    ((topology_info.get_MaxLeafDistance() -
-                      topology_info.get_RootDistance()) ==
+                    (topology_info.get_MaxLeafDistance() ==
                      boost::lexical_cast<int>(offset)) ? true : false;
             }
         }
 
-        if (use_filter == boost::indeterminate)
+        if (boost::indeterminate(use_filter))
         {
             std::string offset = xercesc::selectValue(
-                document.get(), "./Depth/RootRelative/offset"
+                document.get()->getDocumentElement(),
+                "./Depth/RootRelative/@offset"
                 );
 
             if (!offset.empty())
@@ -304,11 +305,15 @@ namespace {
             }
         }
 
-        if (use_filter == false)
+        if (!use_filter)
         {
-            std::cout << debug_prefix
-                      << "Received, and ignored, SpecifyFilter for distributed "
-                      << "component network UID " << uid << "." << std::endl;
+            if (is_filter_debug_enabled)
+            {
+                std::cout << debug_prefix
+                          << "Received, and ignored, SpecifyFilter for "
+                          << "distributed component network UID " << uid 
+                          << "." << std::endl;
+            }
             return;
         }
         
@@ -331,7 +336,9 @@ namespace {
             std::cout << std::endl << xml << std::endl << std::endl;
         }
 
-        i->second->initializeStepTwo(document, document.get()->getFirstChild());
+        i->second->initializeStepTwo(
+            document, document.get()->getDocumentElement()
+            );
         
         i->second->initializeStepThree(
             boost::bind(&bindIncomingUpstream, _1),
