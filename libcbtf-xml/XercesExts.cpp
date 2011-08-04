@@ -311,7 +311,8 @@ boost::shared_ptr<DOMDocument> XERCES_CPP_NAMESPACE_QUALIFIER loadFromFile(
                 {
                     found_schema = true;
                     parser->loadGrammar(
-                        i->string().c_str(), Grammar::SchemaGrammarType, true
+                        i->path().string().c_str(),
+                        Grammar::SchemaGrammarType, true
                         );
                 }
             }
