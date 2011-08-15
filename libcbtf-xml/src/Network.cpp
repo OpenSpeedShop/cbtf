@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -23,7 +23,7 @@
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
 #include <boost/spirit/home/classic.hpp>
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <cstdlib>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
 #include <KrellInstitute/CBTF/Impl/InputMediator.hpp>
@@ -51,7 +51,7 @@ namespace {
     PluginSet plugins;
 
     /** Mutual exclusion lock for the set of loaded plugins. */
-    boost::mutex plugins_mutex;
+    boost::recursive_mutex plugins_mutex;
 
     /** Push the value of the specified node onto the given vector of paths. */
     void pushPath(const xercesc::DOMNode* node,
@@ -69,7 +69,7 @@ namespace {
     {
         using namespace boost::filesystem;
         
-        boost::mutex::scoped_lock guard_plugins(plugins_mutex);
+        boost::recursive_mutex::scoped_lock guard_plugins(plugins_mutex);
         
         if (plugins.find(path) != plugins.end())
         {
