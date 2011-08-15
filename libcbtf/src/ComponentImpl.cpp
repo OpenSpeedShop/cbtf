@@ -85,7 +85,7 @@ void ComponentImpl::registerFactoryFunction(
 {
     Component::Instance instance = function();
 
-    boost::unique_lock<boost::shared_mutex> guard_factories(dm_factories_mutex);
+    boost::recursive_mutex::scoped_lock guard_factories(dm_factories_mutex);
     
     FactoryMap::iterator i = dm_factories.find(instance->getType());
     if (i == dm_factories.end())
@@ -105,7 +105,7 @@ void ComponentImpl::registerFactoryFunction(
 //------------------------------------------------------------------------------
 std::set<Type> ComponentImpl::getAvailableTypes()
 {
-    boost::shared_lock<boost::shared_mutex> guard_factories(dm_factories_mutex);
+    boost::recursive_mutex::scoped_lock guard_factories(dm_factories_mutex);
     
     std::set<Type> available_types;
     for (FactoryMap::const_iterator
@@ -125,7 +125,7 @@ std::set<Type> ComponentImpl::getAvailableTypes()
 //------------------------------------------------------------------------------
 std::set<Version> ComponentImpl::getAvailableVersions(const Type& type)
 {
-    boost::shared_lock<boost::shared_mutex> guard_factories(dm_factories_mutex);
+    boost::recursive_mutex::scoped_lock guard_factories(dm_factories_mutex);
 
     FactoryMap::const_iterator i = dm_factories.find(type);
     if (i == dm_factories.end())
@@ -159,7 +159,7 @@ Component::Instance ComponentImpl::instantiate(
     const boost::optional<Version>& version
     )
 {
-    boost::shared_lock<boost::shared_mutex> guard_factories(dm_factories_mutex);
+    boost::recursive_mutex::scoped_lock guard_factories(dm_factories_mutex);
 
     FactoryMap::const_iterator i = dm_factories.find(type);
     if (i == dm_factories.end())
@@ -518,4 +518,4 @@ ComponentImpl::FactoryMap ComponentImpl::dm_factories;
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-boost::shared_mutex ComponentImpl::dm_factories_mutex;
+boost::recursive_mutex ComponentImpl::dm_factories_mutex;
