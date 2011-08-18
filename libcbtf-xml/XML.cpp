@@ -19,10 +19,10 @@
 /** @file Definition of the XML functions. */
 
 #include <boost/bind.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 #include <KrellInstitute/CBTF/XML.hpp>
 #include <utility>
 
+#include "Global.hpp"
 #include "Network.hpp"
 #include "XercesExts.hpp"
 #include "XML.hpp"
@@ -34,31 +34,29 @@ using namespace KrellInstitute::CBTF::Impl;
 
 /** Anonymous namespace hiding implementation details. */
 namespace {
-    
-    /**
-     * Type of associative container used to map the XML tags identifying
-     * the kind of component network to their corresponding handler.
-     */
-    typedef std::map<std::string, DOMNodeHandler> HandlerMap;
-    
-    /** Set of available handlers. */
-    HandlerMap handlers;
-    
-    /** Mutual exclusion lock for the set of available handlers. */
-    boost::recursive_mutex handlers_mutex;
 
+    /**
+     * Global associative container mapping the XML tags identifying the
+     * kind of component network to their corresponding handler.
+     */
+    KRELL_INSTITUTE_CBTF_IMPL_GLOBAL(
+        Handlers, std::map<std::string BOOST_PP_COMMA() DOMNodeHandler>
+        )
+        
     /** Invoke the appropriate handler for the specified node. */
     void invokeHandler(const boost::shared_ptr<xercesc::DOMDocument>& document,
                        const xercesc::DOMNode* node)
     {
-        boost::recursive_mutex::scoped_lock guard_handlers(handlers_mutex);
+        Handlers::GuardType guard_handlers(Handlers::mutex());
 
         char* transcoded_node_name = xercesc::XMLString::transcode(
             node->getNodeName()
             );
 
-        HandlerMap::const_iterator i = handlers.find(transcoded_node_name);
-        if (i != handlers.end())
+        Handlers::Type::const_iterator i = 
+            Handlers::value().find(transcoded_node_name);
+        
+        if (i != Handlers::value().end())
         {
             (i->second)(document, node);
         }
@@ -119,11 +117,11 @@ void KrellInstitute::CBTF::Impl::registerKindOfComponentNetwork(
     const DOMNodeHandler& handler
     )
 {
-    boost::recursive_mutex::scoped_lock guard_handlers(handlers_mutex);
+    Handlers::GuardType guard_handlers(Handlers::mutex());
 
-    if (handlers.find(tag) == handlers.end())
+    if (Handlers::value().find(tag) == Handlers::value().end())
     {
-        handlers.insert(std::make_pair(tag, handler));
+        Handlers::value().insert(std::make_pair(tag, handler));
     }
 }
 

@@ -23,13 +23,13 @@
 #include <boost/optional.hpp>
 #include <boost/ref.hpp>
 #include <boost/spirit/home/classic.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 #include <cstdlib>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
 #include <KrellInstitute/CBTF/XML.hpp>
 #include <set>
 #include <stdexcept>
 
+#include "Global.hpp"
 #include "InputMediator.hpp"
 #include "Network.hpp"
 #include "OutputMediator.hpp"
@@ -44,14 +44,8 @@ using namespace KrellInstitute::CBTF::Impl;
 /** Anonymous namespace hiding implementation details. */
 namespace {
 
-    /** Type of associative container used to track the loaded plugins. */
-    typedef std::set<boost::filesystem::path> PluginSet;
-
-    /** Set of loaded plugins. */
-    PluginSet plugins;
-
-    /** Mutual exclusion lock for the set of loaded plugins. */
-    boost::recursive_mutex plugins_mutex;
+    /** Global associative container used to track the loaded plugins. */
+    KRELL_INSTITUTE_CBTF_IMPL_GLOBAL(Plugins, std::set<boost::filesystem::path>)
 
     /** Push the value of the specified node onto the given vector of paths. */
     void pushPath(const xercesc::DOMNode* node,
@@ -68,10 +62,10 @@ namespace {
     bool registerPlugin(const boost::filesystem::path& path)
     {
         using namespace boost::filesystem;
+
+        Plugins::GuardType guard_plugins(Plugins::mutex());
         
-        boost::recursive_mutex::scoped_lock guard_plugins(plugins_mutex);
-        
-        if (plugins.find(path) != plugins.end())
+        if (Plugins::value().find(path) != Plugins::value().end())
         {
             return true;
         }
@@ -87,8 +81,8 @@ namespace {
                 Component::registerPlugin(path);
             }
 
-            plugins.insert(path);
-
+            Plugins::value().insert(path);
+            
             return true;
         }
         catch (...)
