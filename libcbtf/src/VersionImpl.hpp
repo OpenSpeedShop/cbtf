@@ -18,9 +18,9 @@
 
 /** @file Declaration of the VersionImpl class. */
 
-#include <string>
-
 #pragma once
+
+#include <string>
 
 namespace KrellInstitute { namespace CBTF { namespace Impl {
 
