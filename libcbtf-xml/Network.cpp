@@ -26,7 +26,6 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <cstdlib>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <KrellInstitute/CBTF/XML.hpp>
 #include <set>
 #include <stdexcept>
@@ -34,6 +33,7 @@
 #include "InputMediator.hpp"
 #include "Network.hpp"
 #include "OutputMediator.hpp"
+#include "Raise.hpp"
 #include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF;

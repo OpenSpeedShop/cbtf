@@ -21,7 +21,6 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <cstddef>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <stdexcept>
 #include <stdlib.h>
 #include <string.h>
@@ -29,6 +28,7 @@
 
 #include "MessageTags.hpp"
 #include "NamedStreams.hpp"
+#include "Raise.hpp"
 #include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF;

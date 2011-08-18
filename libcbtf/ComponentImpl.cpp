@@ -23,10 +23,10 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/once.hpp>
 #include <dlfcn.h>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <stdexcept>
 
 #include "ComponentImpl.hpp"
+#include "Raise.hpp"
 
 using namespace KrellInstitute::CBTF;
 using namespace KrellInstitute::CBTF::Impl;

@@ -21,7 +21,6 @@
 #include <boost/bind.hpp>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <stdexcept>
 
 #include "InputMediator.hpp"
@@ -29,6 +28,7 @@
 #include "MRNet.hpp"
 #include "NamedStreams.hpp"
 #include "OutputMediator.hpp"
+#include "Raise.hpp"
 #include "XercesExts.hpp"
 #include "XML.hpp"
 

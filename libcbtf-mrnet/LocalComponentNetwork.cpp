@@ -20,10 +20,10 @@
 
 #include <boost/bind.hpp>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <stdexcept>
 
 #include "LocalComponentNetwork.hpp"
+#include "Raise.hpp"
 #include "XercesExts.hpp"
 #include "XML.hpp"
 

@@ -23,7 +23,7 @@ add_library(cbtf SHARED
     KrellInstitute/CBTF/Impl/InvokerForAny.hpp
     KrellInstitute/CBTF/Impl/InvokerFor.hpp
     KrellInstitute/CBTF/Impl/Invoker.hpp
-    KrellInstitute/CBTF/Impl/Raise.hpp
+    Raise.hpp
     KrellInstitute/CBTF/Type.hpp Type.cpp
     TypeImpl.hpp TypeImpl.cpp
     KrellInstitute/CBTF/Version.hpp Version.cpp

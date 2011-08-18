@@ -23,7 +23,6 @@
 #include <boost/ref.hpp>
 #include <boost/spirit/home/classic.hpp>
 #include <deque>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <set>
 #include <stdexcept>
 #include <utility>
@@ -32,6 +31,7 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 
+#include "Raise.hpp"
 #include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;

@@ -20,13 +20,13 @@
 
 #include <boost/shared_ptr.hpp>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <KrellInstitute/CBTF/Type.hpp>
 #include <KrellInstitute/CBTF/Version.hpp>
 #include <string>
 #include <typeinfo>
 
 #include "IncomingStreamMediator.hpp"
+#include "Raise.hpp"
 #include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF;

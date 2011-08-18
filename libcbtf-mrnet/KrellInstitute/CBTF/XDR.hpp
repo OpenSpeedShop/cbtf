@@ -21,10 +21,10 @@
 #pragma once
 
 #include <boost/bind.hpp>
+#include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <KrellInstitute/CBTF/Component.hpp>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <KrellInstitute/CBTF/Type.hpp>
 #include <KrellInstitute/CBTF/Version.hpp>
 #include <mrnet/Packet.h>
@@ -68,10 +68,11 @@ namespace KrellInstitute { namespace CBTF {
         {
             if (_xdr_proc == NULL)
             {
-                Impl::raise<std::runtime_error>(
-                    "The XDR procedure for type \"%1%\" was null.",
-                    typeid(T).name()
-                    );
+                throw std::runtime_error(boost::str(
+                    boost::format(
+                        "The XDR procedure for type \"%1%\" was null."
+                        ) % typeid(T).name()
+                    ));
             }
             
             declareInput<boost::shared_ptr<T> >(
@@ -147,10 +148,11 @@ namespace KrellInstitute { namespace CBTF {
         {
             if (_xdr_proc == NULL)
             {
-                Impl::raise<std::runtime_error>(
-                    "The XDR procedure for type \"%1%\" was null.",
-                    typeid(T).name()
-                    );
+                throw std::runtime_error(boost::str(
+                    boost::format(
+                        "The XDR procedure for type \"%1%\" was null."
+                        ) % typeid(T).name()
+                    ));
             }
 
             declareInput<MRN::PacketPtr>(
@@ -168,7 +170,7 @@ namespace KrellInstitute { namespace CBTF {
             if ((in->unpack("%auc", &contents, &size) != 0) ||
                 (contents == NULL) || (size == 0))
             {
-                Impl::raise<std::runtime_error>(
+                throw std::runtime_error(
                     "The incoming message could not be unpacked."
                     );
             }
@@ -181,7 +183,7 @@ namespace KrellInstitute { namespace CBTF {
             boost::shared_ptr<T> value(new T());
             if ((*_xdr_proc)(&xdrs, value.get()) == FALSE)
             {
-                Impl::raise<std::runtime_error>(
+                throw std::runtime_error(
                     "The incoming message could not be decoded."
                     );                
             }

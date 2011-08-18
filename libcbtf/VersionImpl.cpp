@@ -20,9 +20,9 @@
 
 #include <boost/format.hpp>
 #include <boost/spirit/home/classic.hpp>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <stdexcept>
 
+#include "Raise.hpp"
 #include "VersionImpl.hpp"
 
 using namespace KrellInstitute::CBTF;

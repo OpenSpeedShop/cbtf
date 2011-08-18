@@ -23,7 +23,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread/locks.hpp>
 #include <iostream>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <stdexcept>
 #include <stdlib.h>
 #include <string>
@@ -32,6 +31,7 @@
 
 #include "Frontend.hpp"
 #include "MessageTags.hpp"
+#include "Raise.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;
 

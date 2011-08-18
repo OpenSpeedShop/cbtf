@@ -22,7 +22,6 @@
 #include <boost/thread.hpp>
 #include <boost/thread/locks.hpp>
 #include <iostream>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <map>
 #include <mrnet/MRNet.h>
 #include <stdexcept>
@@ -30,6 +29,7 @@
 
 #include "Backend.hpp"
 #include "MessageTags.hpp"
+#include "Raise.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;
 

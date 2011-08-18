@@ -22,11 +22,11 @@
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
 #include <mrnet/MRNet.h>
+#include <stdexcept>
 #include <typeinfo>
 
 #include <KrellInstitute/CBTF/Component.hpp>
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
-#include <KrellInstitute/CBTF/Impl/Raise.hpp>
 #include <KrellInstitute/CBTF/Type.hpp>
 #include <KrellInstitute/CBTF/Version.hpp>
 
@@ -94,7 +94,7 @@ private:
             ));
         if (network->has_Error())
         {
-            raise<std::runtime_error>("Unable to create the MRNet network.");
+             throw std::runtime_error("Unable to create the MRNet network.");
         }
         
         // Destroy the argv-style argument list
