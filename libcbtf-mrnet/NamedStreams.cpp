@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -22,7 +22,6 @@
 #include <boost/lexical_cast.hpp>
 #include <cstddef>
 #include <KrellInstitute/CBTF/Impl/Raise.hpp>
-#include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
 #include <stdexcept>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +29,7 @@
 
 #include "MessageTags.hpp"
 #include "NamedStreams.hpp"
+#include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF;
 using namespace KrellInstitute::CBTF::Impl;

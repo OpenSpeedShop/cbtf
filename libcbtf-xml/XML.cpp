@@ -20,12 +20,12 @@
 
 #include <boost/bind.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-#include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
-#include <KrellInstitute/CBTF/Impl/XML.hpp>
 #include <KrellInstitute/CBTF/XML.hpp>
 #include <utility>
 
 #include "Network.hpp"
+#include "XercesExts.hpp"
+#include "XML.hpp"
 
 using namespace KrellInstitute::CBTF;
 using namespace KrellInstitute::CBTF::Impl;

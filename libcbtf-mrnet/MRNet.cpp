@@ -20,17 +20,17 @@
 
 #include <boost/bind.hpp>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
-#include <KrellInstitute/CBTF/Impl/InputMediator.hpp>
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
-#include <KrellInstitute/CBTF/Impl/OutputMediator.hpp>
 #include <KrellInstitute/CBTF/Impl/Raise.hpp>
-#include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
-#include <KrellInstitute/CBTF/Impl/XML.hpp>
 #include <stdexcept>
 
+#include "InputMediator.hpp"
 #include "MessageTags.hpp"
 #include "MRNet.hpp"
 #include "NamedStreams.hpp"
+#include "OutputMediator.hpp"
+#include "XercesExts.hpp"
+#include "XML.hpp"
 
 using namespace KrellInstitute::CBTF;
 using namespace KrellInstitute::CBTF::Impl;

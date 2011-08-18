@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -21,11 +21,11 @@
 #include <boost/bind.hpp>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
 #include <KrellInstitute/CBTF/Impl/Raise.hpp>
-#include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
-#include <KrellInstitute/CBTF/Impl/XML.hpp>
 #include <stdexcept>
 
 #include "LocalComponentNetwork.hpp"
+#include "XercesExts.hpp"
+#include "XML.hpp"
 
 using namespace KrellInstitute::CBTF;
 using namespace KrellInstitute::CBTF::Impl;

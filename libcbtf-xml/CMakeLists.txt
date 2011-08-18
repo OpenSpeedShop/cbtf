@@ -17,12 +17,12 @@
 ################################################################################
 
 add_library(cbtf-xml SHARED
-    KrellInstitute/CBTF/Impl/DOMNodeHandler.hpp
-    KrellInstitute/CBTF/Impl/InputMediator.hpp
+    DOMNodeHandler.hpp
+    InputMediator.hpp
     Network.cpp Network.hpp
-    KrellInstitute/CBTF/Impl/OutputMediator.hpp
-    KrellInstitute/CBTF/Impl/XercesExts.hpp XercesExts.cpp
-    KrellInstitute/CBTF/XML.hpp KrellInstitute/CBTF/Impl/XML.hpp XML.cpp
+    OutputMediator.hpp
+    XercesExts.hpp XercesExts.cpp
+    KrellInstitute/CBTF/XML.hpp XML.hpp XML.cpp
     )
 
 add_definitions(

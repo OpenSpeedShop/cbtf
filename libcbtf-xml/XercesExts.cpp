@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -24,7 +24,6 @@
 #include <boost/spirit/home/classic.hpp>
 #include <deque>
 #include <KrellInstitute/CBTF/Impl/Raise.hpp>
-#include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
 #include <set>
 #include <stdexcept>
 #include <utility>
@@ -32,6 +31,8 @@
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
+
+#include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;
 XERCES_CPP_NAMESPACE_USE

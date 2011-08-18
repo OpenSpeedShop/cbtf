@@ -27,7 +27,6 @@
 #include <boost/weak_ptr.hpp>
 #include <cstdlib>
 #include <iostream>
-#include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
 #include <map>
 #include <mrnet/MRNet.h>
 #include <string>
@@ -39,6 +38,7 @@
 #include "LocalComponentNetwork.hpp"
 #include "MessageTags.hpp"
 #include "NamedStreams.hpp"
+#include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;
 

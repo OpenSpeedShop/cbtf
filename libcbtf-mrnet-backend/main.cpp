@@ -28,7 +28,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
-#include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
 #include <mrnet/MRNet.h>
 #include <unistd.h>
 #include <xercesc/dom/DOM.hpp>
@@ -39,6 +38,7 @@
 #include "MessageHandler.hpp"
 #include "MessageTags.hpp"
 #include "NamedStreams.hpp"
+#include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;
 
