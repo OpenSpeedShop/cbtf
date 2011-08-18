@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -24,6 +24,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/utility.hpp>
 #include <boost/weak_ptr.hpp>
@@ -142,7 +143,7 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
         static FactoryMap dm_factories;
         
         /** Mutual exclusion lock for the set of available components. */
-        static boost::shared_mutex dm_factories_mutex;
+        static boost::recursive_mutex dm_factories_mutex;
 
         /** Mutual exclusion lock for this component. */
         mutable boost::shared_mutex dm_mutex;

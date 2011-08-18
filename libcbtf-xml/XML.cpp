@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -19,7 +19,7 @@
 /** @file Definition of the XML functions. */
 
 #include <boost/bind.hpp>
-#include <boost/thread/shared_mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <KrellInstitute/CBTF/Impl/XercesExts.hpp>
 #include <KrellInstitute/CBTF/Impl/XML.hpp>
 #include <KrellInstitute/CBTF/XML.hpp>
@@ -45,13 +45,13 @@ namespace {
     HandlerMap handlers;
     
     /** Mutual exclusion lock for the set of available handlers. */
-    boost::shared_mutex handlers_mutex;
+    boost::recursive_mutex handlers_mutex;
 
     /** Invoke the appropriate handler for the specified node. */
     void invokeHandler(const boost::shared_ptr<xercesc::DOMDocument>& document,
                        const xercesc::DOMNode* node)
     {
-        boost::shared_lock<boost::shared_mutex> guard_handlers(handlers_mutex);
+        boost::recursive_mutex::scoped_lock guard_handlers(handlers_mutex);
 
         char* transcoded_node_name = xercesc::XMLString::transcode(
             node->getNodeName()
@@ -119,7 +119,7 @@ void KrellInstitute::CBTF::Impl::registerKindOfComponentNetwork(
     const DOMNodeHandler& handler
     )
 {
-    boost::unique_lock<boost::shared_mutex> guard_handlers(handlers_mutex);
+    boost::recursive_mutex::scoped_lock guard_handlers(handlers_mutex);
 
     if (handlers.find(tag) == handlers.end())
     {
