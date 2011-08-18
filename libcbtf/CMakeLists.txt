@@ -20,6 +20,7 @@ add_library(cbtf SHARED
     KrellInstitute/CBTF/BoostExts.hpp
     KrellInstitute/CBTF/Component.hpp Component.cpp
     ComponentImpl.hpp ComponentImpl.cpp
+    Global.hpp
     KrellInstitute/CBTF/Impl/InvokerForAny.hpp
     KrellInstitute/CBTF/Impl/InvokerFor.hpp
     KrellInstitute/CBTF/Impl/Invoker.hpp

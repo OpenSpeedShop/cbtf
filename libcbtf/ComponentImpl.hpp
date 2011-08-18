@@ -24,7 +24,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/shared_mutex.hpp>
 #include <boost/utility.hpp>
 #include <boost/weak_ptr.hpp>
@@ -124,26 +123,12 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
             > ConnectionMap;
 
         /**
-         * Type of associative container used to map the available component
-         * types and versions to their corresponding factory function.
-         */
-        typedef std::map<
-            Type, std::map<Version, Component::FactoryFunction>
-            > FactoryMap;
-
-        /**
          * Type of associative container used to map a component's inputs to
          * their corresponding handler function.
          */
         typedef std::map<
             std::string, boost::shared_ptr<Impl::Invoker>
             > HandlerMap;
-
-        /** Set of available components. */
-        static FactoryMap dm_factories;
-        
-        /** Mutual exclusion lock for the set of available components. */
-        static boost::recursive_mutex dm_factories_mutex;
 
         /** Mutual exclusion lock for this component. */
         mutable boost::shared_mutex dm_mutex;

@@ -26,10 +26,30 @@
 #include <stdexcept>
 
 #include "ComponentImpl.hpp"
+#include "Global.hpp"
 #include "Raise.hpp"
 
 using namespace KrellInstitute::CBTF;
 using namespace KrellInstitute::CBTF::Impl;
+
+
+
+/** Anonymous namespace hiding implementation details. */
+namespace {
+
+    /** 
+     * Global associative container mapping the available component
+     * types and versions to their corresponding factory function.
+     */
+    KRELL_INSTITUTE_CBTF_IMPL_GLOBAL(
+        Factories,
+        std::map<
+            Type BOOST_PP_COMMA() 
+            std::map<Version BOOST_PP_COMMA() Component::FactoryFunction>
+            >
+        )
+    
+} // namespace <anonymous>
 
 
 
@@ -65,13 +85,13 @@ void ComponentImpl::registerFactoryFunction(
 {
     Component::Instance instance = function();
 
-    boost::recursive_mutex::scoped_lock guard_factories(dm_factories_mutex);
+    Factories::GuardType guard_factories(Factories::mutex());
     
-    FactoryMap::iterator i = dm_factories.find(instance->getType());
-    if (i == dm_factories.end())
+    Factories::Type::iterator i = Factories::value().find(instance->getType());
+    if (i == Factories::value().end())
     {
-        i = dm_factories.insert(
-            std::make_pair(instance->getType(), FactoryMap::mapped_type())
+        i = Factories::value().insert(
+            std::make_pair(instance->getType(), Factories::Type::mapped_type())
             ).first;
     }
     
@@ -85,11 +105,11 @@ void ComponentImpl::registerFactoryFunction(
 //------------------------------------------------------------------------------
 std::set<Type> ComponentImpl::getAvailableTypes()
 {
-    boost::recursive_mutex::scoped_lock guard_factories(dm_factories_mutex);
-    
+    Factories::GuardType guard_factories(Factories::mutex());
+
     std::set<Type> available_types;
-    for (FactoryMap::const_iterator
-             i = dm_factories.begin(); i != dm_factories.end(); ++i)
+    for (Factories::Type::const_iterator
+             i = Factories::value().begin(); i != Factories::value().end(); ++i)
     {
         available_types.insert(i->first);
     }
@@ -105,10 +125,10 @@ std::set<Type> ComponentImpl::getAvailableTypes()
 //------------------------------------------------------------------------------
 std::set<Version> ComponentImpl::getAvailableVersions(const Type& type)
 {
-    boost::recursive_mutex::scoped_lock guard_factories(dm_factories_mutex);
+    Factories::GuardType guard_factories(Factories::mutex());
 
-    FactoryMap::const_iterator i = dm_factories.find(type);
-    if (i == dm_factories.end())
+    Factories::Type::const_iterator i = Factories::value().find(type);
+    if (i == Factories::value().end())
     {
         raise<std::runtime_error>(
             "There are no available versions of "
@@ -118,7 +138,7 @@ std::set<Version> ComponentImpl::getAvailableVersions(const Type& type)
     }
 
     std::set<Version> available_versions;
-    for (FactoryMap::mapped_type::const_iterator
+    for (Factories::Type::mapped_type::const_iterator
              j = i->second.begin(); j != i->second.end(); ++j)
     {
         available_versions.insert(j->first);
@@ -139,10 +159,10 @@ Component::Instance ComponentImpl::instantiate(
     const boost::optional<Version>& version
     )
 {
-    boost::recursive_mutex::scoped_lock guard_factories(dm_factories_mutex);
+    Factories::GuardType guard_factories(Factories::mutex());
 
-    FactoryMap::const_iterator i = dm_factories.find(type);
-    if (i == dm_factories.end())
+    Factories::Type::const_iterator i = Factories::value().find(type);
+    if (i == Factories::value().end())
     {
         raise<std::runtime_error>(
             "There is no factory function registered "
@@ -156,7 +176,9 @@ Component::Instance ComponentImpl::instantiate(
         return i->second.rbegin()->second();
     }
 
-    FactoryMap::mapped_type::const_iterator j = i->second.find(version.get());
+    Factories::Type::mapped_type::const_iterator j = 
+        i->second.find(version.get());
+
     if (j == i->second.end())
     {
         raise<std::runtime_error>(
@@ -487,15 +509,3 @@ void ComponentImpl::emitOutputImpl(const std::string& name, const Type& type,
         }
     }
 }
-
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-ComponentImpl::FactoryMap ComponentImpl::dm_factories;
-
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-boost::recursive_mutex ComponentImpl::dm_factories_mutex;
