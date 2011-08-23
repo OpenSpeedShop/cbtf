@@ -19,15 +19,17 @@
 /** @file Definition of the ComponentImpl class. */
 
 #include <boost/assert.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
-#include <boost/thread/once.hpp>
 #include <dlfcn.h>
+#include <set>
 #include <stdexcept>
 
 #include "ComponentImpl.hpp"
 #include "Global.hpp"
 #include "Raise.hpp"
+#include "ResolvePath.hpp"
 
 using namespace KrellInstitute::CBTF;
 using namespace KrellInstitute::CBTF::Impl;
@@ -36,6 +38,9 @@ using namespace KrellInstitute::CBTF::Impl;
 
 /** Anonymous namespace hiding implementation details. */
 namespace {
+
+    /** Global associative container used to track the loaded plugins. */
+    KRELL_INSTITUTE_CBTF_IMPL_GLOBAL(Plugins, std::set<boost::filesystem::path>)
 
     /** 
      * Global associative container mapping the available component
@@ -54,22 +59,43 @@ namespace {
 
 
 //------------------------------------------------------------------------------
-// Load the module with the specified path. Loading the module causes all of
-// the components contained within the module to be registered with this class.
+// Load the module with the specified path (after path resolution) if it hasn't
+// already been loaded. Loading a module causes all of the components contained
+// within that module to be registered with this class.
 //------------------------------------------------------------------------------
 void ComponentImpl::registerPlugin(const boost::filesystem::path& path)
 {
-    boost::filesystem::path real_path = path.extension().empty() ?
-        boost::filesystem::change_extension(path, ".so") : path;
+    using namespace boost::filesystem;
 
-    if (dlopen(real_path.string().c_str(), RTLD_NOW) == NULL)
+    boost::filesystem::path resolved_path = resolvePath(
+        kPluginFileType,
+        path.extension().empty() ? change_extension(path, ".so") : path
+        );
+    
+    if (resolved_path.empty())
+    {
+        raise<std::runtime_error>(
+            "The specified plugin (%1%) doesn't exist.", path
+            );
+    }
+    
+    Plugins::GuardType guard_plugins(Plugins::mutex());
+
+    if (Plugins::value().find(resolved_path) != Plugins::value().end())
+    {
+        return;
+    }
+    
+    if (dlopen(resolved_path.string().c_str(), RTLD_NOW) == NULL)
     {
         raise<std::runtime_error>(
             "The specified plugin (%1%) doesn't exist or is not "
             "of the correct format. dlopen() reported \"%2%\".",
-            path, dlerror()
+            resolved_path, dlerror()
             );
     }
+    
+    Plugins::value().insert(path);
 }
 
 
