@@ -34,6 +34,13 @@ add_library(cbtf SHARED
     VersionImpl.hpp VersionImpl.cpp
     )
 
+add_definitions(
+  -DCBTF_DATA_FILE_DIR="${CMAKE_INSTALL_PREFIX}/share/KrellInstitute/CBTF"
+  -DCBTF_EXECUTABLE_FILE_DIR="${CMAKE_INSTALL_PREFIX}/bin"
+  -DCBTF_LIBRARY_FILE_DIR="${CMAKE_INSTALL_PREFIX}/lib"
+  -DCBTF_PLUGIN_FILE_DIR="${CMAKE_INSTALL_PREFIX}/lib/KrellInstitute/CBTF"
+  )
+  
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${Boost_INCLUDE_DIRS}

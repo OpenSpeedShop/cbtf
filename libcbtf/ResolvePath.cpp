@@ -18,7 +18,10 @@
 
 /** @file Definition of the path resolution functions. */
 
+#include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/spirit/home/classic.hpp>
+#include <cstdlib>
 #include <map>
 #include <stdexcept>
 #include <vector>
@@ -44,6 +47,34 @@ namespace {
            FileType BOOST_PP_COMMA() std::vector<boost::filesystem::path>
            >
         )
+
+    /**
+     * Statically initialized C++ structure adding the default search paths.
+     */
+    struct AddDefaultSearchPaths
+    {
+        AddDefaultSearchPaths()
+        {
+            const char* cbtf_plugin_paths = getenv("CBTF_PLUGIN_PATH");
+            if (cbtf_plugin_paths != NULL)
+            {
+                using namespace boost::spirit::classic;
+
+                parse(
+                    cbtf_plugin_paths,
+                    list_p((+~ch_p(':'))[
+                        boost::bind(appendToSearchPath, kPluginFileType, _1)
+                        ], ch_p(':')),
+                    space_p
+                    );
+            }
+
+            appendToSearchPath(kDataFileType, CBTF_DATA_FILE_DIR);
+            appendToSearchPath(kExecutableFileType, CBTF_EXECUTABLE_FILE_DIR);
+            appendToSearchPath(kLibraryFileType, CBTF_LIBRARY_FILE_DIR);
+            appendToSearchPath(kPluginFileType, CBTF_PLUGIN_FILE_DIR);
+        }
+    } add_default_search_paths;
 
 } // namespace <anonymous>
 
