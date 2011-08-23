@@ -65,7 +65,7 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
     }
 
     // Resolve the filter path
-    boost::filesystem::path filter_path = 
+    boost::filesystem::path filter_path =
         resolvePath(kLibraryFileType, FILTER_FILE);
     if (filter_path.empty())
     {

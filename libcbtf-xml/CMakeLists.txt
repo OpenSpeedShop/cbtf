@@ -25,11 +25,6 @@ add_library(cbtf-xml SHARED
     KrellInstitute/CBTF/XML.hpp XML.hpp XML.cpp
     )
 
-add_definitions(
-    -DPLUGIN_DIR="${CMAKE_INSTALL_PREFIX}/lib/KrellInstitute/CBTF"
-    -DSCHEMA_DIR="${CMAKE_INSTALL_PREFIX}/share/KrellInstitute/CBTF"
-    )
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/libcbtf

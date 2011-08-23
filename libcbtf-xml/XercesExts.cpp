@@ -298,6 +298,7 @@ boost::shared_ptr<DOMDocument> XERCES_CPP_NAMESPACE_QUALIFIER loadFromFile(
     
     try
     {
+#if defined(DISABLE_NONWORKING_SCHEMA_SUPPORT)
         boost::filesystem::path schema_directory = SCHEMA_DIR;
         
         if (is_directory(schema_directory))
@@ -326,6 +327,7 @@ boost::shared_ptr<DOMDocument> XERCES_CPP_NAMESPACE_QUALIFIER loadFromFile(
                 parser->useCachedGrammarInParse(true);
             }
         }
+#endif
 
         parser->parse(path.string().c_str());
         document = parser->adoptDocument();

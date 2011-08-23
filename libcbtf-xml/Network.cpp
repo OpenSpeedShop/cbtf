@@ -34,6 +34,7 @@
 #include "Network.hpp"
 #include "OutputMediator.hpp"
 #include "Raise.hpp"
+#include "ResolvePath.hpp"
 #include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF;
@@ -55,40 +56,31 @@ namespace {
     }
     
     /**
-     * Register the plugin at the specified path if it wasn't previously
-     * registered, and return a boolean flag indicating if the plugin is
-     * now registered.
+     * Register the plugin with the specified path (after path resolution) if
+     * it hasn't already been loaded.
      */
-    bool registerPlugin(const boost::filesystem::path& path)
+    void registerPlugin(const boost::filesystem::path& path)
     {
-        using namespace boost::filesystem;
+        boost::filesystem::path resolved_path = 
+            resolvePath(kPluginFileType, path);
 
+        if (resolved_path.empty())
+        {
+            raise<std::runtime_error>(
+                "The specified plugin (%1%) doesn't exist.", path
+                );
+        }
+    
         Plugins::GuardType guard_plugins(Plugins::mutex());
-        
-        if (Plugins::value().find(path) != Plugins::value().end())
-        {
-            return true;
-        }
-        
-        try
-        {
-            if (is_regular_file(path) && (extension(path) == ".xml"))
-            {
-                registerXML(path);
-            }
-            else
-            {
-                Component::registerPlugin(path);
-            }
 
-            Plugins::value().insert(path);
-            
-            return true;
-        }
-        catch (...)
+        if (Plugins::value().find(resolved_path) != Plugins::value().end())
         {
-            return false;
+            return;
         }
+    
+        registerXML(path);
+    
+        Plugins::value().insert(path);
     }
     
 } // namespace <anonymous>
@@ -118,20 +110,6 @@ Component::Instance Network::factoryFunction(
 {
     std::vector<boost::filesystem::path> search_paths, plugin_paths;
     
-    search_paths.push_back(boost::filesystem::path(PLUGIN_DIR));
-    
-    const char* cbtf_plugin_paths = getenv("CBTF_PLUGIN_PATH");
-    if (cbtf_plugin_paths != NULL)
-    {
-        using namespace boost::spirit::classic;
-        
-        parse(
-            cbtf_plugin_paths,
-            list_p((+~ch_p(':'))[push_back_a(search_paths)], ch_p(':')),
-            space_p
-            );
-    }
-    
     xercesc::selectNodes(root, "./SearchPath",
                          boost::bind(&pushPath, _1, boost::ref(search_paths)));
     xercesc::selectNodes(root, "./Plugin",
@@ -140,27 +118,18 @@ Component::Instance Network::factoryFunction(
     for (std::vector<boost::filesystem::path>::const_iterator
              i = plugin_paths.begin(); i != plugin_paths.end(); ++i)
     {
-        bool was_found = false;
-        
-        if (i->is_complete())
+        boost::filesystem::path resolved_path = resolvePath(search_paths, *i);
+
+        if (boost::filesystem::extension(resolved_path) == ".xml")
         {
-            was_found = ::registerPlugin(*i);
+            ::registerPlugin(
+                resolved_path.empty() ? *i : resolved_path
+                );
         }
         else
         {
-            for (std::vector<boost::filesystem::path>::const_reverse_iterator
-                     j = search_paths.rbegin(); 
-                 !was_found && (j != search_paths.rend());
-                 ++j)
-            {
-                was_found = ::registerPlugin(*j / *i);
-            }
-        }
-        
-        if (!was_found)
-        {
-            raise<std::runtime_error>(
-                "One of the specified plugins (%1%) couldn't be found.", *i
+            Component::registerPlugin(
+                resolved_path.empty() ? *i : resolved_path
                 );
         }
     }
