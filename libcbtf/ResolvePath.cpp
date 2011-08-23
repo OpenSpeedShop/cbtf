@@ -23,11 +23,9 @@
 #include <boost/spirit/home/classic.hpp>
 #include <cstdlib>
 #include <map>
-#include <stdexcept>
 #include <vector>
 
 #include "Global.hpp"
-#include "Raise.hpp"
 #include "ResolvePath.hpp"
 
 using namespace KrellInstitute::CBTF;
@@ -150,8 +148,5 @@ boost::filesystem::path KrellInstitute::CBTF::Impl::resolvePath(
         }
     }
 
-    raise<std::runtime_error>(
-        "The specified relative path (%1%) to a file of "
-        "the given type (%2%) could not be resolved.", path, type
-        );
+    return boost::filesystem::path();
 }

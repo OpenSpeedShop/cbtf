@@ -60,10 +60,9 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
      *
      * @param type    Type of the file.
      * @param path    Relative path to the file.
-     * @return        Absolute path to the file.
-     *
-     * @throw std::runtime_error    The specified relative path to a file
-     *                              of the given type could not be resolved.
+     * @return        Absolute path to the file. An empty path is returned
+     *                if the specified relative path could not be resolved
+     *                to a file of the given type.
      *
      * @note    If an absolute path is specified, it is returned unmodified.
      */
