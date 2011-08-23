@@ -31,6 +31,9 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
      * launcher components when starting backend processes.
      *
      * @return    Path of the MRNet backend executable.
+     *
+     * @throw std::runtime_error    The path of the MRNet backend could not
+     *                              be resolved.
      */
     boost::filesystem::path getMRNetBackendPath();
 

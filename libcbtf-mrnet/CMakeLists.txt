@@ -30,8 +30,8 @@ add_library(cbtf-mrnet SHARED
     )
 
 add_definitions(
-    -DBACKEND_PATH="${CMAKE_INSTALL_PREFIX}/bin/libcbtf-mrnet-backend"
-    -DFILTER_PATH="${CMAKE_INSTALL_PREFIX}/lib/libcbtf-mrnet-filter.so"
+    -DBACKEND_FILE="libcbtf-mrnet-backend"
+    -DFILTER_FILE="libcbtf-mrnet-filter.so"
     ${MRNet_DEFINES}
     )
 

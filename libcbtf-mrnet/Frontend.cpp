@@ -32,6 +32,7 @@
 #include "Frontend.hpp"
 #include "MessageTags.hpp"
 #include "Raise.hpp"
+#include "ResolvePath.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;
 
@@ -63,42 +64,46 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
         MRN::set_OutputLevel(MRN::MAX_OUTPUT_LEVEL);
     }
 
+    // Resolve the filter path
+    boost::filesystem::path filter_path = 
+        resolvePath(kLibraryFileType, FILTER_FILE);
+    if (filter_path.empty())
+    {
+        raise<std::runtime_error>(
+            "The path of the MRNet filter library (%1%) could not be resolved.",
+            FILTER_FILE
+            );
+    }
+    
     // Load the upstream filter
     int upstream_filter = dm_network->load_FilterFunc(
-        FILTER_PATH, "libcbtf_mrnet_upstream_filter"
+        filter_path.string().c_str(), "libcbtf_mrnet_upstream_filter"
         );
     if (upstream_filter == -1)
     {
         raise<std::runtime_error>(
-            "Unable to locate the library \"libcbtf_mrnet_filter.so\", "
-            "or the filter function libcbtf_mrnet_upstream_filter()."
+            "Unable to load the MRNet filter library (%1%) or to locate the "
+            "filter function libcbtf_mrnet_upstream_filter().", filter_path
             );
     }
 
     // Load the downstream filter
     int downstream_filter = dm_network->load_FilterFunc(
-        FILTER_PATH, "libcbtf_mrnet_downstream_filter"
+        filter_path.string().c_str(), "libcbtf_mrnet_downstream_filter"
         );
     if (downstream_filter == -1)
     {
         raise<std::runtime_error>(
-            "Unable to locate the library \"libcbtf_mrnet_filter.so\", "
-            "or the filter function libcbtf_mrnet_downstream_filter()."
+            "Unable to load the MRNet filter library (%1%) or to locate the "
+            "filter function libcbtf_mrnet_downstream_filter().", filter_path
             );
     }
 
     // Establish the stream used to pass data within this network
-#if 1
     dm_stream = dm_network->new_Stream(
         dm_network->get_BroadcastCommunicator(),
         upstream_filter, MRN::SFILTER_DONTWAIT, downstream_filter
         );
-#else
-    dm_stream = dm_network->new_Stream(
-        dm_network->get_BroadcastCommunicator(),
-        upstream_filter, MRN::SFILTER_WAITFORALL, downstream_filter
-        );
-#endif
     if ((dm_stream == NULL) ||
         (dm_stream->send(MessageTags::EstablishUpstream, 0) != 0) ||
         (dm_stream->flush() != 0))

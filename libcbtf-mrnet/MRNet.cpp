@@ -29,6 +29,7 @@
 #include "NamedStreams.hpp"
 #include "OutputMediator.hpp"
 #include "Raise.hpp"
+#include "ResolvePath.hpp"
 #include "XercesExts.hpp"
 #include "XML.hpp"
 
@@ -69,7 +70,18 @@ namespace {
 //------------------------------------------------------------------------------
 boost::filesystem::path Impl::getMRNetBackendPath()
 {
-    return BACKEND_PATH;
+    boost::filesystem::path backend_path = 
+        resolvePath(kExecutableFileType, BACKEND_FILE);
+    
+    if (backend_path.empty())
+    {
+        raise<std::runtime_error>(
+            "The path of the MRNet backend (%1%) could not be resolved.",
+            BACKEND_FILE
+            );            
+    }
+    
+    return backend_path;
 }
 
 
