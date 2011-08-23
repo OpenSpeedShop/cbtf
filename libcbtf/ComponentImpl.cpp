@@ -65,13 +65,8 @@ namespace {
 //------------------------------------------------------------------------------
 void ComponentImpl::registerPlugin(const boost::filesystem::path& path)
 {
-    using namespace boost::filesystem;
+    boost::filesystem::path resolved_path = resolvePath(kPluginFileType, path);
 
-    boost::filesystem::path resolved_path = resolvePath(
-        kPluginFileType,
-        path.extension().empty() ? change_extension(path, ".so") : path
-        );
-    
     if (resolved_path.empty())
     {
         raise<std::runtime_error>(

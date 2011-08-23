@@ -19,11 +19,9 @@
 /** @file Definition of the path resolution functions. */
 
 #include <boost/bind.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/spirit/home/classic.hpp>
 #include <cstdlib>
 #include <map>
-#include <vector>
 
 #include "Global.hpp"
 #include "ResolvePath.hpp"
@@ -125,6 +123,34 @@ void KrellInstitute::CBTF::Impl::appendToSearchPath(
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 boost::filesystem::path KrellInstitute::CBTF::Impl::resolvePath(
+    const std::vector<boost::filesystem::path>& search_paths,
+    const boost::filesystem::path& path
+    )
+{
+    if (path.is_complete())
+    {
+        return path;
+    }
+    
+    for (std::vector<boost::filesystem::path>::const_iterator
+             i = search_paths.begin(); i != search_paths.end(); ++i)
+    {
+        boost::filesystem::path candidate = *i / path;
+
+        if (boost::filesystem::exists(candidate))
+        {
+            return candidate;
+        }
+    }
+
+    return boost::filesystem::path();
+}
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+boost::filesystem::path KrellInstitute::CBTF::Impl::resolvePath(
     const FileType& type,
     const boost::filesystem::path& path
     )
@@ -137,16 +163,8 @@ boost::filesystem::path KrellInstitute::CBTF::Impl::resolvePath(
     SearchPaths::Type::const_iterator i = SearchPaths::value().find(type);
     if (i != SearchPaths::value().end())
     {
-        for (SearchPaths::Type::mapped_type::const_iterator
-                 j = i->second.begin(); j != i->second.end(); ++j)
-        {
-            boost::filesystem::path candidate = *j / path;
-            if (boost::filesystem::exists(candidate))
-            {
-                return candidate;
-            }
-        }
+        return resolvePath(i->second, path);
     }
-
+    
     return boost::filesystem::path();
 }

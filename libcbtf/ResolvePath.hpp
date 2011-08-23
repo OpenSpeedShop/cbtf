@@ -21,6 +21,7 @@
 #pragma once
 
 #include <boost/filesystem.hpp>
+#include <vector>
 
 namespace KrellInstitute { namespace CBTF { namespace Impl {
 
@@ -54,17 +55,37 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
                             const boost::filesystem::path& path);
 
     /**
-     * Resolve the specified relative path to a file of the given type into
-     * an absolute path. All of the current search paths for this file type
-     * are searched.
+     * Resolve the specified relative path to an absolute path using the given
+     * search paths. The search paths are examined in order. An empty path is
+     * returned if the path could not be resolved.
      *
-     * @param type    Type of the file.
-     * @param path    Relative path to the file.
-     * @return        Absolute path to the file. An empty path is returned
-     *                if the specified relative path could not be resolved
-     *                to a file of the given type.
+     * @param search_paths    Search paths used for this resolution.
+     * @param path            Relative path to be resolved.
+     * @return                Absolute path resolved from this relative path,
+     *                        or an empty path if the relative path could not
+     *                        be resolved.
      *
-     * @note    If an absolute path is specified, it is returned unmodified.
+     * @note    If the specified relative path is already an absolute path, it
+     *          is returned unmodified.
+     */
+    boost::filesystem::path resolvePath(
+        const std::vector<boost::filesystem::path>& search_paths,
+        const boost::filesystem::path& path
+        );
+
+    /**
+     * Resolve the specified relative path to an absolute path using the search
+     * paths for the given file type. All of the current search paths for this
+     * file type are searched in order. An empty path is returned if the path
+     * could not be resolved.
+     *
+     * @param type    File type used for this resolution.
+     * @param path    Relative path to be resolved.
+     * @return        Absolute path resolved from this relative path, or an
+     *                empty path if the relative path could not be resolved.
+     *
+     * @note    If the specified relative path is already an absolute path, it
+     *          is returned unmodified.
      */
     boost::filesystem::path resolvePath(const FileType& type,
                                         const boost::filesystem::path& path);
