@@ -46,7 +46,7 @@ namespace {
      * Statically initialized C++ structure that automatically initializes
      * and terminates the Xerces-C++ library.
      */
-    struct __attribute__ ((visibility("hidden"))) AutoInitializeXercesC
+    struct AutoInitializeXercesC
     {
         
         /** Default constructor. Initialize the Xerces-C++ library. */
