@@ -62,6 +62,13 @@ add_custom_command(
         ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.x
     )
 
+add_definitions(
+    -DCBTF_TEST_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+    -DCBTF_MRNET_BACKEND_BINARY_DIR="${CMAKE_BINARY_DIR}/libcbtf-mrnet-backend"
+    -DCBTF_MRNET_FILTER_BINARY_DIR="${CMAKE_BINARY_DIR}/libcbtf-mrnet-filter"
+    -DCBTF_MRNET_LAUNCHERS_BINARY_DIR="${CMAKE_BINARY_DIR}/BasicMRNetLaunchers"
+    )
+
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}/libcbtf
@@ -99,5 +106,5 @@ endif()
 
 if(XERCESC_FOUND AND MRNET_FOUND)
     file(COPY test-mrnet.topology DESTINATION .)
-    file(COPY test-mrnet.xml DESTINATION .)
+    configure_file(test-mrnet.xml .)
 endif()

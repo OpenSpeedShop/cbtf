@@ -45,9 +45,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Type>FrontendNetwork</Type>
       <Version>1.0.0</Version>
 
-      <SearchPath>.</SearchPath>
-      <Plugin>plugin-xml</Plugin>
-      <Plugin>plugin-mrnet</Plugin>
+      <SearchPath>${CMAKE_CURRENT_BINARY_DIR}</SearchPath>
+      <Plugin>plugin-xml.so</Plugin>
+      <Plugin>plugin-mrnet.so</Plugin>
 
       <Component>
         <Name>1A</Name>
@@ -146,9 +146,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Type>FilterNetwork</Type>
       <Version>1.0.0</Version>
 
-      <SearchPath>.</SearchPath>
-      <Plugin>plugin-xml</Plugin>
-      <Plugin>plugin-mrnet</Plugin>
+      <SearchPath>${CMAKE_CURRENT_BINARY_DIR}</SearchPath>
+      <Plugin>plugin-xml.so</Plugin>
+      <Plugin>plugin-mrnet.so</Plugin>
 
       <Component>
         <Name>A</Name>
@@ -224,9 +224,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Type>BackendNetwork</Type>
       <Version>1.0.0</Version>
       
-      <SearchPath>.</SearchPath>
-      <Plugin>plugin-xml</Plugin>
-      <Plugin>plugin-mrnet</Plugin>
+      <SearchPath>${CMAKE_CURRENT_BINARY_DIR}</SearchPath>
+      <Plugin>plugin-xml.so</Plugin>
+      <Plugin>plugin-mrnet.so</Plugin>
 
       <Component>
         <Name>A</Name>

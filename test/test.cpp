@@ -39,6 +39,8 @@
 #include <string>
 #include <typeinfo>
 
+#include "ResolvePath.hpp"
+
 using namespace KrellInstitute::CBTF;
 
 
@@ -93,6 +95,34 @@ namespace std {
     }
     
 } // namespace std
+
+
+
+/** Global fixture adding the testing search paths. */
+struct AddTestingSearchPaths
+{
+    AddTestingSearchPaths()
+    {
+        KrellInstitute::CBTF::Impl::prependToSearchPath(
+            KrellInstitute::CBTF::Impl::kPluginFileType,
+            CBTF_TEST_BINARY_DIR
+            );
+        KrellInstitute::CBTF::Impl::prependToSearchPath(
+            KrellInstitute::CBTF::Impl::kExecutableFileType,
+            CBTF_MRNET_BACKEND_BINARY_DIR
+            );
+        KrellInstitute::CBTF::Impl::prependToSearchPath(
+            KrellInstitute::CBTF::Impl::kLibraryFileType,
+            CBTF_MRNET_FILTER_BINARY_DIR
+            );
+        KrellInstitute::CBTF::Impl::prependToSearchPath(
+            KrellInstitute::CBTF::Impl::kPluginFileType,
+            CBTF_MRNET_LAUNCHERS_BINARY_DIR
+            );
+    }
+};
+
+BOOST_GLOBAL_FIXTURE(AddTestingSearchPaths);
 
 
 
@@ -283,7 +313,7 @@ BOOST_AUTO_TEST_CASE(TestComponent)
                       std::runtime_error);
     BOOST_CHECK_EQUAL(available_types.find(Type("TestComponentB")),
                       available_types.end());
-    BOOST_REQUIRE_NO_THROW(Component::registerPlugin("./plugin"));
+    BOOST_REQUIRE_NO_THROW(Component::registerPlugin("plugin.so"));
     available_types = Component::getAvailableTypes();
     BOOST_CHECK_NE(available_types.find(Type("TestComponentB")),
                    available_types.end());

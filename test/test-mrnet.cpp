@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
     
     // Test instantiation of the basic launcher component
 
-    BOOST_REQUIRE_NO_THROW(Component::registerPlugin("BasicMRNetLaunchers"));
+    BOOST_REQUIRE_NO_THROW(Component::registerPlugin("BasicMRNetLaunchers.so"));
     Component::Instance launcher;
     BOOST_CHECK_NO_THROW(
         launcher = Component::instantiate(

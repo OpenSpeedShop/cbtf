@@ -23,8 +23,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
   <Type>TestXML</Type>
   <Version>1.2.3</Version>
 
-  <SearchPath>.</SearchPath>
-  <Plugin>plugin-xml</Plugin>
+  <Plugin>plugin-xml.so</Plugin>
   
   <Component>
     <Name>Stage1</Name>
