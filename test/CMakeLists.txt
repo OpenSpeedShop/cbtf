@@ -19,17 +19,11 @@
 if(XERCESC_FOUND)
     set(XML_SOURCES "test-xml.cpp")
     set(XML_LIBRARIES "cbtf-xml")
-else()
-    set(XML_SOURCES "")
-    set(XML_LIBRARIES "")
 endif()
 
 if(XERCESC_FOUND AND MRNET_FOUND)
     set(MRNET_SOURCES "test-mrnet.cpp")
     set(MRNET_LIBRARIES "cbtf-mrnet")
-else()
-    set(MRNET_SOURCES "")
-    set(MRNET_LIBRARIES "")
 endif()
 
 add_library(plugin MODULE plugin.cpp)
