@@ -22,6 +22,7 @@ project(CBTF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 
+find_package(Threads)
 find_package(Boost 1.35.0 REQUIRED
     COMPONENTS date_time filesystem system thread unit_test_framework
     )

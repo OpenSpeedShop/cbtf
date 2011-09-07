@@ -83,6 +83,7 @@ endif()
 target_link_libraries(test
     cbtf ${XML_LIBRARIES} ${MRNET_LIBRARIES}
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+    ${CMAKE_THREAD_LIBS_INIT}
     )
 
 set_target_properties(plugin PROPERTIES PREFIX "")
