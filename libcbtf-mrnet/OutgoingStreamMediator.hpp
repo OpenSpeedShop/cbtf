@@ -85,12 +85,21 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * @param packet    Packet containing a new message to be forwarded.
          */
         void handler(const MRN::PacketPtr& packet);
+
+        /** Automatic type converter (if any) for this mediator. */
+        Component::Instance& converter()
+        {
+            return dm_converter;
+        }
         
         /** Tag applied to each mediated message. */
         const int dm_tag;
         
         /** Handler for the messages being mediated. */
         const MessageHandler dm_handler;
+        
+        /** Automatic type converter (if any) for this mediator. */
+        Component::Instance dm_converter;
         
     }; // class OutgoingStreamMediator
 

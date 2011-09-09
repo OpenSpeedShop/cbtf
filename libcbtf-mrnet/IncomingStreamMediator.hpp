@@ -72,7 +72,7 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * @return    MRNet message tag for the named stream being mediated.
          */
         int tag() const;
-        
+
     private:
 
         /**
@@ -81,10 +81,19 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * @param tag    MRNet message tag for the named stream being mediated.
          */
         IncomingStreamMediator(const int& tag);
+
+        /** Automatic type converter (if any) for this mediator. */
+        Component::Instance& converter()
+        {
+            return dm_converter;
+        }
         
         /** MRNet message tag for the named stream being mediated. */
         const int dm_tag;
-        
+
+        /** Automatic type converter (if any) for this mediator. */
+        Component::Instance dm_converter;
+                        
     }; // class IncomingStreamMediator
 
 } } } // namespace KrellInstitute::CBTF::Impl

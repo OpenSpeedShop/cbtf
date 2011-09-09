@@ -26,6 +26,7 @@ add_library(cbtf-mrnet SHARED
     KrellInstitute/CBTF/Impl/MRNet.hpp MRNet.cpp MRNet.hpp
     NamedStreams.cpp NamedStreams.hpp
     OutgoingStreamMediator.cpp OutgoingStreamMediator.hpp
+    StreamMediator.cpp StreamMediator.hpp
     KrellInstitute/CBTF/XDR.hpp
     )
 

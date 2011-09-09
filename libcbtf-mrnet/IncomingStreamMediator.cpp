@@ -27,6 +27,7 @@
 
 #include "IncomingStreamMediator.hpp"
 #include "Raise.hpp"
+#include "StreamMediator.hpp"
 #include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF;
@@ -54,7 +55,9 @@ Component::Instance IncomingStreamMediator::create(
     Component::Instance mediator_instance =
         boost::reinterpret_pointer_cast<Component>(mediator);
 
-    Component::connect(mediator_instance, "value", network, to_input);
+    mediator->converter() = connectWithAutomaticConversion(    
+        mediator_instance, "value", network, to_input
+        );
 
     return mediator_instance;
 }
@@ -80,7 +83,8 @@ void IncomingStreamMediator::handler(const MRN::PacketPtr& packet)
 //------------------------------------------------------------------------------
 IncomingStreamMediator::IncomingStreamMediator(const int& tag) :
     Component(Type(typeid(IncomingStreamMediator)), Version(0, 0, 0)),
-    dm_tag(tag)
+    dm_tag(tag),
+    dm_converter()
 {
     declareOutput<MRN::PacketPtr>("value");
 }

@@ -21,7 +21,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 <MRNet xmlns="http://www.krellinst.org/CBTF/MRNet.xsd">
     
   <Type>TestMRNet</Type>
-  <Version>1.0.0</Version>
+  <Version>1.0.1</Version>
 
   <Input>
     <Name>in</Name>
@@ -50,29 +50,19 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Plugin>plugin-mrnet.so</Plugin>
 
       <Component>
-        <Name>1A</Name>
+        <Name>Incrementer-1</Name>
         <Type>Incrementer</Type>
       </Component>
       
       <Component>
-        <Name>1B</Name>
-        <Type>ConvertIntToPacket</Type>
-      </Component>
-
-      <Component>
-        <Name>2A</Name>
-        <Type>ConvertPacketToInt</Type>
-      </Component>
-                  
-      <Component>
-        <Name>2B</Name>
+        <Name>Incrementer-2</Name>
         <Type>Incrementer</Type>
       </Component>
 
       <Input>
         <Name>in1</Name>
         <To>
-          <Name>1A</Name>
+          <Name>Incrementer-1</Name>
           <Input>in</Input>
         </To>
       </Input>
@@ -80,37 +70,15 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Input>
         <Name>in2</Name>
         <To>
-          <Name>2A</Name>
+          <Name>Incrementer-2</Name>
           <Input>in</Input>
         </To>
       </Input>
       
-      <Connection>
-        <From>
-          <Name>1A</Name>
-          <Output>out</Output>
-        </From>
-        <To>
-          <Name>1B</Name>
-          <Input>in</Input>
-        </To>
-      </Connection>
-      
-      <Connection>
-        <From>
-          <Name>2A</Name>
-          <Output>out</Output>
-        </From>
-        <To>
-          <Name>2B</Name>
-          <Input>in</Input>
-        </To>
-      </Connection>
-      
       <Output>
         <Name>out1</Name>
         <From>
-          <Name>1B</Name>
+          <Name>Incrementer-1</Name>
           <Output>out</Output>
         </From>
       </Output>
@@ -118,7 +86,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Output>
         <Name>out2</Name>
         <From>
-          <Name>2B</Name>
+          <Name>Incrementer-2</Name>
           <Output>out</Output>
         </From>
       </Output>
@@ -151,54 +119,22 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Plugin>plugin-mrnet.so</Plugin>
 
       <Component>
-        <Name>A</Name>
-        <Type>ConvertPacketToInt</Type>
-      </Component>
-                  
-      <Component>
-        <Name>B</Name>
+        <Name>Incrementer-1</Name>
         <Type>Incrementer</Type>
       </Component>
       
-      <Component>
-        <Name>C</Name>
-        <Type>ConvertIntToPacket</Type>
-      </Component>
-                  
       <Input>
         <Name>in</Name>
         <To>
-          <Name>A</Name>
+          <Name>Incrementer-1</Name>
           <Input>in</Input>
         </To>
       </Input>
 
-      <Connection>
-        <From>
-          <Name>A</Name>
-          <Output>out</Output>
-        </From>
-        <To>
-          <Name>B</Name>
-          <Input>in</Input>
-        </To>
-      </Connection>
-      
-      <Connection>
-        <From>
-          <Name>B</Name>
-          <Output>out</Output>
-        </From>
-        <To>
-          <Name>C</Name>
-          <Input>in</Input>
-        </To>
-      </Connection>
-            
       <Output>
         <Name>out</Name>
         <From>
-          <Name>C</Name>
+          <Name>Incrementer-1</Name>
           <Output>out</Output>
         </From>
       </Output>
@@ -229,54 +165,22 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <Plugin>plugin-mrnet.so</Plugin>
 
       <Component>
-        <Name>A</Name>
-        <Type>ConvertPacketToInt</Type>
-      </Component>
-                  
-      <Component>
-        <Name>B</Name>
+        <Name>Doubler-1</Name>
         <Type>Doubler</Type>
       </Component>
       
-      <Component>
-        <Name>C</Name>
-        <Type>ConvertIntToPacket</Type>
-      </Component>
-            
       <Input>
         <Name>in</Name>
         <To>
-          <Name>A</Name>
+          <Name>Doubler-1</Name>
           <Input>in</Input>
         </To>
       </Input>
       
-      <Connection>
-        <From>
-          <Name>A</Name>
-          <Output>out</Output>
-        </From>
-        <To>
-          <Name>B</Name>
-          <Input>in</Input>
-        </To>
-      </Connection>
-      
-      <Connection>
-        <From>
-          <Name>B</Name>
-          <Output>out</Output>
-        </From>
-        <To>
-          <Name>C</Name>
-          <Input>in</Input>
-        </To>
-      </Connection>
-      
       <Output>
         <Name>out</Name>
         <From>
-          <Name>C</Name>
+          <Name>Doubler-1</Name>
           <Output>out</Output>
         </From>
       </Output>
