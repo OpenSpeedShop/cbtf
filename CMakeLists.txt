@@ -20,13 +20,18 @@ cmake_minimum_required(VERSION 2.8.0)
 
 project(CBTF)
 
+if(EXISTS /usr/lib64)
+    set(LIB_SUFFIX 64)
+    set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 
-find_package(Threads)
 find_package(Boost 1.35.0 REQUIRED
     COMPONENTS date_time filesystem system thread unit_test_framework
     )
 find_package(MRNet 3.1)
+find_package(Threads)
 find_package(XercesC 3.0)
 
 add_subdirectory(libcbtf)

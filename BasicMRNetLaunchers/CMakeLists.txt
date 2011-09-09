@@ -42,6 +42,6 @@ set_target_properties(BasicMRNetLaunchers PROPERTIES PREFIX "")
 
 install(TARGETS BasicMRNetLaunchers
     RUNTIME DESTINATION bin/KrellInstitute/CBTF
-    LIBRARY DESTINATION lib/KrellInstitute/CBTF
-    ARCHIVE DESTINATION lib/KrellInstitute/CBTF
+    LIBRARY DESTINATION lib${LIB_SUFFIX}/KrellInstitute/CBTF
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}/KrellInstitute/CBTF
     )

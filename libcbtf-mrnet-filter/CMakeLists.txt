@@ -41,6 +41,6 @@ set_target_properties(cbtf-mrnet-filter PROPERTIES VERSION 0.0.0)
 
 install(TARGETS cbtf-mrnet-filter
     RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib${LIB_SUFFIX}
+    ARCHIVE DESTINATION lib${LIB_SUFFIX}
     )

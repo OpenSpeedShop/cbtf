@@ -39,9 +39,9 @@ target_link_libraries(libcbtf-mrnet-backend
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
+    ${CMAKE_THREAD_LIBS_INIT}
     ${MRNet_LIBRARIES}
     ${XercesC_LIBRARIES}
-    ${CMAKE_THREAD_LIBS_INIT}
     )
 
 install(TARGETS libcbtf-mrnet-backend RUNTIME DESTINATION bin)
