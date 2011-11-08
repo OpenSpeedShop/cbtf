@@ -115,6 +115,12 @@ std::vector<std::string> Impl::getMRNetBackendArguments()
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+TopologyInfo Impl::TheTopologyInfo;
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 void MRNet::registerXML(
     const boost::shared_ptr<xercesc::DOMDocument>& document,
     const xercesc::DOMNode* root

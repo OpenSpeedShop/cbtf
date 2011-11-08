@@ -27,6 +27,7 @@
 #include <boost/weak_ptr.hpp>
 #include <cstdlib>
 #include <iostream>
+#include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <map>
 #include <mrnet/MRNet.h>
 #include <string>
@@ -163,6 +164,15 @@ namespace {
         stream << " " << getpid() << "] ";
 
         debug_prefix = stream.str();
+
+        TheTopologyInfo.Rank = topology_info.get_Rank();
+        TheTopologyInfo.NumChildren = topology_info.get_NumChildren();
+        TheTopologyInfo.NumSiblings = topology_info.get_NumSiblings();
+        TheTopologyInfo.NumDescendants = topology_info.get_NumDescendants();
+        TheTopologyInfo.NumLeafDescendants =
+            topology_info.get_NumLeafDescendants();
+        TheTopologyInfo.RootDistance = topology_info.get_RootDistance();
+        TheTopologyInfo.MaxLeafDistance = topology_info.get_MaxLeafDistance();
     }
     
     /**

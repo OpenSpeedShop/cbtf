@@ -44,5 +44,49 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
      * @return    Arguments to the MRNet backend executable.
      */
     std::vector<std::string> getMRNetBackendArguments();
+
+    /**
+     * Plain old data (POD) structure containing topological information for
+     * a single node in an MRNet network.
+     *
+     * @sa http://en.wikipedia.org/wiki/Plain_old_data_structure
+     */
+    struct TopologyInfo
+    {
+
+        /** Rank number of this node within the network. */
+        unsigned int Rank;
+
+        /** Number of direct children of this node. */
+        unsigned int NumChildren;
+        
+        /** Number of siblings to this node. */
+        unsigned int NumSiblings;
+
+        /** Number of descendants of this node. */
+        unsigned int NumDescendants;
+
+        /** Number of leaves below this node. */
+        unsigned int NumLeafDescendants;
+
+        /** Distance from this node to the network's root node. */
+        unsigned int RootDistance;
+
+        /** Maximum distance from this node to one of its leaf descendants. */
+        unsigned int MaxLeafDistance;
+        
+    }; // struct TopologyInfo
+
+    /**
+     * Topological information for this MRNet node.
+     *
+     * @note    Using a single global to contain the per-node topological
+     *          information implies each node can participate in only one
+     *          MRNet network. Currently MRNet itself has this limitation
+     *          due to its own extensive use of globals. In the future,
+     *          if this limitation is removed, a different mechanism will
+     *          be needed to access the topological information.
+     */
+    extern TopologyInfo TheTopologyInfo;
             
 } } } // namespace KrellInstitute::CBTF::Impl

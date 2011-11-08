@@ -22,6 +22,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/locks.hpp>
 #include <iostream>
+#include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <map>
 #include <mrnet/MRNet.h>
 #include <stdexcept>
@@ -215,6 +216,23 @@ void Backend::startMessagePump(int argc, char* argv[])
     {
         raise<std::runtime_error>("Unable to initialize MRNet.");
     }
+    
+    // Initialize the topological information for this MRNet node
+
+    MRN::TopologyLocalInfo topology_info(
+        mrnet_network->get_NetworkTopology(),
+        mrnet_network->get_NetworkTopology()->find_Node(
+            mrnet_network->get_LocalRank()
+            )
+        );
+    
+    TheTopologyInfo.Rank = topology_info.get_Rank();
+    TheTopologyInfo.NumChildren = topology_info.get_NumChildren();
+    TheTopologyInfo.NumSiblings = topology_info.get_NumSiblings();
+    TheTopologyInfo.NumDescendants = topology_info.get_NumDescendants();
+    TheTopologyInfo.NumLeafDescendants = topology_info.get_NumLeafDescendants();
+    TheTopologyInfo.RootDistance = topology_info.get_RootDistance();
+    TheTopologyInfo.MaxLeafDistance = topology_info.get_MaxLeafDistance();
     
     // Establish the stream used to pass data within this network
     int tag = -1;

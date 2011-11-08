@@ -23,6 +23,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread/locks.hpp>
 #include <iostream>
+#include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <stdexcept>
 #include <stdlib.h>
 #include <string>
@@ -48,6 +49,23 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
     dm_stream(NULL),
     dm_message_pump_thread()
 {
+    // Initialize the topological information for this MRNet node
+    
+    MRN::TopologyLocalInfo topology_info(
+        dm_network->get_NetworkTopology(),
+        dm_network->get_NetworkTopology()->find_Node(
+            dm_network->get_LocalRank()
+            )
+        );
+    
+    TheTopologyInfo.Rank = topology_info.get_Rank();
+    TheTopologyInfo.NumChildren = topology_info.get_NumChildren();
+    TheTopologyInfo.NumSiblings = topology_info.get_NumSiblings();
+    TheTopologyInfo.NumDescendants = topology_info.get_NumDescendants();
+    TheTopologyInfo.NumLeafDescendants = topology_info.get_NumLeafDescendants();
+    TheTopologyInfo.RootDistance = topology_info.get_RootDistance();
+    TheTopologyInfo.MaxLeafDistance = topology_info.get_MaxLeafDistance();
+    
     // Determine the type of debugging that should be enabled
     dm_is_debug_enabled = 
         ((getenv("CBTF_DEBUG_MRNET") != NULL) ||
