@@ -18,6 +18,28 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -->
 
+<!--
+The MRNet topology file used with this test creates the following processes,
+and overlayed component network:
+
+      FE:0 FI:0       FI:1       FI:2       FI:3       FI:4       FI:5 BE:5
+     +====+====+     +====+     +====+     +====+     +====+     +====+====+
+  in |  I |    | ==> |    | ==> |    | ==> |    | ==> |    | ==> |    |    |
+     |    |    |     |    |     |    |     |    |     |    |     |    | D  |
+ out |  I |    | <== | I  | <== | I  | <== |    | <== |  I | <== |    |    |
+     +====+====+     +====+     +====+     +====+     +====+     +====+====+
+
+where FE is the frontend, FI is a filter, BE is a backend, I is an incrementer
+component, and D is a doubler component. The inputs and outputs of the network
+are integers, and if we call the input "x" and the output "f(x)", the function
+being computed is:
+
+    f(x) = ((x + 1) * 2) + 1 + 1 + 1 + 1 
+         = (2x + 2) + 4 
+         = 2x + 6
+
+-->
+
 <MRNet xmlns="http://www.krellinst.org/CBTF/MRNet.xsd">
     
   <Type>TestMRNet</Type>
@@ -106,8 +128,13 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
   </Frontend>
   
   <Filter>
-    
-    <Depth><AllOther/></Depth>
+
+    <Depth>
+      <RootRelative offset="4">
+        <Offset>1</Offset>
+        <Offset>2</Offset>
+      </RootRelative>
+    </Depth>
     
     <Network>
       

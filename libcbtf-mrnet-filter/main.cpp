@@ -30,6 +30,7 @@
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <map>
 #include <mrnet/MRNet.h>
+#include <set>
 #include <string>
 #include <unistd.h>
 #include <utility>
@@ -250,7 +251,36 @@ namespace {
         
         networks.insert(std::make_pair(named_streams->uid(), network));
     }
-    
+
+    /** Insert the value of the specified node into the given integer set. */
+    void insertInteger(const xercesc::DOMNode* node, std::set<int>& integers)
+    {
+        integers.insert(
+            boost::lexical_cast<int>(xercesc::selectValue(node, "."))
+            );
+    }
+
+    /** Compare the given offset against the ones in the specified node. */
+    void checkOffset(const xercesc::DOMNode* node, int offset,
+                     boost::tribool& use_filter)
+    {
+        std::set<int> offsets;
+
+        xercesc::selectNodes(
+            node, "./Offset",
+            boost::bind(&insertInteger, _1, boost::ref(offsets))
+            );
+        
+        std::string value = xercesc::selectValue(node, "./@offset");
+        
+        if (!value.empty())
+        {
+            offsets.insert(boost::lexical_cast<int>(value));
+        }
+        
+        use_filter = (offsets.find(offset) != offsets.end()) ? true : false;
+    }
+
     /**
      * Handler for the SpecifyFilter message. Decodes the XML specification
      * for the filters and completes the construction of this filter's local
@@ -285,34 +315,23 @@ namespace {
         
         boost::tribool use_filter = boost::indeterminate;
 
+        xercesc::selectNodes(
+            document.get()->getDocumentElement(),
+            "./Depth/LeafRelative",
+            boost::bind(&checkOffset, _1, topology_info.get_MaxLeafDistance(),
+                        boost::ref(use_filter))
+            );
+        
+        xercesc::selectNodes(
+            document.get()->getDocumentElement(),
+            "./Depth/RootRelative",
+            boost::bind(&checkOffset, _1, topology_info.get_RootDistance(),
+                        boost::ref(use_filter))
+            );
+
         if (boost::indeterminate(use_filter))
         {
-            std::string offset = xercesc::selectValue(
-                document.get()->getDocumentElement(),
-                "./Depth/LeafRelative/@offset"
-                );
-
-            if (!offset.empty())
-            {
-                use_filter =
-                    (topology_info.get_MaxLeafDistance() ==
-                     boost::lexical_cast<int>(offset)) ? true : false;
-            }
-        }
-
-        if (boost::indeterminate(use_filter))
-        {
-            std::string offset = xercesc::selectValue(
-                document.get()->getDocumentElement(),
-                "./Depth/RootRelative/@offset"
-                );
-
-            if (!offset.empty())
-            {
-                use_filter =
-                    (topology_info.get_RootDistance() ==
-                     boost::lexical_cast<int>(offset)) ? true : false;
-            }
+            use_filter = (networks.find(uid) == networks.end());
         }
 
         if (!use_filter)

@@ -112,6 +112,11 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
 
     *topology_value = boost::filesystem::path("test-mrnet.topology");
 
+    //
+    // Per the description in "test-mrnet.topology", the function being
+    // computed by this distributed component network is f(x) = 2x + 6.
+    //
+
     *input_value = 10;
     int first_output_value = *output_value;
     BOOST_CHECK_EQUAL(first_output_value, 26);

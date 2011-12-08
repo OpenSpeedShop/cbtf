@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright (c) 2010 Krell Institute. All Rights Reserved.
+Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
     
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free
@@ -51,7 +51,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
   <!-- Type describing the depth of a filter within the MRNet tree -->
   <xs:complexType name="DepthType">
-    <xs:choice>
+    <xs:choice maxOccurs="unbounded">
 
       <!-- Filter is at all levels -->
       <xs:element name="AllOther"/>
@@ -59,6 +59,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <!-- Filter is at a single level relative to the leaves -->
       <xs:element name="LeafRelative">
         <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Offset" type="xs:integer"/>
+          </xs:sequence>
           <xs:attribute name="offset" type="xs:integer"/>
         </xs:complexType>
       </xs:element>
@@ -66,6 +69,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <!-- Filter is at a single level relative to the root -->
       <xs:element name="RootRelative">
         <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Offset" type="xs:integer"/>
+          </xs:sequence>
           <xs:attribute name="offset" type="xs:integer"/>
         </xs:complexType>
       </xs:element>
