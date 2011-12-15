@@ -20,7 +20,10 @@ cmake_minimum_required(VERSION 2.8.0)
 
 project(CBTF)
 
-if(EXISTS /usr/lib64)
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc*")
+    set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+elseif(EXISTS /usr/lib64)
     set(LIB_SUFFIX 64)
     set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
 endif()
