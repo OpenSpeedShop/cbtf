@@ -52,11 +52,13 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * stream used by backends to pass data to the frontend, then starts a
          * thread executing this frontend's message pump.
          *
-         * @param network    MRNet network containing this frontend.
+         * @param network        MRNet network containing this frontend.
+         * @param filter_mode    MRNet filter synchronization mode to be used.
          *
          * @throw std::runtime_error    Unable to initialize MRNet.
          */
-        Frontend(const boost::shared_ptr<MRN::Network>& network);
+        Frontend(const boost::shared_ptr<MRN::Network>& network,
+                 const MRN::FilterId& filter_mode = MRN::SFILTER_DONTWAIT);
         
         /**
          * Destroy this frontend. Instructs all of the corresponding network's

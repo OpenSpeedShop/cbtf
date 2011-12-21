@@ -41,7 +41,8 @@ using namespace KrellInstitute::CBTF::Impl;
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
+Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network,
+                   const MRN::FilterId& filter_mode) :
     dm_is_debug_enabled(false),
     dm_message_handlers(),
     dm_message_handlers_mutex(),
@@ -120,7 +121,7 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network) :
     // Establish the stream used to pass data within this network
     dm_stream = dm_network->new_Stream(
         dm_network->get_BroadcastCommunicator(),
-        upstream_filter, MRN::SFILTER_DONTWAIT, downstream_filter
+        upstream_filter, filter_mode, downstream_filter
         );
     if ((dm_stream == NULL) ||
         (dm_stream->send(MessageTags::EstablishUpstream, 0) != 0) ||

@@ -56,7 +56,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <!-- Filter is at all levels -->
       <xs:element name="AllOther"/>
 
-      <!-- Filter is at a single level relative to the leaves -->
+      <!-- Filter is at one or more levels relative to the leaves -->
       <xs:element name="LeafRelative">
         <xs:complexType>
           <xs:sequence>
@@ -66,7 +66,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
         </xs:complexType>
       </xs:element>
 
-      <!-- Filter is at a single level relative to the root -->
+      <!-- Filter is at one or more levels relative to the root -->
       <xs:element name="RootRelative">
         <xs:complexType>
           <xs:sequence>
@@ -79,6 +79,17 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
     </xs:choice>
   </xs:complexType>
 
+
+
+  <!-- Type describing the synchronization mode of an MRNet filter -->
+  <xs:simpleType name="FilterModeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DontWait"/>
+      <xs:enumeration value="WaitForAll"/>
+      <xs:enumeration value="TimeOut"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
 
 
   <!-- Type describing a MRNet filters' component configuration -->
@@ -174,6 +185,10 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <!-- Frontend of the network -->
       <xs:element name="Frontend" type="FrontendType"/>
 
+      <!-- MRNet filter synchronization mode to be used  -->
+      <xs:element name="FilterMode" type="FilterModeType"
+                  minOccurs="0" maxOccurs="1"/>
+      
       <!-- List of the network's filters -->
       <xs:element name="Filter" type="FilterType"
                   minOccurs="0" maxOccurs="unbounded"/>

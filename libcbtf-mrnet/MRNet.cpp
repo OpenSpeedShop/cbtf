@@ -229,8 +229,24 @@ void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
     {
         raise<std::runtime_error>("Only one MRNet network may be specified.");
     }
+
+    MRN::FilterId mode = MRN::SFILTER_DONTWAIT;
+
+    std::string filter_mode = xercesc::selectValue(dm_root, "./FilterMode");
+    if (filter_mode == "DontWait")
+    {
+        mode = MRN::SFILTER_DONTWAIT;
+    }
+    else if (filter_mode == "WaitForAll")
+    {
+        mode = MRN::SFILTER_WAITFORALL;
+    }
+    else if (filter_mode == "TimeOut")
+    {
+        mode = MRN::SFILTER_TIMEOUT;
+    }
     
-    dm_frontend.reset(new Frontend(network));
+    dm_frontend.reset(new Frontend(network, mode));
 
     dm_local_component_network.initializeStepThree(
         boost::bind(&MRNet::bindIncomingUpstream, this, _1),
