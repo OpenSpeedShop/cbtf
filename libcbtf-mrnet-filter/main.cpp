@@ -278,7 +278,7 @@ namespace {
             offsets.insert(boost::lexical_cast<int>(value));
         }
         
-        use_filter = (offsets.find(offset) != offsets.end()) ? true : false;
+        use_filter = (offsets.find(offset) != offsets.end());
     }
 
     /**
@@ -309,9 +309,21 @@ namespace {
         }
         std::string xml(buffer);
         free(buffer);
-        
+
         boost::shared_ptr<xercesc::DOMDocument> document = 
             xercesc::loadFromString(xml);
+
+        NetworkMap::iterator i = networks.find(uid);
+
+        if (i == networks.end())
+        {
+            std::cout << debug_prefix << "WARNING: "
+                      << "Received SpecifyFilter for distributed "
+                      << "component network UID " << uid
+                      << " before receiving SpecifyNamedStreams."
+                      << std::endl;
+            return;
+        }
         
         boost::tribool use_filter = boost::indeterminate;
 
@@ -331,9 +343,9 @@ namespace {
 
         if (boost::indeterminate(use_filter))
         {
-            use_filter = (networks.find(uid) == networks.end());
+            use_filter = !i->second->network();
         }
-
+        
         if (!use_filter)
         {
             if (is_filter_debug_enabled)
@@ -346,9 +358,7 @@ namespace {
             return;
         }
         
-        NetworkMap::iterator i = networks.find(uid);
-        
-        if (i == networks.end())
+        if (i->second->network())
         {
             std::cout << debug_prefix << "WARNING: "
                       << "Received SpecifyFilter for distributed "
