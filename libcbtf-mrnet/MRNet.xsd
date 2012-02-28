@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
     
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License as published by the Free
@@ -19,13 +19,14 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 -->
 
 <xs:schema elementFormDefault="qualified"
-           targetNamespace="http://www.krellinst.org/CBTF/MRNet.xsd"
-           xmlns="http://www.krellinst.org/CBTF/MRNet.xsd"
-           xmlns:cbtf="http://www.krellinst.org/CBTF/Network.xsd"
+           targetNamespace="http://www.krellinst.org/CBTF/MRNet"
+           xmlns="http://www.krellinst.org/CBTF/MRNet"
+           xmlns:cbtf="http://www.krellinst.org/CBTF/Network"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:import namespace="http://www.krellinst.org/CBTF/Network.xsd"
-             schemaLocation="Network.xsd"/>
+  <xs:import namespace="http://www.krellinst.org/CBTF/Network"/>
+
+  <xs:element name="MRNet" type="MRNetType"/>
 
 
 
@@ -60,7 +61,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <xs:element name="LeafRelative">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="Offset" type="xs:integer"/>
+            <xs:element name="Offset" type="xs:integer"
+                        minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
           <xs:attribute name="offset" type="xs:integer"/>
         </xs:complexType>
@@ -70,7 +72,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <xs:element name="RootRelative">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="Offset" type="xs:integer"/>
+            <xs:element name="Offset" type="xs:integer"
+                        minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
           <xs:attribute name="offset" type="xs:integer"/>
         </xs:complexType>
@@ -152,7 +155,11 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       
       <!-- Source of the input -->
       <xs:element name="To">
-        <xs:element name="Input" type="xs:string"/>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Input" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
       </xs:element>
       
     </xs:sequence>
@@ -168,7 +175,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       <xs:element name="Type" type="xs:string"/>
 
       <!-- Version of the network -->
-      <xs:element name="Version" type="VersionType"/>
+      <xs:element name="Version" type="cbtf:VersionType"/>
 
       <!-- List of the network's inputs -->
       <xs:element name="Input" type="InputType"
@@ -211,7 +218,11 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
       
       <!-- Source of the output -->
       <xs:element name="From">
-        <xs:element name="Output" type="xs:string"/>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Output" type="xs:string"/>
+          </xs:sequence>
+        </xs:complexType>
       </xs:element>
       
     </xs:sequence>

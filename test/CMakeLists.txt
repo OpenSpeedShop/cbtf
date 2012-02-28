@@ -58,9 +58,11 @@ add_custom_command(
 
 add_definitions(
     -DCBTF_TEST_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}"
+    -DCBTF_MRNET_SOURCE_DIR="${CMAKE_SOURCE_DIR}/libcbtf-mrnet"
     -DCBTF_MRNET_BACKEND_BINARY_DIR="${CMAKE_BINARY_DIR}/libcbtf-mrnet-backend"
     -DCBTF_MRNET_FILTER_BINARY_DIR="${CMAKE_BINARY_DIR}/libcbtf-mrnet-filter"
     -DCBTF_MRNET_LAUNCHERS_BINARY_DIR="${CMAKE_BINARY_DIR}/BasicMRNetLaunchers"
+    -DCBTF_XML_SOURCE_DIR="${CMAKE_SOURCE_DIR}/libcbtf-xml"
     )
 
 include_directories(

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -21,9 +21,11 @@
 #include <boost/bind.hpp>
 #include <KrellInstitute/CBTF/XML.hpp>
 #include <utility>
+#include <vector>
 
 #include "Global.hpp"
 #include "Network.hpp"
+#include "ResolvePath.hpp"
 #include "XercesExts.hpp"
 #include "XML.hpp"
 
@@ -65,19 +67,6 @@ namespace {
     }
 
     /**
-     * Register all of the networks of connected components rooted under
-     * the specified node.
-     */
-    void registerNetworks(
-        const boost::shared_ptr<xercesc::DOMDocument>& document,
-        const xercesc::DOMNode* root
-        )
-    {
-        xercesc::selectNodes(root, "./*",
-                             boost::bind(invokeHandler, document, _1));
-    }
-    
-    /**
      * Statically initialized C++ structure registering the "Network" kind
      * of component network.
      */
@@ -87,9 +76,6 @@ namespace {
         {
             registerKindOfComponentNetwork(
                 "Network", boost::bind(&Network::registerXML, _1, _2)
-                );
-            registerKindOfComponentNetwork(
-                "Networks", boost::bind(&registerNetworks, _1, _2)
                 );
         }
     } register_network_kind;
@@ -102,8 +88,29 @@ namespace {
 //------------------------------------------------------------------------------
 void KrellInstitute::CBTF::registerXML(const boost::filesystem::path& path)
 {
-    boost::shared_ptr<xercesc::DOMDocument> document = 
-        xercesc::loadFromFile(path);
+    Handlers::GuardType guard_handlers(Handlers::mutex());
+    
+    std::vector<boost::filesystem::path> schema_paths;
+
+    for (Handlers::Type::const_iterator
+             i = Handlers::value().begin(); i != Handlers::value().end(); ++i)
+    {
+        boost::filesystem::path schema_path =
+            resolvePath(kDataFileType, i->first + ".xsd");
+        
+        if (!schema_path.empty())
+        {
+            schema_paths.insert(
+                (i->first == "Network") ? 
+                    schema_paths.begin() : schema_paths.end(),
+                schema_path
+                );
+        }
+    }
+    
+    boost::shared_ptr<xercesc::DOMDocument> document =
+        xercesc::loadFromFile(path, schema_paths);
+    
     xercesc::selectNodes(document.get(), "./*",
                          boost::bind(invokeHandler, document, _1));
 }

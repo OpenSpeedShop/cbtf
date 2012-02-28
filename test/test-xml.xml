@@ -18,7 +18,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -->
 
-<Network xmlns="http://www.krellinst.org/CBTF/Network.xsd">
+<Network xmlns="http://www.krellinst.org/CBTF/Network">
 
   <Type>TestXML</Type>
   <Version>1.2.3</Version>

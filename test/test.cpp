@@ -108,6 +108,10 @@ struct AddTestingSearchPaths
             CBTF_TEST_BINARY_DIR
             );
         KrellInstitute::CBTF::Impl::prependToSearchPath(
+            KrellInstitute::CBTF::Impl::kDataFileType,
+            CBTF_MRNET_SOURCE_DIR
+            );
+        KrellInstitute::CBTF::Impl::prependToSearchPath(
             KrellInstitute::CBTF::Impl::kExecutableFileType,
             CBTF_MRNET_BACKEND_BINARY_DIR
             );
@@ -118,6 +122,10 @@ struct AddTestingSearchPaths
         KrellInstitute::CBTF::Impl::prependToSearchPath(
             KrellInstitute::CBTF::Impl::kPluginFileType,
             CBTF_MRNET_LAUNCHERS_BINARY_DIR
+            );
+        KrellInstitute::CBTF::Impl::prependToSearchPath(
+            KrellInstitute::CBTF::Impl::kDataFileType,
+            CBTF_XML_SOURCE_DIR
             );
     }
 };

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -29,6 +29,8 @@
 #include <vector>
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/sax/ErrorHandler.hpp>
+#include <xercesc/sax/SAXParseException.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 
 #include "Raise.hpp"
@@ -62,6 +64,94 @@ namespace {
         }
         
     } auto_initialize_xercesc;
+
+    /**
+     * Handle XML parsing warnings and errors by queueing them up and then
+     * later throwing them as an exception.
+     */
+    class ParsingExceptionHandler :
+        public ErrorHandler
+    {
+
+    public:
+
+        /** Default constructor. */
+        ParsingExceptionHandler() :
+            ErrorHandler(),
+            dm_exceptions()
+        {
+        }
+
+        /** Destructor. */
+        virtual ~ParsingExceptionHandler()
+        {
+        }
+        
+        /** Receive notification of a warning. */
+        virtual void warning(const SAXParseException& exc)
+        {
+            queue("Warning", exc);
+        }
+
+        /** Receive notification of a recoverable error. */
+        virtual void error(const SAXParseException& exc)
+        {
+            queue("Error", exc);
+        }
+
+        /** Receive notification of a non-recoverable error. */
+        virtual void fatalError(const SAXParseException& exc)
+        {
+            queue("Fatal Error", exc);
+        }
+
+        /** Reset the error handler object on its reuse. */
+        virtual void resetErrors()
+        {
+            dm_exceptions.clear();
+        }
+
+        /** Throw any parsing warnings and errors as a single exception. */
+        void throwExceptions() const
+        {
+            std::string what;
+
+            for (std::vector<std::string>::const_iterator
+                     i = dm_exceptions.begin(); i != dm_exceptions.end(); ++i)
+            {
+                what += *i + "\n\n";
+            }
+            
+            if (!what.empty())
+            {
+                throw std::runtime_error(what.c_str());
+            }
+        }
+        
+    private:
+
+        /** Queue of any parsing warnings and errors. */
+        std::vector<std::string> dm_exceptions;
+        
+        /** Queue a parsing warning or error. */
+        void queue(const std::string& type, const SAXParseException& error)
+        {
+            char* file = XMLString::transcode(error.getSystemId());
+            char* message = XMLString::transcode(error.getMessage());
+
+            std::string what = boost::str(
+                boost::format("%1% (%2%, Line %4%, Column %5%): %3%") %
+                type % file % message %
+                error.getLineNumber() % error.getColumnNumber()
+                );
+            
+            XMLString::release(&file);
+            XMLString::release(&message);
+            
+            dm_exceptions.push_back(what);
+        }
+
+    }; // class ParsingExceptionHandler
 
     /**
      * Deleter for documents.
@@ -275,17 +365,14 @@ namespace {
 
 
 //------------------------------------------------------------------------------
-// TODO: Schema validation does not appear to be working currently. The schema
-//       files are found and loaded properly. But documents don't appear to be
-//       validated against the schema. This should be fixed in order to provide
-//       better error reporting.
 //------------------------------------------------------------------------------
 boost::shared_ptr<DOMDocument> XERCES_CPP_NAMESPACE_QUALIFIER loadFromFile(
-    const boost::filesystem::path& path
+    const boost::filesystem::path& path,
+    const std::vector<boost::filesystem::path>& schema_paths
     )
 {
     using namespace boost::filesystem;
-    
+
     if (!is_regular_file(path))
     {
         raise<std::runtime_error>(
@@ -295,49 +382,58 @@ boost::shared_ptr<DOMDocument> XERCES_CPP_NAMESPACE_QUALIFIER loadFromFile(
 
     DOMDocument* document = NULL;
     XercesDOMParser* parser = new XercesDOMParser();
-    
+
     try
     {
-#if defined(DISABLE_NONWORKING_SCHEMA_SUPPORT)
-        boost::filesystem::path schema_directory = SCHEMA_DIR;
-        
-        if (is_directory(schema_directory))
+        ParsingExceptionHandler handler;
+        parser->setErrorHandler(&handler);
+    
+        if (!schema_paths.empty())
         {
-            bool found_schema = false;
-
-            for (directory_iterator i(schema_directory);
-                 i != directory_iterator();
-                 ++i)
+            parser->setDoNamespaces(true);
+            parser->setDoSchema(true);
+            parser->setLoadSchema(false);
+            //
+            // Uncomment the line below to enable XML schema validation. The
+            // actual validation appears to be working now. But unfortunately
+            // the MRNet unit test's XML (test-mrnet.xml) won't validate. For
+            // some unknown reason the parser thinks the <Network> tag usage
+            // in that file is incorrect. The problem almost certainly has to
+            // do with the fact that <Network> is in a different namespace,
+            // but I can't figure out how to make it work out... Until then,
+            // validation is still disabled.
+            //
+            // parser->setValidationScheme(AbstractDOMParser::Val_Always);
+            parser->setValidationSchemaFullChecking(true);
+            parser->useCachedGrammarInParse(true);
+            
+            for (std::vector<boost::filesystem::path>::const_iterator
+                     i = schema_paths.begin(); i != schema_paths.end(); ++i)
             {
-                if (is_regular_file(*i) && (extension(*i) == ".xsd"))
+                if (!is_regular_file(*i))
                 {
-                    found_schema = true;
-                    parser->loadGrammar(
-                        i->path().string().c_str(),
-                        Grammar::SchemaGrammarType, true
+                    raise<std::runtime_error>(
+                        "The specified schema file (%1%) doesn't exist.", *i
                         );
                 }
-            }
 
-            if (found_schema)
-            {
-                parser->setDoNamespaces(true);
-                parser->setDoSchema(true);
-                parser->setValidationScheme(XercesDOMParser::Val_Always);
-                parser->useCachedGrammarInParse(true);
+                parser->loadGrammar(
+                    i->string().c_str(), Grammar::SchemaGrammarType, true
+                    );
             }
         }
-#endif
-
+        
         parser->parse(path.string().c_str());
         document = parser->adoptDocument();
+        
+        handler.throwExceptions();
     }
     catch (...)
     {
         delete parser;
         throw;
     }
-
+    
     delete parser;
     return boost::shared_ptr<DOMDocument>(document, deleteDocument);
 }

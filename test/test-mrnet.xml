@@ -40,7 +40,7 @@ being computed is:
 
 -->
 
-<MRNet xmlns="http://www.krellinst.org/CBTF/MRNet.xsd">
+<MRNet xmlns="http://www.krellinst.org/CBTF/MRNet">
     
   <Type>TestMRNet</Type>
   <Version>1.0.1</Version>
@@ -62,7 +62,7 @@ being computed is:
   
   <Frontend>
     
-    <Network>
+    <Network xmlns="http://www.krellinst.org/CBTF/Network">
       
       <Type>FrontendNetwork</Type>
       <Version>1.0.0</Version>
@@ -136,7 +136,7 @@ being computed is:
       </RootRelative>
     </Depth>
     
-    <Network>
+    <Network xmlns="http://www.krellinst.org/CBTF/Network">
       
       <Type>FilterNetwork</Type>
       <Version>1.0.0</Version>
@@ -182,7 +182,7 @@ being computed is:
   
   <Backend>
     
-    <Network>
+    <Network xmlns="http://www.krellinst.org/CBTF/Network">
       
       <Type>BackendNetwork</Type>
       <Version>1.0.0</Version>

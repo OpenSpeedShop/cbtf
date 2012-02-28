@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -24,21 +24,27 @@
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include <vector>
 #include <xercesc/dom/DOM.hpp>
 
 XERCES_CPP_NAMESPACE_BEGIN
 
     /**
-     * Parse and validate the tree found in the specified file. Return the
-     * resulting document to the caller.
+     * Parse the tree found in the specified file and validate it against the
+     * given schema(s). Return the resulting document to the caller.
      *
-     * @param path    Path of the file to load.
-     * @return        Document contained in the loaded file.
+     * @param path            Path of the file to load.
+     * @param schema_paths    Paths of the schemas against which to validate.
+     *                        Has an empty default value.
+     * @return                Document contained in the loaded file.
      *
-     * @throw std::runtime_error    The specified file doesn't exist.
+     * @throw std::runtime_error    The specified {schema} file doesn't exist,
+     *                              or schema validation failed.
      */
     boost::shared_ptr<DOMDocument> loadFromFile(
-        const boost::filesystem::path& path
+        const boost::filesystem::path& path,
+        const std::vector<boost::filesystem::path>& schema_paths =
+            std::vector<boost::filesystem::path>()
         );
 
     /**
