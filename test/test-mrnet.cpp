@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -113,8 +113,8 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
     *topology_value = boost::filesystem::path("test-mrnet.topology");
 
     //
-    // Per the description in "test-mrnet.topology", the function being
-    // computed by this distributed component network is f(x) = 2x + 6.
+    // Per the description in "test-mrnet.xml", the function being computed
+    // by this distributed component network is f(x) = 2x + 6.
     //
 
     *input_value = 10;
@@ -124,6 +124,83 @@ BOOST_AUTO_TEST_CASE(TestMRNet)
     *input_value = 13;
     int second_output_value = *output_value;
     BOOST_CHECK_EQUAL(second_output_value, 32);
+}
+
+
+
+/**
+ * Unit test for multiple virtual distributed component networks overlayed
+ * onto a single MRNet network.
+ */
+BOOST_AUTO_TEST_CASE(TestMRNetMulti)
+{
+    BOOST_CHECK_NO_THROW(registerXML("test-mrnet-multiA.xml"));
+    BOOST_CHECK_NO_THROW(registerXML("test-mrnet-multiB.xml"));
+
+    Component::Instance networkA, networkB;
+    BOOST_CHECK_NO_THROW(
+        networkA = Component::instantiate(Type("TestMRNetMultiA"))
+        );
+    BOOST_CHECK_NO_THROW(
+        networkB = Component::instantiate(Type("TestMRNetMultiB"))
+        );
+
+    BOOST_REQUIRE_NO_THROW(Component::registerPlugin("BasicMRNetLaunchers.so"));
+    Component::Instance launcher;
+    BOOST_CHECK_NO_THROW(
+        launcher = Component::instantiate(
+            Type("BasicMRNetLauncherUsingBackendCreate")
+            )
+        );
+    
+    boost::shared_ptr<ValueSource<boost::filesystem::path> > topology_value =
+        ValueSource<boost::filesystem::path>::instantiate();
+    boost::shared_ptr<ValueSource<int> > input_value_A = 
+        ValueSource<int>::instantiate();
+    boost::shared_ptr<ValueSource<int> > input_value_B = 
+        ValueSource<int>::instantiate();
+    boost::shared_ptr<ValueSink<int> > output_value_A = 
+        ValueSink<int>::instantiate();
+    boost::shared_ptr<ValueSink<int> > output_value_B = 
+        ValueSink<int>::instantiate();
+
+    Component::Instance topology_value_component = 
+        boost::reinterpret_pointer_cast<Component>(topology_value);
+    Component::Instance input_value_component_A = 
+        boost::reinterpret_pointer_cast<Component>(input_value_A);
+    Component::Instance input_value_component_B = 
+        boost::reinterpret_pointer_cast<Component>(input_value_B);
+    Component::Instance output_value_component_A = 
+        boost::reinterpret_pointer_cast<Component>(output_value_A);
+    Component::Instance output_value_component_B = 
+        boost::reinterpret_pointer_cast<Component>(output_value_B);
+
+    Component::connect(
+        topology_value_component, "value", launcher, "TopologyFile"
+        );
+    Component::connect(launcher, "Network", networkA, "Network");
+    Component::connect(launcher, "Network", networkB, "Network");
+    Component::connect(input_value_component_A, "value", networkA, "in");
+    Component::connect(input_value_component_B, "value", networkB, "in");
+    Component::connect(networkA, "out", output_value_component_A, "value");
+    Component::connect(networkB, "out", output_value_component_B, "value");
+
+    *topology_value = boost::filesystem::path("test-mrnet-multi.topology");
+
+    //
+    // Per the descriptions in "test-mrnet-multi-{A|B}.xml", the function
+    // being computed by these distributed component networks are:
+    //
+    //     TestMRNetMulti-A: f(x) = 2x + 4
+    //     TestMRNetMulti-B: f(x) = 4x + 5
+    //
+
+    *input_value_A = 27;
+    *input_value_B = 42;
+    int the_output_value_A = *output_value_A;
+    int the_output_value_B = *output_value_B;
+    BOOST_CHECK_EQUAL(the_output_value_A, 58);
+    BOOST_CHECK_EQUAL(the_output_value_B, 173);
 }
 
 

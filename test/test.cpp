@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -18,10 +18,6 @@
 
 /** @file Unit tests for the CBTF library. */
 
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MAIN
-#define BOOST_TEST_MODULE CBTF
-
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
@@ -38,8 +34,6 @@
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
-
-#include "ResolvePath.hpp"
 
 using namespace KrellInstitute::CBTF;
 
@@ -95,42 +89,6 @@ namespace std {
     }
     
 } // namespace std
-
-
-
-/** Global fixture adding the testing search paths. */
-struct AddTestingSearchPaths
-{
-    AddTestingSearchPaths()
-    {
-        KrellInstitute::CBTF::Impl::prependToSearchPath(
-            KrellInstitute::CBTF::Impl::kPluginFileType,
-            CBTF_TEST_BINARY_DIR
-            );
-        KrellInstitute::CBTF::Impl::prependToSearchPath(
-            KrellInstitute::CBTF::Impl::kDataFileType,
-            CBTF_MRNET_SOURCE_DIR
-            );
-        KrellInstitute::CBTF::Impl::prependToSearchPath(
-            KrellInstitute::CBTF::Impl::kExecutableFileType,
-            CBTF_MRNET_BACKEND_BINARY_DIR
-            );
-        KrellInstitute::CBTF::Impl::prependToSearchPath(
-            KrellInstitute::CBTF::Impl::kLibraryFileType,
-            CBTF_MRNET_FILTER_BINARY_DIR
-            );
-        KrellInstitute::CBTF::Impl::prependToSearchPath(
-            KrellInstitute::CBTF::Impl::kPluginFileType,
-            CBTF_MRNET_LAUNCHERS_BINARY_DIR
-            );
-        KrellInstitute::CBTF::Impl::prependToSearchPath(
-            KrellInstitute::CBTF::Impl::kDataFileType,
-            CBTF_XML_SOURCE_DIR
-            );
-    }
-};
-
-BOOST_GLOBAL_FIXTURE(AddTestingSearchPaths);
 
 
 

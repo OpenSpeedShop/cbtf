@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -35,9 +35,10 @@ if(XERCESC_FOUND AND MRNET_FOUND)
 endif()
 
 add_executable(test
+    main.cpp
+    test.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.h
     ${CMAKE_CURRENT_BINARY_DIR}/TestMessage.c
-    test.cpp
     ${XML_SOURCES}
     ${MRNET_SOURCES}
     )
@@ -105,5 +106,8 @@ endif()
 
 if(XERCESC_FOUND AND MRNET_FOUND)
     file(COPY test-mrnet.topology DESTINATION .)
+    file(COPY test-mrnet-multi.topology DESTINATION .)
     configure_file(test-mrnet.xml .)
+    configure_file(test-mrnet-multiA.xml .)
+    configure_file(test-mrnet-multiB.xml .)
 endif()
