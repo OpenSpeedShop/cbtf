@@ -25,6 +25,7 @@
 #include <iostream>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
 #include <KrellInstitute/CBTF/Component.hpp>
+#include <KrellInstitute/CBTF/SignalAdapter.hpp>
 #include <KrellInstitute/CBTF/Type.hpp>
 #include <KrellInstitute/CBTF/ValueSink.hpp>
 #include <KrellInstitute/CBTF/ValueSource.hpp>
@@ -376,4 +377,44 @@ BOOST_AUTO_TEST_CASE(TestComponent)
     *input_value = 42;
     int second_output_value = *output_value;
     BOOST_CHECK_EQUAL(second_output_value, 42);
+}
+
+
+
+/**
+ * Callback used by the unit tes tfor the SignalAdapter class.
+ */
+void callback(const int& value)
+{
+    BOOST_CHECK_EQUAL(value, 20);
+}
+
+
+
+/**
+ * Unit test for the SignalAdapter class.
+ */
+BOOST_AUTO_TEST_CASE(TestSignalAdapter)
+{
+    Component::Instance instance =
+        Component::instantiate(Type("TestComponentA"));
+    BOOST_REQUIRE(instance);
+
+    boost::shared_ptr<ValueSource<int> > input_value = 
+        ValueSource<int>::instantiate();
+    Component::Instance input_value_component = 
+        boost::reinterpret_pointer_cast<Component>(input_value);
+    BOOST_REQUIRE(input_value_component);
+
+    boost::shared_ptr<SignalAdapter<int> > output_value = 
+        SignalAdapter<int>::instantiate();
+    Component::Instance output_value_component = 
+        boost::reinterpret_pointer_cast<Component>(output_value);
+    BOOST_REQUIRE(output_value_component);
+
+    Component::connect(input_value_component, "value", instance, "in");
+    Component::connect(instance, "double", output_value_component, "value");
+
+    output_value->Value.connect(callback);
+    *input_value = 10;
 }

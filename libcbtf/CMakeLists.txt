@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ add_library(cbtf SHARED
     KrellInstitute/CBTF/Impl/Invoker.hpp
     Raise.hpp
     ResolvePath.hpp ResolvePath.cpp
+    KrellInstitute/CBTF/SignalAdapter.hpp
     KrellInstitute/CBTF/Type.hpp Type.cpp
     TypeImpl.hpp TypeImpl.cpp
     KrellInstitute/CBTF/Version.hpp Version.cpp
