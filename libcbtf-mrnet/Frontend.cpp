@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -31,11 +31,155 @@
 #include <vector>
 
 #include "Frontend.hpp"
+#include "Global.hpp"
 #include "MessageTags.hpp"
 #include "Raise.hpp"
 #include "ResolvePath.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;
+
+
+
+/** Anonymous namespace hiding implementation details. */
+namespace {
+
+    /**
+     * Global associative container mapping MRNet networks
+     * to their corresponding MRNet frontend.
+     */
+    KRELL_INSTITUTE_CBTF_IMPL_GLOBAL(
+        Frontends,
+        std::map<
+            boost::shared_ptr<MRN::Network> BOOST_PP_COMMA()
+            boost::shared_ptr<Frontend>
+            >
+        )
+    
+} // namespace <anonymous>
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+boost::shared_ptr<Frontend> Frontend::instantiate(
+    const boost::shared_ptr<MRN::Network>& network,
+    const MRN::FilterId& filter_mode
+    )
+{
+    Frontends::GuardType guard_frontends(Frontends::mutex());
+
+    Frontends::Type::iterator i = Frontends::value().find(network);
+    if (i == Frontends::value().end())
+    {
+        i = Frontends::value().insert(
+            std::make_pair(network, new Frontend(network, filter_mode))
+            ).first;
+    }
+    
+    return i->second;
+}
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+Frontend::~Frontend()
+{
+    // Interrupt the thread executing this backend's message pump
+    dm_message_pump_thread.interrupt();
+
+    // Wait for the thread to actually exit
+    dm_message_pump_thread.join();
+
+    // Instruct the backends to shutdown
+    sendToBackends(
+        MRN::PacketPtr(new MRN::Packet(0, MessageTags::RequestShutdown, ""))
+        );
+    
+    // Iterate until all backends are ready to shutdown
+    int remaining_endpoints =
+        dm_network->get_BroadcastCommunicator()->get_EndPoints().size();
+    while (remaining_endpoints > 0)
+    {
+        // Receive the next available message
+        int tag = -1;
+        MRN::PacketPtr packet;
+        int retval = dm_stream->recv(&tag, packet, false);
+        if (retval == 0)
+        {
+            continue;
+        }
+        else if ((retval == -1) || (packet == NULL))
+        {
+            raise<std::runtime_error>(
+                "MRNet failed to receive the next message."
+                );
+        }
+
+        if (dm_is_debug_enabled)
+        {
+            bool handling = (tag == MessageTags::AcknowledgeShutdown);
+            std::cout << "[FE " << getpid() << "] "
+                      << "Received and "
+                      << (handling ? "handling" : "ignoring")
+                      << " " << tag << "." << std::endl;
+        }
+                            
+        // Was this backend reporting its readiness to shutdown?
+        if (tag == MessageTags::AcknowledgeShutdown)
+        {
+            --remaining_endpoints;
+        }
+    }
+
+    // Destroy the stream used to pass data within this network
+    delete dm_stream;
+}
+
+
+
+//------------------------------------------------------------------------------
+// Set the message handler for the specified message tag.
+//------------------------------------------------------------------------------
+void Frontend::setMessageHandler(const int& tag, const MessageHandler& handler)
+{
+    boost::unique_lock<boost::shared_mutex> guard_message_handlers(
+        dm_message_handlers_mutex
+        );
+    dm_message_handlers.insert(std::make_pair(tag, handler));    
+}
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+void Frontend::sendToBackends(const MRN::PacketPtr& packet)
+{
+    if (dm_is_debug_enabled)
+    {
+        std::cout << "[FE " << getpid() << "] "
+                  << "Sending " << packet->get_Tag() << "." << std::endl;
+    }
+
+    // Insure the packet containing the message has the correct stream ID
+    if (dm_stream == NULL)
+    {
+        raise<std::runtime_error>("The MRNet stream hasn't been created yet.");
+    }
+    packet->set_StreamId(dm_stream->get_Id());
+
+    // Send the message
+    int retval = dm_stream->send(const_cast<MRN::PacketPtr&>(packet));
+    if (retval != 0)
+    {
+        raise<std::runtime_error>("Failed to send the specified message.");
+    }
+    retval = dm_stream->flush();
+    if (retval != 0)
+    {
+        raise<std::runtime_error>("Failed to send the specified message.");
+    }
+}
 
 
 
@@ -152,108 +296,6 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network,
     dm_message_pump_thread = boost::thread(
         boost::bind(&Frontend::doMessagePump, this)
         );
-}
-
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-Frontend::~Frontend()
-{
-    // Interrupt the thread executing this backend's message pump
-    dm_message_pump_thread.interrupt();
-
-    // Wait for the thread to actually exit
-    dm_message_pump_thread.join();
-    
-    // Instruct the backends to shutdown
-    sendToBackends(
-        MRN::PacketPtr(new MRN::Packet(0, MessageTags::RequestShutdown, ""))
-        );
-    
-    // Iterate until all backends are ready to shutdown
-    int remaining_endpoints =
-        dm_network->get_BroadcastCommunicator()->get_EndPoints().size();
-    while (remaining_endpoints > 0)
-    {
-        // Receive the next available message
-        int tag = -1;
-        MRN::PacketPtr packet;
-        int retval = dm_stream->recv(&tag, packet, false);
-        if (retval == 0)
-        {
-            continue;
-        }
-        else if ((retval == -1) || (packet == NULL))
-        {
-            raise<std::runtime_error>(
-                "MRNet failed to receive the next message."
-                );
-        }
-
-        if (dm_is_debug_enabled)
-        {
-            bool handling = (tag == MessageTags::AcknowledgeShutdown);
-            std::cout << "[FE " << getpid() << "] "
-                      << "Received and "
-                      << (handling ? "handling" : "ignoring")
-                      << " " << tag << "." << std::endl;
-        }
-                            
-        // Was this backend reporting its readiness to shutdown?
-        if (tag == MessageTags::AcknowledgeShutdown)
-        {
-            --remaining_endpoints;
-        }
-    }
-
-    // Destroy the stream used to pass data within this network
-    delete dm_stream;
-}
-
-
-
-//------------------------------------------------------------------------------
-// Set the message handler for the specified message tag.
-//------------------------------------------------------------------------------
-void Frontend::setMessageHandler(const int& tag, const MessageHandler& handler)
-{
-    boost::unique_lock<boost::shared_mutex> guard_message_handlers(
-        dm_message_handlers_mutex
-        );
-    dm_message_handlers.insert(std::make_pair(tag, handler));    
-}
-
-
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-void Frontend::sendToBackends(const MRN::PacketPtr& packet)
-{
-    if (dm_is_debug_enabled)
-    {
-        std::cout << "[FE " << getpid() << "] "
-                  << "Sending " << packet->get_Tag() << "." << std::endl;
-    }
-
-    // Insure the packet containing the message has the correct stream ID
-    if (dm_stream == NULL)
-    {
-        raise<std::runtime_error>("The MRNet stream hasn't been created yet.");
-    }
-    packet->set_StreamId(dm_stream->get_Id());
-
-    // Send the message
-    int retval = dm_stream->send(const_cast<MRN::PacketPtr&>(packet));
-    if (retval != 0)
-    {
-        raise<std::runtime_error>("Failed to send the specified message.");
-    }
-    retval = dm_stream->flush();
-    if (retval != 0)
-    {
-        raise<std::runtime_error>("Failed to send the specified message.");
-    }
 }
 
 

@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -246,7 +246,7 @@ void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
         mode = MRN::SFILTER_TIMEOUT;
     }
     
-    dm_frontend.reset(new Frontend(network, mode));
+    dm_frontend = Frontend::instantiate(network, mode);
 
     dm_local_component_network.initializeStepThree(
         boost::bind(&MRNet::bindIncomingUpstream, this, _1),

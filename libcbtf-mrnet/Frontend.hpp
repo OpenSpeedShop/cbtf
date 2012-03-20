@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -48,17 +48,17 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
     public:
 
         /**
-         * Construct the frontend for the given MRNet network. Establishes the
-         * stream used by backends to pass data to the frontend, then starts a
-         * thread executing this frontend's message pump.
+         * Instantiate the frontend for the given MRNet network if it hasn't
+         * been instantiated already, or return the existing frontend if one
+         * already exists.
          *
          * @param network        MRNet network containing this frontend.
          * @param filter_mode    MRNet filter synchronization mode to be used.
-         *
-         * @throw std::runtime_error    Unable to initialize MRNet.
          */
-        Frontend(const boost::shared_ptr<MRN::Network>& network,
-                 const MRN::FilterId& filter_mode = MRN::SFILTER_DONTWAIT);
+        static boost::shared_ptr<Frontend> instantiate(
+            const boost::shared_ptr<MRN::Network>& network,
+            const MRN::FilterId& filter_mode = MRN::SFILTER_DONTWAIT
+            );
         
         /**
          * Destroy this frontend. Instructs all of the corresponding network's
@@ -92,6 +92,19 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
         
     private:
 
+        /**
+         * Construct the frontend for the given MRNet network. Establishes the
+         * stream used by backends to pass data to the frontend, then starts a
+         * thread executing this frontend's message pump.
+         *
+         * @param network        MRNet network containing this frontend.
+         * @param filter_mode    MRNet filter synchronization mode to be used.
+         *
+         * @throw std::runtime_error    Unable to initialize MRNet.
+         */
+        Frontend(const boost::shared_ptr<MRN::Network>& network,
+                 const MRN::FilterId& filter_mode);
+        
         /** Implementation of the message pump. */
         void doMessagePump();
 
