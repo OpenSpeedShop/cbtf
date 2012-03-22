@@ -21,13 +21,16 @@ include(FindPackageHandleStandardArgs)
 find_library(MRNet_MRNET_LIBRARY NAMES libmrnet.so HINTS ENV MRNET_ROOT)
 find_library(MRNet_XPLAT_LIBRARY NAMES libxplat.so HINTS ENV MRNET_ROOT)
 find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h HINTS ENV MRNET_ROOT)
+# Look for the configuration header files in the MRNet install library paths
+find_path(MRNet_INCLUDE_DIR2 mrnet_config.h PATHS MRNET_ROOT PATH_SUFFIXES lib lib64)
 
 find_package_handle_standard_args(
     MRNet DEFAULT_MSG MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR
     )
 
 set(MRNet_LIBRARIES ${MRNet_MRNET_LIBRARY} ${MRNet_XPLAT_LIBRARY})
-set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR})
+# Use the normal MRNet include path and the non-standard path for the configuration header files in the MRNet install library paths
+set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR} ${MRNet_INCLUDE_DIR2})
 
 set(MRNet_DEFINES "-Dos_linux")
 
