@@ -20,10 +20,10 @@
 
 #pragma once
 
+#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/shared_mutex.hpp>
-#include <boost/utility.hpp>
 #include <map>
 #include <mrnet/MRNet.h>
 
