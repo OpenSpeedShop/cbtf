@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -22,10 +22,10 @@
 
 #include <boost/any.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/shared_mutex.hpp>
-#include <boost/utility.hpp>
 #include <boost/weak_ptr.hpp>
 #include <KrellInstitute/CBTF/Component.hpp>
 #include <KrellInstitute/CBTF/Impl/Invoker.hpp>

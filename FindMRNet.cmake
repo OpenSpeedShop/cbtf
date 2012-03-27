@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -21,13 +21,16 @@ include(FindPackageHandleStandardArgs)
 find_library(MRNet_MRNET_LIBRARY NAMES libmrnet.so HINTS ENV MRNET_ROOT)
 find_library(MRNet_XPLAT_LIBRARY NAMES libxplat.so HINTS ENV MRNET_ROOT)
 find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h HINTS ENV MRNET_ROOT)
+# Look for the configuration header files in the MRNet install library paths
+find_path(MRNet_INCLUDE_DIR2 mrnet_config.h PATHS MRNET_ROOT PATH_SUFFIXES lib lib64)
 
 find_package_handle_standard_args(
     MRNet DEFAULT_MSG MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR
     )
 
 set(MRNet_LIBRARIES ${MRNet_MRNET_LIBRARY} ${MRNet_XPLAT_LIBRARY})
-set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR})
+# Use the normal MRNet include path and the non-standard path for the configuration header files in the MRNet install library paths
+set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR} ${MRNet_INCLUDE_DIR2})
 
 set(MRNet_DEFINES "-Dos_linux")
 
@@ -38,17 +41,17 @@ if(MRNET_FOUND AND DEFINED MRNet_INCLUDE_DIR)
     file(READ ${MRNet_INCLUDE_DIR}/mrnet/Types.h MRNet_VERSION_FILE)
   
     string(REGEX REPLACE
-        ".*#define MRNET_VERSION_MAJOR[ ]+([0-9]+)\n.*" "\\1"
+        ".*#[ ]*define MRNET_VERSION_MAJOR[ ]+([0-9]+)\n.*" "\\1"
         MRNet_VERSION_MAJOR ${MRNet_VERSION_FILE}
         )
       
     string(REGEX REPLACE
-        ".*#define MRNET_VERSION_MINOR[ ]+([0-9]+)\n.*" "\\1"
+        ".*#[ ]*define MRNET_VERSION_MINOR[ ]+([0-9]+)\n.*" "\\1"
         MRNet_VERSION_MINOR ${MRNet_VERSION_FILE}
         )
   
     string(REGEX REPLACE
-        ".*#define MRNET_VERSION_REV[ ]+([0-9]+)\n.*" "\\1"
+        ".*#[ ]*define MRNET_VERSION_REV[ ]+([0-9]+)\n.*" "\\1"
         MRNet_VERSION_PATCH ${MRNet_VERSION_FILE}
         )
   

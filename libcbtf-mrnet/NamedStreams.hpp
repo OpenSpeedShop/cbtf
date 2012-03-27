@@ -21,7 +21,7 @@
 #pragma once
 
 #include <boost/bimap.hpp>
-#include <boost/utility.hpp>
+#include <boost/noncopyable.hpp>
 #include <iostream>
 #include <mrnet/Packet.h>
 #include <string>
