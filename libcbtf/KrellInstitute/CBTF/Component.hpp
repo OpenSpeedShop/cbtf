@@ -157,9 +157,7 @@ namespace KrellInstitute { namespace CBTF {
                                Component::Instance input_instance,
                                const std::string& input_name);
         
-        /**
-         * Destroy a component. Releases any resources used by the component.
-         */
+        /** Destructor. */
         virtual ~Component();
         
         /**

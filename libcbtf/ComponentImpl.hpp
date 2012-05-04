@@ -80,7 +80,7 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
                                Component::Instance input_instance,
                                const std::string& input_name);
         
-        /** Constructor. */
+        /** Construct a new component of the given type and version. */
         ComponentImpl(const Type& type, const Version& version);
         
         /** Destructor. */

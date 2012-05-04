@@ -52,7 +52,7 @@ VersionImpl::VersionImpl(const std::string& name) :
 {
     using namespace boost::spirit::classic;
 
-    bool isFullMatch = parse(
+    bool is_full_match = parse(
         name.c_str(),
         uint_p[assign_a(dm_major_number)] >> ch_p('.') >> 
         uint_p[assign_a(dm_minor_number)] >> ch_p('.') >> 
@@ -60,7 +60,7 @@ VersionImpl::VersionImpl(const std::string& name) :
         space_p
         ).full;
     
-    if (!isFullMatch)
+    if (!is_full_match)
     {
         raise<std::invalid_argument>(
             "The specified string (%1%) doesn't name a version.", name
