@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ add_library(cbtf-mrnet SHARED
     IncomingStreamMediator.cpp IncomingStreamMediator.hpp
     LocalComponentNetwork.cpp LocalComponentNetwork.hpp
     MessageHandler.hpp
+    MessageHandlers.cpp MessageHandlers.hpp
     MessageTags.hpp
     KrellInstitute/CBTF/Impl/MRNet.hpp MRNet.cpp MRNet.hpp
     NamedStreams.cpp NamedStreams.hpp

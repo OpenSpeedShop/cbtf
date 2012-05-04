@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -28,6 +28,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <map>
 #include <mrnet/MRNet.h>
 #include <unistd.h>
 #include <xercesc/dom/DOM.hpp>
@@ -65,17 +66,20 @@ namespace {
     NetworkMap networks;
 
     /**
-     * Bind the specified incoming downstream mediator by attaching its
-     * handler() method directly to the correct backend message handler.
+     * Bind the specified incoming downstream mediator by adding its handler()
+     * method to the backend's message handlers.
      *
+     * @param uid         Unique identifier for the distribured component
+     *                    network associated with this mediator.
      * @param mediator    Incoming downstream mediator to be bound.
      */
     void bindIncomingDownstream(
-        boost::shared_ptr<IncomingStreamMediator>& mediator
+        const int& uid,
+        const boost::shared_ptr<IncomingStreamMediator>& mediator
         )
     {
-        Backend::setMessageHandler(
-            mediator->tag(),
+        Backend::MessageHandlers.add(
+            uid, mediator->tag(),
             boost::bind(&IncomingStreamMediator::handler, mediator, _1)
             );
     }
@@ -184,16 +188,16 @@ namespace {
         
         i->second->initializeStepThree(
             LocalComponentNetwork::IncomingBinder(), // No Incoming Upstreams
-            boost::bind(&bindIncomingDownstream, _1),
+            boost::bind(&bindIncomingDownstream, uid, _1),
             boost::bind(&Backend::sendToFrontend, _1),
             MessageHandler() // No Outgoing Downstreams
-            );        
+            );
     }
 
     /**
      * Handler for the DestroyNetwork message. Initiate the destruction of
      * this backend's local component network for the specified distributed
-     * component network.
+     * component network after removing its message handlers.
      *
      * @param packet    Packet containing the received message.
      */
@@ -218,6 +222,7 @@ namespace {
                       << "component network UID " << uid << "." << std::endl;
         }
 
+        Backend::MessageHandlers.remove(uid);
         networks.erase(uid);
     }
     
@@ -264,20 +269,20 @@ int main(int argc, char* argv[])
     std::cout << std::endl;
     std::cout.flush();
     
-    // Set message handlers for this backend
-    Backend::setMessageHandler(
-        MessageTags::RequestShutdown, requestShutdown
+    // Set the non-network-specific message handlers for this backend
+    Backend::MessageHandlers.add(
+        -1, MessageTags::RequestShutdown, requestShutdown
         );
-    Backend::setMessageHandler(
-        MessageTags::SpecifyNamedStreams, specifyNamedStreams
+    Backend::MessageHandlers.add(
+        -1, MessageTags::SpecifyNamedStreams, specifyNamedStreams
         );
-    Backend::setMessageHandler(
-        MessageTags::SpecifyBackend, specifyBackend
+    Backend::MessageHandlers.add(
+        -1, MessageTags::SpecifyBackend, specifyBackend
         );
-    Backend::setMessageHandler(
-        MessageTags::DestroyNetwork, destroyNetwork
+    Backend::MessageHandlers.add(
+        -1, MessageTags::DestroyNetwork, destroyNetwork
         );
-
+    
     // Catch and log any exceptions encountered during execution
     try
     {
@@ -302,19 +307,8 @@ int main(int argc, char* argv[])
     // Stop this backend's message pump
     Backend::stopMessagePump();
     
-    // Remove message handlers for this backend
-    Backend::setMessageHandler(
-        MessageTags::RequestShutdown, MessageHandler()
-        );
-    Backend::setMessageHandler(
-        MessageTags::SpecifyNamedStreams, MessageHandler()
-        );
-    Backend::setMessageHandler(
-        MessageTags::SpecifyBackend, MessageHandler()
-        );
-    Backend::setMessageHandler(
-        MessageTags::DestroyNetwork, MessageHandler()
-        );
+    // Remove the non-network-specific message handlers for this backend
+    Backend::MessageHandlers.remove(-1);
 
     // Display a shutdown message
     std::cout << std::endl;

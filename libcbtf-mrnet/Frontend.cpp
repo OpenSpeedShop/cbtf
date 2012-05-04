@@ -21,7 +21,6 @@
 #include <algorithm>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/thread/locks.hpp>
 #include <iostream>
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <stdexcept>
@@ -116,37 +115,24 @@ Frontend::~Frontend()
                 );
         }
 
-        if (dm_is_debug_enabled)
-        {
-            bool handling = (tag == MessageTags::AcknowledgeShutdown);
-            std::cout << "[FE " << getpid() << "] "
-                      << "Received and "
-                      << (handling ? "handling" : "ignoring")
-                      << " " << tag << "." << std::endl;
-        }
-                            
         // Was this backend reporting its readiness to shutdown?
+        bool handled = false;
         if (tag == MessageTags::AcknowledgeShutdown)
         {
             --remaining_endpoints;
+            handled = true;
+        }
+        if (dm_is_debug_enabled)
+        {
+            std::cout << "[FE " << getpid() << "] "
+                      << "Received and "
+                      << (handled ? "handled" : "ignored")
+                      << " " << tag << "." << std::endl;
         }
     }
 
     // Destroy the stream used to pass data within this network
     delete dm_stream;
-}
-
-
-
-//------------------------------------------------------------------------------
-// Set the message handler for the specified message tag.
-//------------------------------------------------------------------------------
-void Frontend::setMessageHandler(const int& tag, const MessageHandler& handler)
-{
-    boost::unique_lock<boost::shared_mutex> guard_message_handlers(
-        dm_message_handlers_mutex
-        );
-    dm_message_handlers.insert(std::make_pair(tag, handler));    
 }
 
 
@@ -187,9 +173,8 @@ void Frontend::sendToBackends(const MRN::PacketPtr& packet)
 //------------------------------------------------------------------------------
 Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network,
                    const MRN::FilterId& filter_mode) :
+    MessageHandlers(),
     dm_is_debug_enabled(false),
-    dm_message_handlers(),
-    dm_message_handlers_mutex(),
     dm_network(network),
     dm_stream(NULL),
     dm_message_pump_thread()
@@ -352,40 +337,23 @@ void Frontend::doMessagePump()
                             );
                     }
                     
-                    // Dispatch the message to the proper handler
-
-                    MessageHandler handler;
-
+                    // Dispatch the message to the proper handlers
+                    bool handled = false;                    
+                    try
                     {
-                        boost::shared_lock<boost::shared_mutex>
-                            guard_message_handlers(dm_message_handlers_mutex);
-                        std::map<int, MessageHandler>::const_iterator i =
-                            dm_message_handlers.find(tag);
-                        if (i != dm_message_handlers.end())
-                        {
-                            handler = i->second;
-                        }
+                        handled = MessageHandlers(tag, packet);
                     }
-
+                    catch (const std::exception& error)
+                    {
+                        std::cout << "[FE " << getpid() << "] EXCEPTION: "
+                                  << error.what() << std::endl;
+                    }
                     if (dm_is_debug_enabled)
                     {
                         std::cout << "[FE " << getpid() << "] "
                                   << "Received and "
-                                  << (handler ? "handling" : "ignoring")
+                                  << (handled ? "handled" : "ignored")
                                   << " " << tag << "." << std::endl;
-                    }
-                    
-                    if (handler)
-                    {
-                        try
-                        {
-                            handler(packet);
-                        }
-                        catch (const std::exception& error)
-                        {
-                            std::cout << "[FE " << getpid() << "] EXCEPTION: "
-                                      << error.what() << std::endl;
-                        }
                     }
                     
                     // Reset MRNet data event notification

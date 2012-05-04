@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -20,11 +20,8 @@
 
 #include <algorithm>
 #include <boost/thread.hpp>
-#include <boost/thread/locks.hpp>
 #include <iostream>
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
-#include <map>
-#include <mrnet/MRNet.h>
 #include <stdexcept>
 #include <sys/select.h>
 
@@ -42,12 +39,6 @@ namespace {
     /** Flag indicating if debugging is enabled for this backend. */
     bool is_backend_debug_enabled = false;
 
-    /** Message handlers for this backend. */
-    std::map<int, MessageHandler> message_handlers;
-    
-    /** Mutual exclusion lock for this backend's message handlers. */
-    boost::shared_mutex message_handlers_mutex;
-    
     /** MRNet network containing this backend. */
     MRN::Network* mrnet_network = NULL;
 
@@ -114,41 +105,23 @@ namespace {
                                 );
                         }
 
-                        // Dispatch the message to the proper handler
-
-                        MessageHandler handler;
-
+                        // Dispatch the message to the proper handlers
+                        bool handled = false;                    
+                        try
                         {
-                            boost::shared_lock<boost::shared_mutex> 
-                                guard_message_handlers(message_handlers_mutex);
-                            std::map<int, MessageHandler>::const_iterator i =
-                                message_handlers.find(tag);
-                            if (i != message_handlers.end())
-                            {
-                                handler = i->second;
-                            }
+                            handled = Backend::MessageHandlers(tag, packet);
                         }
-
+                        catch (const std::exception& error)
+                        {
+                            std::cout << "[BE " << getpid() << "] EXCEPTION: "
+                                      << error.what() << std::endl;
+                        }
                         if (is_backend_debug_enabled)
                         {
                             std::cout << "[BE " << getpid() << "] "
                                       << "Received and "
-                                      << (handler ? "handling" : "ignoring")
+                                      << (handled ? "handled" : "ignored")
                                       << " " << tag << "." << std::endl;
-                        }
-
-                        if (handler)
-                        {
-                            try
-                            {
-                                handler(packet);
-                            }
-                            catch (const std::exception& error)
-                            {
-                                std::cout << "[BE " << getpid() 
-                                          << "] EXCEPTION: "
-                                          << error.what() << std::endl;
-                            }
                         }
                         
                         // Reset MRNet data event notification
@@ -172,19 +145,6 @@ namespace {
     } // doMessagePump()
     
 } // namespace <anonymous>
-
-
-
-//------------------------------------------------------------------------------
-// Set the message handler for the specified message tag.
-//------------------------------------------------------------------------------
-void Backend::setMessageHandler(const int& tag, const MessageHandler& handler)
-{
-    boost::unique_lock<boost::shared_mutex> guard_message_handlers(
-        message_handlers_mutex
-        );
-    message_handlers.insert(std::make_pair(tag, handler));    
-}
 
 
 
@@ -267,6 +227,12 @@ void Backend::stopMessagePump()
     mrnet_network->waitfor_ShutDown();
     delete mrnet_network;
 }
+
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+KrellInstitute::CBTF::Impl::MessageHandlers Backend::MessageHandlers;
 
 
 

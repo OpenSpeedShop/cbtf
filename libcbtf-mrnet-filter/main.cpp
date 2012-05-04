@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -38,6 +38,7 @@
 #include <xercesc/dom/DOM.hpp>
 
 #include "LocalComponentNetwork.hpp"
+#include "MessageHandlers.hpp"
 #include "MessageTags.hpp"
 #include "NamedStreams.hpp"
 #include "XercesExts.hpp"
@@ -69,19 +70,11 @@ namespace {
     /** Distributed component networks on this filter. */
     NetworkMap networks;
 
-    /**
-     * Type of associative container used to map between the MRNet message tags
-     * for named streams and their incoming stream mediators.
-     */
-    typedef std::map<
-        int, boost::shared_ptr<IncomingStreamMediator>
-        > MediatorMap;
+    /** Incoming upstream message handlers for this filter. */
+    MessageHandlers incoming_upstream_message_handlers;
 
-    /** Named incoming upstreams on this filter. */
-    MediatorMap incoming_upstream_mediators;
-
-    /** Named incoming downstreams on this filter. */
-    MediatorMap incoming_downstream_mediators;
+    /** Incoming downstream message handlers for this filter. */
+    MessageHandlers incoming_downstream_message_handlers;
 
     /** Mutual exclusion lock for the packet queues. */
     boost::mutex packet_queues_mutex;
@@ -93,35 +86,43 @@ namespace {
     std::vector<MRN::PacketPtr> downstream_packet_queue;
 
     /**
-     * Bind the specified incoming upstream mediator by adding it to the map
-     * of incoming upstream mediators for later use when receiving packets.
+     * Bind the specified incoming upstream mediator by adding its handler()
+     * method to the filter's incoming upstream message handlers.
      *
+     * @param uid         Unique identifier for the distribured component
+     *                    network associated with this mediator.
      * @param mediator    Incoming upstream mediator to be bound.
      */
     void bindIncomingUpstream(
-        boost::shared_ptr<IncomingStreamMediator>& mediator
+        const int& uid,
+        const boost::shared_ptr<IncomingStreamMediator>& mediator
         )
     {
-        incoming_upstream_mediators.insert(
-            std::make_pair(mediator->tag(), mediator)
+        incoming_upstream_message_handlers.add(
+            uid, mediator->tag(),
+            boost::bind(&IncomingStreamMediator::handler, mediator, _1)
             );
     }
     
     /**
-     * Bind the specified incoming downstream mediator by adding it to the map
-     * of incoming downstream mediators for later use when receiving packets.
+     * Bind the specified incoming downstream mediator by adding its handler()
+     * method to the filter's incoming downstream message handlers.
      *
+     * @param uid         Unique identifier for the distribured component
+     *                    network associated with this mediator.
      * @param mediator    Incoming downstream mediator to be bound.
      */
     void bindIncomingDownstream(
-        boost::shared_ptr<IncomingStreamMediator>& mediator
+        const int& uid,
+        const boost::shared_ptr<IncomingStreamMediator>& mediator
         )
     {
-        incoming_downstream_mediators.insert(
-            std::make_pair(mediator->tag(), mediator)
+        incoming_downstream_message_handlers.add(
+            uid, mediator->tag(),
+            boost::bind(&IncomingStreamMediator::handler, mediator, _1)
             );
     }
-
+    
     /**
      * Handler for the filter configuration parameters message. Decodes the
      * parameters and configures debugging settings as appropriate.
@@ -380,8 +381,8 @@ namespace {
             );
         
         i->second->initializeStepThree(
-            boost::bind(&bindIncomingUpstream, _1),
-            boost::bind(&bindIncomingDownstream, _1),
+            boost::bind(&bindIncomingUpstream, uid, _1),
+            boost::bind(&bindIncomingDownstream, uid, _1),
             boost::bind(&sendToFrontend, _1),
             boost::bind(&sendToBackends, _1)
             );
@@ -390,7 +391,7 @@ namespace {
     /**
      * Handler for the DestroyNetwork message. Initiate the destruction of
      * this filter's local component network for the specified distributed
-     * component network.
+     * component network after removing its message handlers.
      *
      * @param packet    Packet containing the received message.
      */
@@ -415,6 +416,8 @@ namespace {
                       << "component network UID " << uid << "." << std::endl;
         }
 
+        incoming_upstream_message_handlers.remove(uid);
+        incoming_downstream_message_handlers.remove(uid);
         networks.erase(uid);
     }
     
@@ -461,43 +464,29 @@ extern "C" void libcbtf_mrnet_upstream_filter(
          i != packets_in_upstream.end();
          ++i)
     {
-        bool forward_packet = true;
+        bool handled = false;
 
         try
         {
-            MediatorMap::const_iterator j = 
-                incoming_upstream_mediators.find((*i)->get_Tag());
-            
-            if (j != incoming_upstream_mediators.end())
-            {
-                forward_packet = false;
-                
-                if (is_filter_debug_enabled)
-                {
-                    std::cout << debug_prefix
-                              << "Received (upward) and handling "
-                              << (*i)->get_Tag() << "." << std::endl;
-                }
-
-                j->second->handler(*i);
-            }
+            handled = incoming_upstream_message_handlers((*i)->get_Tag(), *i);
         }
         catch (const std::exception& error)
         {
-            forward_packet = true;
             std::cout << debug_prefix << "EXCEPTION: "
                       << error.what() << std::endl;
         }
         
-        if (forward_packet)
+        if (!handled)
         {
-            if (is_filter_debug_enabled)
-            {
-                std::cout << debug_prefix << "Received (upward) and forwarding "
-                          << (*i)->get_Tag() << "." << std::endl;
-            }
-            
             packets_to_forward.push_back(*i);
+        }
+                
+        if (is_filter_debug_enabled)
+        {
+            std::cout << debug_prefix
+                      << "Received (upward) and "
+                      << (handled ? "handled" : "forwarded")
+                      << " " << (*i)->get_Tag() << "." << std::endl;
         }
     }
 
@@ -549,12 +538,12 @@ extern "C" void libcbtf_mrnet_downstream_filter(
          i != packets_in_downstream.end();
          ++i)
     {
-        bool forward_packet = true;
+        bool handled = false;
 
         try
         {
             if ((*i)->get_Tag() == MessageTags::SpecifyNamedStreams)
-            {
+            {                
                 specifyNamedStreams(*i);
             }
             else if ((*i)->get_Tag() == MessageTags::SpecifyFilter)
@@ -567,41 +556,28 @@ extern "C" void libcbtf_mrnet_downstream_filter(
             }
             else
             {
-                MediatorMap::const_iterator j = 
-                    incoming_downstream_mediators.find((*i)->get_Tag());
-                
-                if (j != incoming_downstream_mediators.end())
-                {
-                    forward_packet = false;
-
-                    if (is_filter_debug_enabled)
-                    {
-                        std::cout << debug_prefix
-                                  << "Received (downward) and handling "
-                                  << (*i)->get_Tag() << "." << std::endl;
-                    }
-                    
-                    j->second->handler(*i);
-                }
+                handled = incoming_downstream_message_handlers(
+                    (*i)->get_Tag(), *i
+                    );
             }
         }
         catch (const std::exception& error)
         {
-            forward_packet = true;
             std::cout << debug_prefix << "EXCEPTION: "
                       << error.what() << std::endl;
         }
         
-        if (forward_packet)
+        if (!handled)
         {
-            if (is_filter_debug_enabled)
-            {
-                std::cout << debug_prefix
-                          << "Received (downward) and forwarding "
-                          << (*i)->get_Tag() << "." << std::endl;
-            }
-
             packets_to_forward.push_back(*i);
+        }
+                
+        if (is_filter_debug_enabled)
+        {
+            std::cout << debug_prefix
+                      << "Received (downward) and "
+                      << (handled ? "handled" : "forwarded")
+                      << " " << (*i)->get_Tag() << "." << std::endl;
         }
     }
 

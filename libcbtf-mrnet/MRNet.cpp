@@ -154,7 +154,8 @@ Component::Instance MRNet::factoryFunction(
 
 
 //------------------------------------------------------------------------------
-// Send a DestroyNetwork message to the backends and filters.
+// Send a DestroyNetwork message to the backends and filters, and then remove
+// all of our message handlers.
 //------------------------------------------------------------------------------
 MRNet::~MRNet()
 {
@@ -164,6 +165,10 @@ MRNet::~MRNet()
             0, MessageTags::DestroyNetwork, "%d",
             dm_local_component_network.named_streams()->uid()
             )));
+
+        dm_frontend->MessageHandlers.remove(
+            dm_local_component_network.named_streams()->uid()
+            );
     }
 }
 
@@ -203,14 +208,15 @@ MRNet::MRNet(const Type& type, const Version& version,
 
 
 //------------------------------------------------------------------------------
-// Bind the specified incoming upstream mediator by attaching its handler()
-// method directly to the correct frontend message handler.
+// Bind the specified incoming upstream mediator by adding its handler()
+// method to the frontend's message handlers.
 //------------------------------------------------------------------------------
 void MRNet::bindIncomingUpstream(
     boost::shared_ptr<IncomingStreamMediator>& mediator
     )
 {
-    dm_frontend->setMessageHandler(
+    dm_frontend->MessageHandlers.add(
+        dm_local_component_network.named_streams()->uid(),
         mediator->tag(),
         boost::bind(&IncomingStreamMediator::handler, mediator, _1)
         );

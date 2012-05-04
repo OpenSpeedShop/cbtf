@@ -23,11 +23,9 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
-#include <boost/thread/shared_mutex.hpp>
-#include <map>
 #include <mrnet/MRNet.h>
 
-#include "MessageHandler.hpp"
+#include "MessageHandlers.hpp"
 
 namespace KrellInstitute { namespace CBTF { namespace Impl {
 
@@ -35,8 +33,8 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
      * RAII class representing the frontend of a MRNet network. The lifetime of
      * the network mirrors that of the corresponding Frontend object. Starts and
      * stops a message pump for the frontend, which is responsible for receiving
-     * and handling incoming messages from the backends. Methods to set message
-     * handlers and send messages to the backends are also provided.
+     * and handling incoming messages from the backends. Also provides the means
+     * to configure message handlers and send messages to the backends.
      *
      * @sa http://en.wikipedia.org/wiki/Event_loop
      * @sa http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization
@@ -66,21 +64,10 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * frontend's message pump.
          */
         virtual ~Frontend();
-        
-        /**
-         * Set a message handler. Requests the given handler be invoked when
-         * messages with the specified tag arrive at this frontend's message
-         * pump.
-         *
-         * @param tag        Message tag for which the handler is to be set.
-         * @param handler    New handler for that message tag.
-         *
-         * @note    The message handler for a particular message tag can be
-         *          effectively removed by specifying a default constructed
-         *          message handler.
-         */
-        void setMessageHandler(const int& tag, const MessageHandler& handler);
 
+        /** Message handlers for this frontend. */
+        KrellInstitute::CBTF::Impl::MessageHandlers MessageHandlers;
+        
         /**
          * Send a message to all of the backends.
          *
@@ -110,12 +97,6 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
 
         /** Flag indicating if debugging is enabled for this frontend. */
         bool dm_is_debug_enabled;
-        
-        /** Message handlers for this frontend. */
-        std::map<int, MessageHandler> dm_message_handlers;
-    
-        /** Mutual exclusion lock for this frontend's message handlers. */
-        boost::shared_mutex dm_message_handlers_mutex;
         
         /** MRNet network containing this frontend. */
         boost::shared_ptr<MRN::Network> dm_network;

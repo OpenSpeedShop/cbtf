@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010,2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010-2012 Krell Institute. All Rights Reserved.
 //
 // This library is free software; you can redistribute it and/or modify it under
 // the terms of the GNU Lesser General Public License as published by the Free
@@ -22,35 +22,21 @@
 
 #include <mrnet/MRNet.h>
 
-#include "MessageHandler.hpp"
+#include "MessageHandlers.hpp"
 
 namespace KrellInstitute { namespace CBTF { namespace Impl {
 
     /**
-     * Namespace containing functions to set message handlers for, starting,
-     * and stopping the MRNet backend message pump. This pump is responsible
-     * for receiving and handling incoming messages from the frontend. Also
-     * provides functions for sending messages to the frontend.
+     * Namespace containing functions to start and stop a message pump for
+     * the backend, which is responsible for receiving and handling incoming
+     * messages from the frontend. Also provides the means to configure message
+     * handlers and send messages to the frontend.
      *
      * @sa http://en.wikipedia.org/wiki/Event_loop
      */
     namespace Backend
     {
 
-        /**
-         * Set a message handler for this backend's message pump. Requests the
-         * given handler be invoked when messages with the specified tag arrive
-         * at this backend's message pump.
-         *
-         * @param tag        Message tag for which the handler is to be set.
-         * @param handler    New handler for that message tag.
-         *
-         * @note    The message handler for a particular message tag can be
-         *          effectively removed by specifying a default constructed
-         *          message handler.
-         */
-        void setMessageHandler(const int& tag, const MessageHandler& handler);
-        
         /**
          * Start this backend's message pump. Initializes the MRNet library as
          * a backend, gathering necessary parameters directly from the command-
@@ -72,6 +58,9 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * so. Also finalizes the MRNet library.
          */
         void stopMessagePump();
+
+        /** Message handlers for this backend. */
+        extern KrellInstitute::CBTF::Impl::MessageHandlers MessageHandlers;
 
         /**
          * Send a message to the frontend.
