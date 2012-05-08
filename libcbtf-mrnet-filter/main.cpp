@@ -19,8 +19,6 @@
 /** @file Main entry points for the CBTF MRNet filter. */
 
 #include <boost/bind.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/logic/tribool.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
@@ -30,7 +28,6 @@
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <map>
 #include <mrnet/MRNet.h>
-#include <set>
 #include <string>
 #include <unistd.h>
 #include <utility>
@@ -41,6 +38,7 @@
 #include "MessageHandlers.hpp"
 #include "MessageTags.hpp"
 #include "NamedStreams.hpp"
+#include "ParseDepth.hpp"
 #include "XercesExts.hpp"
 
 using namespace KrellInstitute::CBTF::Impl;
@@ -253,35 +251,6 @@ namespace {
         networks.insert(std::make_pair(named_streams->uid(), network));
     }
 
-    /** Insert the value of the specified node into the given integer set. */
-    void insertInteger(const xercesc::DOMNode* node, std::set<int>& integers)
-    {
-        integers.insert(
-            boost::lexical_cast<int>(xercesc::selectValue(node, "."))
-            );
-    }
-
-    /** Compare the given offset against the ones in the specified node. */
-    void checkOffset(const xercesc::DOMNode* node, int offset,
-                     boost::tribool& use_filter)
-    {
-        std::set<int> offsets;
-
-        xercesc::selectNodes(
-            node, "./Offset",
-            boost::bind(&insertInteger, _1, boost::ref(offsets))
-            );
-        
-        std::string value = xercesc::selectValue(node, "./@offset");
-        
-        if (!value.empty())
-        {
-            offsets.insert(boost::lexical_cast<int>(value));
-        }
-        
-        use_filter = (offsets.find(offset) != offsets.end());
-    }
-
     /**
      * Handler for the SpecifyFilter message. Decodes the XML specification
      * for the filters and completes the construction of this filter's local
@@ -325,29 +294,15 @@ namespace {
                       << std::endl;
             return;
         }
-        
-        boost::tribool use_filter = boost::indeterminate;
 
-        xercesc::selectNodes(
-            document.get()->getDocumentElement(),
-            "./Depth/LeafRelative",
-            boost::bind(&checkOffset, _1, topology_info.get_MaxLeafDistance(),
-                        boost::ref(use_filter))
-            );
+        bool selected = i->second->network();
         
         xercesc::selectNodes(
-            document.get()->getDocumentElement(),
-            "./Depth/RootRelative",
-            boost::bind(&checkOffset, _1, topology_info.get_RootDistance(),
-                        boost::ref(use_filter))
+            document.get()->getDocumentElement(), "./Depth",
+            boost::bind(&parseDepth, _1, boost::ref(selected))
             );
-
-        if (boost::indeterminate(use_filter))
-        {
-            use_filter = !i->second->network();
-        }
         
-        if (!use_filter)
+        if (!selected)
         {
             if (is_filter_debug_enabled)
             {
