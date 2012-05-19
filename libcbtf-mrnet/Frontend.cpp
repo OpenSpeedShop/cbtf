@@ -246,12 +246,39 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network,
             "filter function libcbtf_mrnet_downstream_filter().", filter_path
             );
     }
+ 
+    // Load the sync filter for the appropriate mode.
+    int sync_filter;
+
+    if (filter_mode == MRN::SFILTER_WAITFORALL) {
+
+	// Use the CBTF specific waitforall filter and override
+	// the default internal mrnet implementation (MRN::SFILTER_WAITFORALL).
+        sync_filter = dm_network->load_FilterFunc(
+        filter_path.string().c_str(), "libcbtf_mrnet_sync_waitforall_filter"
+        );
+        if (sync_filter == -1)
+        {
+        raise<std::runtime_error>(
+            "Unable to load the MRNet filter library (%1%) or to locate the "
+            "filter function libcbtf_mrnet_sync_waitforall_filter().", filter_path
+            );
+        }
+    } else if (filter_mode == MRN::SFILTER_TIMEOUT) {
+	// TODO: implement a timeout filter in libcbtf-mrnet-filter.
+	sync_filter = filter_mode;
+    } else if (filter_mode == MRN::SFILTER_DONTWAIT) {
+	// the default internal mrnet implementation (MRN::SFILTER_DONTWAIT)
+	// workd just fine as is.
+	sync_filter = filter_mode;
+    }
 
     // Establish the stream used to pass data within this network
     dm_stream = dm_network->new_Stream(
         dm_network->get_BroadcastCommunicator(),
-        upstream_filter, filter_mode, downstream_filter
+        upstream_filter, sync_filter, downstream_filter
         );
+
     if ((dm_stream == NULL) ||
         (dm_stream->send(MessageTags::EstablishUpstream, 0) != 0) ||
         (dm_stream->flush() != 0))
@@ -275,6 +302,15 @@ Frontend::Frontend(const boost::shared_ptr<MRN::Network>& network,
             is_tracing_debug_enabled ? 1 : 0) != 0)
     {
         raise<std::runtime_error>("Unable to configure the downstream filter.");
+    }
+
+    if (dm_stream->set_FilterParameters(
+            MRN::FILTER_UPSTREAM_SYNC, "%ud %d %d", 
+            dm_stream->get_Id(),
+            is_filter_debug_enabled ? 1 : 0,
+            is_tracing_debug_enabled ? 1 : 0) != 0)
+    {
+        raise<std::runtime_error>("Unable to configure the upstream sync filter.");
     }
 
     // Start a thread executing the frontend's message pump
