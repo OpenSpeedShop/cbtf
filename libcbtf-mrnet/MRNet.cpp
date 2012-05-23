@@ -19,6 +19,7 @@
 /** @file Definition of the MRNet class. */
 
 #include <boost/bind.hpp>
+#include <boost/ref.hpp>
 #include <KrellInstitute/CBTF/BoostExts.hpp>
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <stdexcept>
@@ -259,7 +260,7 @@ void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
         boost::bind(&MRNet::bindIncomingUpstream, this, _1),
         LocalComponentNetwork::IncomingBinder(), // No Incoming Downstreams
         MessageHandler(), // No Outgoing Upstreams
-        boost::bind(&Frontend::sendToBackends, dm_frontend, _1)
+        boost::bind(&Frontend::sendToBackends, boost::ref(dm_frontend), _1)
         );
     
     dm_frontend->sendToBackends(*dm_local_component_network.named_streams());

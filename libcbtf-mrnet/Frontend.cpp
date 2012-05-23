@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/weak_ptr.hpp>
 #include <iostream>
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <stdexcept>
@@ -50,7 +51,7 @@ namespace {
         Frontends,
         std::map<
             boost::shared_ptr<MRN::Network> BOOST_PP_COMMA()
-            boost::shared_ptr<Frontend>
+            boost::weak_ptr<Frontend>
             >
         )
     
@@ -68,14 +69,23 @@ boost::shared_ptr<Frontend> Frontend::instantiate(
     Frontends::GuardType guard_frontends(Frontends::mutex());
 
     Frontends::Type::iterator i = Frontends::value().find(network);
-    if (i == Frontends::value().end())
+
+    if (i != Frontends::value().end())
     {
-        i = Frontends::value().insert(
-            std::make_pair(network, new Frontend(network, filter_mode))
-            ).first;
+        if (!i->second.expired())
+        {
+            return i->second.lock();
+        }
+        Frontends::value().erase(network);
     }
-    
-    return i->second;
+
+    boost::shared_ptr<Frontend> instance(new Frontend(network, filter_mode));
+
+    Frontends::value().insert(
+        std::make_pair(network, boost::weak_ptr<Frontend>(instance))
+        );
+
+    return instance;
 }
 
 
