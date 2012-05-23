@@ -33,7 +33,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 find_package(Boost 1.39.0 REQUIRED
     COMPONENTS date_time filesystem system thread unit_test_framework
     )
-find_package(MRNet 3.1)
+find_package(MRNet 4.0.0)
 find_package(Threads)
 find_package(XercesC 3.0)
 

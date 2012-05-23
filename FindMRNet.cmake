@@ -18,9 +18,9 @@
 
 include(FindPackageHandleStandardArgs)
 
-find_library(MRNet_MRNET_LIBRARY NAMES libmrnet.so HINTS ENV MRNET_ROOT)
-find_library(MRNet_XPLAT_LIBRARY NAMES libxplat.so HINTS ENV MRNET_ROOT)
-find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h HINTS ENV MRNET_ROOT)
+find_library(MRNet_MRNET_LIBRARY NAMES libmrnet.so HINTS ENV MRNET_ROOT PATHS PATH_SUFFIXES lib lib64)
+find_library(MRNet_XPLAT_LIBRARY NAMES libxplat.so HINTS ENV MRNET_ROOT PATHS PATH_SUFFIXES lib lib64)
+find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h HINTS ENV MRNET_ROOT PATHS PATH_SUFFIXES include)
 
 find_package_handle_standard_args(
     MRNet DEFAULT_MSG MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR
@@ -91,22 +91,34 @@ else()
     #
 
     find_path(
-        MRNet_CONFIG_INCLUDE_DIR mrnet_config.h
-        PATH_SUFFIXES lib lib64 HINTS ENV MRNET_ROOT
+        MRNet_CONFIG_INCLUDE_DIR1 mrnet_config.h
+        PATH_SUFFIXES lib/mrnet-${MRNet_VERSION_STRING}/include lib64/mrnet-${MRNet_VERSION_STRING}/include HINTS ENV MRNET_ROOT
         )
 
-    if(NOT MRNet_CONFIG_INCLUDE_DIR)
+    if(NOT MRNet_CONFIG_INCLUDE_DIR1)
         message(FATAL_ERROR
           "Could NOT find the MRNet " ${MRNet_VERSION_STRING}
-          " configuration header files"
+          " mrnet configuration header files"
           )
     endif()
 
-    set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR} ${MRNet_CONFIG_INCLUDE_DIR})
+    find_path(
+        MRNet_CONFIG_INCLUDE_DIR2 xplat_config.h
+        PATH_SUFFIXES lib/xplat-${MRNet_VERSION_STRING}/include lib64/xplat-${MRNet_VERSION_STRING}/include HINTS ENV MRNET_ROOT
+        )
+
+    if(NOT MRNet_CONFIG_INCLUDE_DIR2)
+        message(FATAL_ERROR
+          "Could NOT find the MRNet " ${MRNet_VERSION_STRING}
+          " xplat configuration header files"
+          )
+    endif()
+
+    set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR} ${MRNet_CONFIG_INCLUDE_DIR1} ${MRNet_CONFIG_INCLUDE_DIR2})
 
     mark_as_advanced(
         MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY
-        MRNet_INCLUDE_DIR MRNet_CONFIG_INCLUDE_DIR
+        MRNet_INCLUDE_DIR MRNet_CONFIG_INCLUDE_DIR1 MRNet_CONFIG_INCLUDE_DIR2
         )
 
 endif()

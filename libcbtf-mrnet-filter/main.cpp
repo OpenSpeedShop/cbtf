@@ -386,6 +386,7 @@ extern "C" const char* const libcbtf_mrnet_upstream_filter_format_string = "";
 /** Format of data operated upon by the downstream filter function. */
 extern "C" const char* const libcbtf_mrnet_downstream_filter_format_string = "";
 
+extern "C" const char* const libcbtf_mrnet_sync_waitforall_filter_format_string = "";
 
 
 /**
@@ -549,3 +550,209 @@ extern "C" void libcbtf_mrnet_downstream_filter(
         packets_to_forward.begin(), packets_to_forward.end()
         );
 }
+
+
+typedef struct {
+    std::map < MRN::Rank, std::vector< MRN::PacketPtr >* > packets_by_rank;
+    std::set < MRN::Rank > ready_peers;
+} wfa_state;
+
+/**
+ * Upstream filter function. Mediate all packets connected to one of the local
+ * component networks on this filter, forwarding all the rest along with all of
+ * the packets currently waiting in the outgoing queues.
+ *
+ * @param packets_in_upstream       Packets arriving along the upstream.
+ * @param packets_out_upstream      Packets outgoing along the upstream.
+ * @param packets_out_downstream    Packets outgoing along the downstream.
+ * @param filter_state              State specific to this filter instance.
+ * @param config_params             Packet containing the current configuration
+ *                                  settings for this filter instance.
+ * @param topology_info             Location of this filter instance.
+ */
+extern "C" void libcbtf_mrnet_sync_waitforall_filter(
+    std::vector<MRN::PacketPtr>& packets_in_upstream,
+    std::vector<MRN::PacketPtr>& packets_out_upstream,
+    std::vector<MRN::PacketPtr>& packets_out_downstream,
+    void** filter_state,
+    MRN::PacketPtr& config_params,
+    const MRN::TopologyLocalInfo& topology_info
+    )
+{
+    configurationParameters(config_params, topology_info);
+
+    if (is_filter_debug_enabled) {
+	for( unsigned i = 0; i < packets_in_upstream.size( ); i++ ) {
+	    MRN::PacketPtr cur_packet = packets_in_upstream[i];
+	    std::cerr << "CBTF SFILTER IN packet [" << i << "]"
+	    << " streamID:" << cur_packet->get_StreamId()
+	    << " tag:" << cur_packet->get_Tag()
+	    << std::endl;
+	}
+    }
+
+
+    std::map < MRN::Rank, std::vector< MRN::PacketPtr >* >::iterator map_iter, del_iter;
+    wfa_state* state;
+    
+    MRN::Network* net = const_cast< MRN::Network* >( topology_info.get_Network() );
+
+    int stream_id = packets_in_upstream[0]->get_StreamId();
+    MRN::Stream* stream = net->get_Stream( stream_id );
+    if( stream == NULL ) {
+        if (is_filter_debug_enabled) {
+            std::cerr << "ERROR: stream lookup " << stream_id <<  " failed" << std::endl;
+	}
+        return;
+    }
+
+    //1. Setup/Recover Filter State
+    if( *filter_state == NULL ) {
+        // allocate packet buffer map as appropriate
+        if (is_filter_debug_enabled) {
+            std::cerr << "No previous storage, allocating ..." << std::endl;
+	}
+        state = new wfa_state;
+        *filter_state = state;
+    }
+    else{
+        // get packet buffer map from filter state
+        state = ( wfa_state * ) *filter_state;
+
+        // check for failed nodes && closed Peers
+        map_iter = state->packets_by_rank.begin();
+        while ( map_iter != state->packets_by_rank.end() ) {
+
+            MRN::Rank rank = (*map_iter).first;
+            if( net->node_Failed(rank) ) {
+                if (is_filter_debug_enabled) {
+                    std::cerr << "Discarding packets from failed node[" << rank << "] ... " << std::endl;
+		}
+                del_iter = map_iter;
+                map_iter++;
+
+                // clear packet vector
+                (*del_iter).second->clear();
+
+                // erase map slot
+                state->packets_by_rank.erase( del_iter );
+                state->ready_peers.erase( rank );
+            }
+            else{
+        	if (is_filter_debug_enabled) {
+                    std::cerr << "Node[" << rank << "] failed? no " << std::endl;
+		}
+                map_iter++;
+            }
+        }
+    }
+
+    //2. Place input packets
+    for( unsigned int i=0; i < packets_in_upstream.size(); i++ ) {
+
+        MRN::Rank cur_inlet_rank = packets_in_upstream[i]->get_InletNodeRank();
+
+        // special case for back-end synchronization; packets have unknown inlet
+        if( cur_inlet_rank == MRN::UnknownRank ) {
+            if( packets_in_upstream.size() == 1 ) {
+                packets_out_upstream.push_back( packets_in_upstream[i] );
+                if (is_filter_debug_enabled) {
+		    std::cerr << "MRN::UnknownRank, packets have unknown inlet ... return" << std::endl;
+		}
+                return;
+            }
+        }
+
+        if( net->node_Failed(cur_inlet_rank) ) {
+            // drop packets from failed node
+            if (is_filter_debug_enabled) {
+	        std::cerr << "drop packets from failed node ... continue" << std::endl;
+	    }
+            continue;
+        }
+
+        // insert packet into map
+        map_iter = state->packets_by_rank.find( cur_inlet_rank );
+
+        // allocate new slot if necessary
+        if( map_iter == state->packets_by_rank.end() ) {
+            if (is_filter_debug_enabled) {
+                std::cerr << "Allocating new map slot for node[" << cur_inlet_rank << "] ..." << std::endl;
+	    }
+            state->packets_by_rank[ cur_inlet_rank ] = new std::vector < MRN::PacketPtr >;
+        }
+
+        if (is_filter_debug_enabled) {
+            std::cerr <<  "Placing packet[" << i << "] from node[" << cur_inlet_rank << "]" << std::endl;
+	}
+        state->packets_by_rank[ cur_inlet_rank ]->push_back( packets_in_upstream[i] );
+        state->ready_peers.insert( cur_inlet_rank );
+    }
+
+    std::set< MRN::Rank > peers;
+    stream->get_ChildRanks( peers );
+
+    if (is_filter_debug_enabled) {
+	std::cerr << "slots:" << state->packets_by_rank.size()
+	      << " ready:" << state->ready_peers.size()
+	      << " peers:" << peers.size()
+	<< std::endl;
+    }
+
+    // check for a complete wave
+    if( state->ready_peers.size() < peers.size() ) {
+        // not all peers ready, so sync condition not met
+	if (is_filter_debug_enabled) {
+            std::cerr << "sync condition not met! return." << std::endl;
+	}
+        return;
+    }
+
+    // if we get here, SYNC CONDITION MET!
+    if (is_filter_debug_enabled) {
+        std::cerr << "All child nodes ready!" << std::endl;
+    }
+
+    //3. All nodes ready! Place output packets
+    for( map_iter = state->packets_by_rank.begin();
+         map_iter != state->packets_by_rank.end();
+         map_iter++ ) {
+
+        MRN::Rank r = map_iter->first;
+        std::vector< MRN::PacketPtr >* pkt_vec = map_iter->second;
+        if( pkt_vec->empty() ) {
+            // list should only be empty if peer closed stream
+	    if (is_filter_debug_enabled) {
+                std::cerr << "Node[" << r << "]'s slot is empty" << std::endl;
+	    }
+            continue;
+        }
+
+	if (is_filter_debug_enabled) {
+            std::cerr << "Popping packet from Node[" << r << "]" << std::endl;
+	}
+
+        // push head of list onto output vector
+        packets_out_upstream.push_back( pkt_vec->front() );
+        pkt_vec->erase( pkt_vec->begin() );
+        
+        // if list now empty, remove slot from ready list
+        if( pkt_vec->empty() ) {
+	    if (is_filter_debug_enabled) {
+                std::cerr << "Removing Node[" << r << "] from ready list" << std::endl;
+            }
+            state->ready_peers.erase( r );
+        }
+    }
+
+    if (is_filter_debug_enabled) {
+	for( unsigned i = 0; i < packets_out_upstream.size( ); i++ ) {
+	    MRN::PacketPtr cur_packet = packets_out_upstream[i];
+	    std::cerr << "CBTF SFILTER OUT packet [" << i << "]"
+	    << " streamID:" << cur_packet->get_StreamId()
+	    << " tag:" << cur_packet->get_Tag()
+	    << std::endl;
+	}
+    }
+}
+
