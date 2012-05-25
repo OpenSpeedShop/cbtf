@@ -143,6 +143,15 @@ Frontend::~Frontend()
 
     // Destroy the stream used to pass data within this network
     delete dm_stream;
+
+    //
+    // Remove this network from the global associative container mapping MRNet
+    // networks to their corresponding MRNet frontend. This will result in the
+    // destruction of the network object.
+    //
+
+    Frontends::GuardType guard_frontends(Frontends::mutex());
+    Frontends::value().erase(dm_network);
 }
 
 
