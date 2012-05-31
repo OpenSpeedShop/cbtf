@@ -165,6 +165,10 @@ namespace {
 
         debug_prefix = stream.str();
 
+        TheTopologyInfo.IsFrontend = 
+            topology_info.get_Network()->is_LocalNodeFrontEnd();
+        TheTopologyInfo.IsBackend =
+            topology_info.get_Network()->is_LocalNodeBackEnd();
         TheTopologyInfo.Rank = topology_info.get_Rank();
         TheTopologyInfo.NumChildren = topology_info.get_NumChildren();
         TheTopologyInfo.NumSiblings = topology_info.get_NumSiblings();

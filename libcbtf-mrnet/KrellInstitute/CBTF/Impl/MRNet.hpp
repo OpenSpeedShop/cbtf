@@ -54,6 +54,12 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
     struct TopologyInfo
     {
 
+        /** Flag indicating if this node is located on the MRNet frontend. */
+        bool IsFrontend;
+        
+        /** Flag indicating if this node is located on a MRNet backend. */
+        bool IsBackend;
+
         /** Rank number of this node within the network. */
         unsigned int Rank;
 

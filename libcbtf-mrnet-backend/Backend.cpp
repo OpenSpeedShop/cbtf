@@ -185,7 +185,9 @@ void Backend::startMessagePump(int argc, char* argv[])
             mrnet_network->get_LocalRank()
             )
         );
-    
+
+    TheTopologyInfo.IsFrontend = false;
+    TheTopologyInfo.IsBackend = true;
     TheTopologyInfo.Rank = topology_info.get_Rank();
     TheTopologyInfo.NumChildren = topology_info.get_NumChildren();
     TheTopologyInfo.NumSiblings = topology_info.get_NumSiblings();

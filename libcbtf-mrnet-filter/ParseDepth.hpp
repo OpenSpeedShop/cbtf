@@ -30,7 +30,7 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
      *
      * @param root                Root node of the XML tree containing the
      *                            filter depth specification in a DepthType
-     *                            node.     
+     *                            node.
      * @param[in,out] selected    Boolean "true" if this depth specification
      *                            selects the current MRNet filter node, or
      *                            "false" otherwise. The caller must set the
