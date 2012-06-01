@@ -147,6 +147,8 @@ namespace {
             MRN::set_OutputLevel(MRN::MAX_OUTPUT_LEVEL); 
         }
 
+	if (is_filter_debug_enabled)
+	{
         std::ostringstream stream;
         stream << "[FI/";
         if (topology_info.get_Network()->is_LocalNodeFrontEnd())
@@ -164,6 +166,7 @@ namespace {
         stream << " " << getpid() << "] ";
 
         debug_prefix = stream.str();
+	}
 
         TheTopologyInfo.IsFrontend = 
             topology_info.get_Network()->is_LocalNodeFrontEnd();
@@ -417,6 +420,13 @@ extern "C" void libcbtf_mrnet_upstream_filter(
 {
     configurationParameters(config_params, topology_info);
 
+#if 0
+    std::cout << "ENTERED libcbtf_mrnet_upstream_filter"
+	<< " upstream in " << packets_in_upstream.size()
+	<< " upstream out " << packets_out_upstream.size()
+	<< " downstream out " << packets_out_downstream.size()
+	<< std::endl;
+#endif
     std::vector<MRN::PacketPtr> packets_to_forward;
 
     for (std::vector<MRN::PacketPtr>::const_iterator
