@@ -1,0 +1,12 @@
+###
+# this is a temporary hack.  mrnet on llnl systems uses
+# rsh for XPLAT_RSH.  But rsh does not setup the environment
+# properly on the remote nodes by not using the current
+# environment.  Further, this script is hard coded
+# to dotkit and then name openss.  This assumes that the
+# openss dotkit has EVERYTHING needed to run CBTF or
+# an OSS configured to run with CBTF.  So this file
+# would need to be edited as needed for OSS and CBTF and
+# or just CBTF. UGH!!!
+#!/bin/tcsh
+rsh $1 $2 "source /usr/global/tools/dotkit/init ; use openss >> /dev/null ; $3 $4 $5 $6 $7 $8 $9"

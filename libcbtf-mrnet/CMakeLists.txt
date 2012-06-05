@@ -58,6 +58,7 @@ target_link_libraries(cbtf-mrnet
 set_target_properties(cbtf-mrnet PROPERTIES VERSION 0.0.0)
 
 install(FILES MRNet.xsd DESTINATION share/KrellInstitute/CBTF)
+install(FILES LLNLrsh DESTINATION share/KrellInstitute/CBTF)
 
 install(DIRECTORY KrellInstitute DESTINATION include)
 
