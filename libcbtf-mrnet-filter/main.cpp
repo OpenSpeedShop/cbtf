@@ -206,13 +206,23 @@ namespace {
         
         std::set<MRN::NetworkTopology::Node*> backends;
         topology->get_BackEndNodes(backends);
-        
-        for (std::set<MRN::NetworkTopology::Node*>::const_iterator
-                 i = children.begin(); i != children.end(); ++i)
+
+        if (backends.size() == 0)
         {
-            if (backends.find(*i) != backends.end())
+            if (children.size() == 0)
             {
                 return true;
+            }
+        }
+        else
+        {
+            for (std::set<MRN::NetworkTopology::Node*>::const_iterator
+                     i = children.begin(); i != children.end(); ++i)
+            {
+                if (backends.find(*i) != backends.end())
+                {
+                    return true;
+                }
             }
         }
         
