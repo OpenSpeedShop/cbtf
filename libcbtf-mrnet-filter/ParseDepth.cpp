@@ -18,11 +18,13 @@
 
 /** @file Definition of the depth parsing function. */
 
+#include <algorithm>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/logic/tribool.hpp>
 #include <boost/ref.hpp>
 #include <boost/spirit/home/classic.hpp>
+#include <boost/spirit/home/classic/phoenix.hpp>
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <set>
 #include <string>
@@ -89,11 +91,13 @@ namespace {
     {
         member1 value;
     };
-    
+
     /** Boost.Spirit (classic) grammar for parsing an <Expression> node. */
     struct ExpressionGrammar :
         public grammar<ExpressionGrammar, BooleanClosure::context_t>
     {
+        bool IsOnLeafCP;
+        
         template <typename ScannerType>
         struct definition
         {
@@ -120,24 +124,42 @@ namespace {
                 boolean = relational[boolean.value = arg1] |
                     ('!' >> boolean[boolean.value = !arg1]) |
                     ('(' >> logical_or[boolean.value = arg1] >> ')') |
-                    chseq_p("FE")[boolean.value = TheTopologyInfo.IsFrontend] |
-                    chseq_p("CP")[boolean.value = !TheTopologyInfo.IsFrontend &&
-                                                  !TheTopologyInfo.IsBackend] |
-                    chseq_p("BE")[boolean.value = TheTopologyInfo.IsBackend];
+                    as_lower_d["fe"]
+                        [boolean.value = TheTopologyInfo.IsFrontend] |
+                    as_lower_d["cp:top"]
+                        [boolean.value =
+                         !TheTopologyInfo.IsFrontend &&
+                         !TheTopologyInfo.IsBackend &&
+                         (TheTopologyInfo.RootDistance == 1)] |
+                    as_lower_d["cp:middle"]
+                        [boolean.value = 
+                         !TheTopologyInfo.IsFrontend &&
+                         !TheTopologyInfo.IsBackend &&
+                         (TheTopologyInfo.RootDistance != 0) &&
+                         !self.IsOnLeafCP] |
+                    as_lower_d["cp:bottom"]
+                        [boolean.value =
+                         !TheTopologyInfo.IsFrontend &&
+                         !TheTopologyInfo.IsBackend &&
+                         self.IsOnLeafCP] |
+                    as_lower_d["cp"]
+                        [boolean.value = !TheTopologyInfo.IsFrontend &&
+                         !TheTopologyInfo.IsBackend] |
+                    as_lower_d["be"][boolean.value = TheTopologyInfo.IsBackend];
                 
                 relational = additive[relational.temp = arg1] >>
                     (("==" >> additive
-                      [relational.value = relational.temp == arg1]) |
+                          [relational.value = relational.temp == arg1]) |
                      ("!=" >> additive
-                      [relational.value = relational.temp != arg1]) |
+                          [relational.value = relational.temp != arg1]) |
                      ('<' >> additive
-                      [relational.value = relational.temp < arg1]) |
+                          [relational.value = relational.temp < arg1]) |
                      ("<=" >> additive
-                      [relational.value = relational.temp <= arg1]) |
+                          [relational.value = relational.temp <= arg1]) |
                      ('>' >> additive
-                      [relational.value = relational.temp > arg1]) |
+                          [relational.value = relational.temp > arg1]) |
                      (">=" >> additive
-                      [relational.value = relational.temp >= arg1]));
+                          [relational.value = relational.temp >= arg1]));
                     
                 additive = multiplicative[additive.value = arg1] >>
                     *(('+' >> multiplicative[additive.value += arg1]) |
@@ -147,25 +169,35 @@ namespace {
                     *(('*' >> integer[multiplicative.value *= arg1]) |
                       ('/' >> integer[multiplicative.value /= arg1]) |
                       ('%' >> integer[multiplicative.value %= arg1]));
-                
+
                 integer = int_p[integer.value = arg1] |
                     ('+' >> integer[integer.value = arg1]) |
                     ('-' >> integer[integer.value = -arg1]) |
                     ('(' >> additive[integer.value = arg1] >> ')') |
-                    chseq_p("Rank")[integer.value = 
+                    as_lower_d["rank"][integer.value = 
                         static_cast<int>(TheTopologyInfo.Rank)] |
-                    chseq_p("NumChildren")[integer.value = 
+                    as_lower_d["numchildren"][integer.value = 
                         static_cast<int>(TheTopologyInfo.NumChildren)] |
-                    chseq_p("NumSiblings")[integer.value = 
+                    as_lower_d["numsiblings"][integer.value = 
                         static_cast<int>(TheTopologyInfo.NumSiblings)] |
-                    chseq_p("NumDescendants")[integer.value = 
+                    as_lower_d["numdescendants"][integer.value = 
                         static_cast<int>(TheTopologyInfo.NumDescendants)] |
-                    chseq_p("NumLeafDescendants")[integer.value = 
+                    as_lower_d["numleafdescendants"][integer.value = 
                         static_cast<int>(TheTopologyInfo.NumLeafDescendants)] |
-                    chseq_p("RootDistance")[integer.value = 
+                    as_lower_d["rootdistance"][integer.value = 
                         static_cast<int>(TheTopologyInfo.RootDistance)] |
-                    chseq_p("MaxLeafDistance")[integer.value = 
-                        static_cast<int>(TheTopologyInfo.MaxLeafDistance)];
+                    as_lower_d["maxleafdistance"][integer.value = 
+                        static_cast<int>(TheTopologyInfo.MaxLeafDistance)] |
+                    (as_lower_d["min"] >> '(' >> 
+                     additive[integer.value = arg1] >> ',' >>
+                     additive[integer.value =
+                              bind(&std::min<int>)(integer.value, arg1)] >>
+                     ')') ||
+                    (as_lower_d["max"] >> '(' >>
+                     additive[integer.value = arg1] >> ',' >>
+                     additive[integer.value =
+                              bind(&std::max<int>)(integer.value, arg1)] >>
+                     ')');
             }
             
             const rule<ScannerType>& start() const
@@ -177,10 +209,13 @@ namespace {
     }; // struct ExpressionGrammar
 
     /** Parse the specified <Expression> node. */
-    void parseExpression(const xercesc::DOMNode* node, boost::tribool& selected)
+    void parseExpression(const xercesc::DOMNode* node,
+                         bool is_on_leaf_cp,
+                         boost::tribool& selected)
     {
         std::string expression = xercesc::selectValue(node, ".");
         ExpressionGrammar grammar;
+        grammar.IsOnLeafCP = is_on_leaf_cp;
         bool value = false;
         if (parse(expression.c_str(), grammar[assign_a(value)], space_p).full)
         {
@@ -195,6 +230,7 @@ namespace {
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 void KrellInstitute::CBTF::Impl::parseDepth(const xercesc::DOMNode* root,
+                                            bool is_on_leaf_cp,
                                             bool& selected)
 {
     boost::tribool value = boost::indeterminate;
@@ -206,7 +242,7 @@ void KrellInstitute::CBTF::Impl::parseDepth(const xercesc::DOMNode* root,
 
     xercesc::selectNodes(
         root, "./Expression",
-        boost::bind(&parseExpression, _1, boost::ref(value))
+        boost::bind(&parseExpression, _1, is_on_leaf_cp, boost::ref(value))
         );
 
     xercesc::selectNodes(

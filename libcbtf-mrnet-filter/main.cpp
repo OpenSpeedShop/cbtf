@@ -18,6 +18,7 @@
 
 /** @file Main entry points for the CBTF MRNet filter. */
 
+#include <boost/assert.hpp>
 #include <boost/bind.hpp>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
@@ -28,6 +29,7 @@
 #include <KrellInstitute/CBTF/Impl/MRNet.hpp>
 #include <map>
 #include <mrnet/MRNet.h>
+#include <set>
 #include <string>
 #include <unistd.h>
 #include <utility>
@@ -147,26 +149,26 @@ namespace {
             MRN::set_OutputLevel(MRN::MAX_OUTPUT_LEVEL); 
         }
 
-	if (is_filter_debug_enabled)
-	{
-        std::ostringstream stream;
-        stream << "[FI/";
-        if (topology_info.get_Network()->is_LocalNodeFrontEnd())
+        if (is_filter_debug_enabled)
         {
-            stream << "FE";
+            std::ostringstream stream;
+            stream << "[FI/";
+            if (topology_info.get_Network()->is_LocalNodeFrontEnd())
+            {
+                stream << "FE";
+            }
+            else if (topology_info.get_Network()->is_LocalNodeBackEnd())
+            {
+                stream << "BE";
+            }
+            else
+            {
+                stream << "CP";
+            }
+            stream << " " << getpid() << "] ";
+            
+            debug_prefix = stream.str();
         }
-        else if (topology_info.get_Network()->is_LocalNodeBackEnd())
-        {
-            stream << "BE";
-        }
-        else
-        {
-            stream << "CP";
-        }
-        stream << " " << getpid() << "] ";
-
-        debug_prefix = stream.str();
-	}
 
         TheTopologyInfo.IsFrontend = 
             topology_info.get_Network()->is_LocalNodeFrontEnd();
@@ -180,6 +182,41 @@ namespace {
             topology_info.get_NumLeafDescendants();
         TheTopologyInfo.RootDistance = topology_info.get_RootDistance();
         TheTopologyInfo.MaxLeafDistance = topology_info.get_MaxLeafDistance();
+    }
+
+    /**
+     * Is this filter located on a leaf communication process (CP) within the
+     * network?
+     *
+     * @param topology_info    Location of this filter instance.
+     * @return                 Boolean "true" if this filter is located on a
+     *                         leaf CP within the network, or "false" otherwise.
+     */
+    bool isOnLeafCP(const MRN::TopologyLocalInfo& topology_info)
+    {
+        const MRN::NetworkTopology* topology = topology_info.get_Topology();
+        BOOST_ASSERT(topology != NULL);
+        
+        MRN::NetworkTopology::Node* node =
+            topology->find_Node(topology_info.get_Rank());
+        BOOST_ASSERT(node != NULL);
+        
+        const std::set<MRN::NetworkTopology::Node*>& children =
+            node->get_Children();
+        
+        std::set<MRN::NetworkTopology::Node*> backends;
+        topology->get_BackEndNodes(backends);
+        
+        for (std::set<MRN::NetworkTopology::Node*>::const_iterator
+                 i = children.begin(); i != children.end(); ++i)
+        {
+            if (backends.find(*i) != backends.end())
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     /**
@@ -306,7 +343,8 @@ namespace {
         
         xercesc::selectNodes(
             document.get()->getDocumentElement(), "./Depth",
-            boost::bind(&parseDepth, _1, boost::ref(selected))
+            boost::bind(&parseDepth, _1, isOnLeafCP(topology_info),
+                        boost::ref(selected))
             );
         
         if (!selected)
@@ -564,6 +602,7 @@ extern "C" void libcbtf_mrnet_downstream_filter(
         packets_to_forward.begin(), packets_to_forward.end()
         );
 }
+
 
 
 typedef struct {

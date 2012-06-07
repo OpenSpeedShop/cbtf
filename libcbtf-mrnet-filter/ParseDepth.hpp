@@ -26,17 +26,21 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
 
     /**
      * Parse the specified DepthType node and return a flag indicating whether
-     * the parsed depth specification selects the current MRNet filter node.
+     * the parsed depth specification selects the current MRNet filter.
      *
      * @param root                Root node of the XML tree containing the
      *                            filter depth specification in a DepthType
      *                            node.
+     * @param is_on_leaf_cp       Boolean "true" if this MRNet filter is
+     *                            located on a leaf communication process
+     *                            (CP) or "false" otherwise.
      * @param[in,out] selected    Boolean "true" if this depth specification
-     *                            selects the current MRNet filter node, or
-     *                            "false" otherwise. The caller must set the
-     *                            initial value of this parameter to indicate
-     *                            if the node has already been selected.
+     *                            selects the current MRNet filter, or "false"
+     *                            otherwise. The caller must set the initial
+     *                            value of this parameter to indicate if the
+     *                            filter has already been selected.
      */
-    void parseDepth(const xercesc::DOMNode* root, bool& selected);
+    void parseDepth(const xercesc::DOMNode* root, bool is_on_leaf_cp,
+                    bool& selected);
 
 } } } // namespace KrellInstitute::CBTF::Impl
