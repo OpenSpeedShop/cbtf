@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -20,14 +20,6 @@ cmake_minimum_required(VERSION 2.8.0)
 
 project(CBTF)
 
-
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc*")
-    set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
-elseif(EXISTS /usr/lib64)
-    set(LIB_SUFFIX 64)
-    set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
-endif()
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
 
 find_package(Boost 1.39.0 REQUIRED
@@ -36,6 +28,13 @@ find_package(Boost 1.39.0 REQUIRED
 find_package(MRNet 4.0.0)
 find_package(Threads)
 find_package(XercesC 3.0)
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc*")
+    set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+elseif(EXISTS /usr/lib64)
+    set(LIB_SUFFIX 64)
+    set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX})
+endif()
 
 add_subdirectory(libcbtf)
 

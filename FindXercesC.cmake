@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -18,11 +18,15 @@
 
 include(FindPackageHandleStandardArgs)
 
-find_library(XercesC_LIBRARY NAMES libxerces-c.so HINTS ENV XERCESC_ROOT)
-find_path(XercesC_INCLUDE_DIR xercesc/util/XercesVersion.hpp HINTS ENV XERCESC_ROOT)
+find_library(XercesC_LIBRARY NAMES libxerces-c.so
+    HINTS $ENV{XERCESC_ROOT}
+    )
+find_path(XercesC_INCLUDE_DIR xercesc/util/XercesVersion.hpp
+    HINTS $ENV{XERCESC_ROOT}
+    )
 
 find_package_handle_standard_args(
-    XercesC DEFAULT_MSG XercesC_LIBRARY XercesC_INCLUDE_DIR 
+    XercesC DEFAULT_MSG XercesC_LIBRARY XercesC_INCLUDE_DIR
     )
 
 set(XercesC_LIBRARIES ${XercesC_LIBRARY})

@@ -18,9 +18,19 @@
 
 include(FindPackageHandleStandardArgs)
 
-find_library(MRNet_MRNET_LIBRARY NAMES libmrnet.so HINTS ENV MRNET_ROOT PATHS PATH_SUFFIXES lib lib64)
-find_library(MRNet_XPLAT_LIBRARY NAMES libxplat.so HINTS ENV MRNET_ROOT PATHS PATH_SUFFIXES lib lib64)
-find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h HINTS ENV MRNET_ROOT PATHS PATH_SUFFIXES include)
+find_library(MRNet_MRNET_LIBRARY NAMES libmrnet.so
+    HINTS $ENV{MRNET_ROOT}
+    PATH_SUFFIXES lib64
+    )
+
+find_library(MRNet_XPLAT_LIBRARY NAMES libxplat.so 
+    HINTS $ENV{MRNET_ROOT}
+    PATH_SUFFIXES lib64
+    )
+
+find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h 
+    HINTS $ENV{MRNET_ROOT}
+    )
 
 find_package_handle_standard_args(
     MRNet DEFAULT_MSG MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR
@@ -50,8 +60,8 @@ if(MRNET_FOUND AND DEFINED MRNet_INCLUDE_DIR)
         )
   
     set(MRNet_VERSION_STRING 
-      ${MRNet_VERSION_MAJOR}.${MRNet_VERSION_MINOR}.${MRNet_VERSION_PATCH}
-      )
+        ${MRNet_VERSION_MAJOR}.${MRNet_VERSION_MINOR}.${MRNet_VERSION_PATCH}
+        )
   
     message(STATUS "MRNet version: " ${MRNet_VERSION_STRING})
 
@@ -75,53 +85,64 @@ if(MRNET_FOUND AND DEFINED MRNet_INCLUDE_DIR)
         endif()
     endif()
   
-endif()
+    if(MRNet_VERSION_STRING VERSION_LESS "4.0.0")
+        set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR})
+        mark_as_advanced(
+            MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR
+            )
+    else()
+      
+        #
+        # Find the MRNet 4 (and up) configuration header files. These are found
+        # in the lib[64] subdirectory rather than the include subdirectory where
+        # one would expect to find them...
+        #
 
-if(MRNet_VERSION_STRING VERSION_LESS "4.0.0")
+        find_path(
+            MRNet_MRNET_CONFIG_INCLUDE_DIR mrnet_config.h
+            HINTS $ENV{MRNET_ROOT}
+            PATH_SUFFIXES 
+                lib/mrnet-${MRNet_VERSION_STRING}/include
+                lib64/mrnet-${MRNet_VERSION_STRING}/include
+            )
 
-    set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR})
-    mark_as_advanced(MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY MRNet_INCLUDE_DIR)
+        if(NOT MRNet_MRNET_CONFIG_INCLUDE_DIR)
+            set(MRNET_FOUND FALSE)
+            message(STATUS
+                "Could NOT find the MRNet " ${MRNet_VERSION_STRING}
+                " mrnet configuration header file"
+                )
+        endif()
 
-else()
+        find_path(
+            MRNet_XPLAT_CONFIG_INCLUDE_DIR xplat_config.h
+            HINTS $ENV{MRNET_ROOT}
+            PATH_SUFFIXES 
+                lib/xplat-${MRNet_VERSION_STRING}/include
+                lib64/xplat-${MRNet_VERSION_STRING}/include
+            )
 
-    #
-    # Find the MRNet 4 (and up) configuration header files. These are found
-    # in the lib[64] subdirectory rather than the include subdirectory where
-    # one would expect to find them...
-    #
-
-    find_path(
-        MRNet_CONFIG_INCLUDE_DIR1 mrnet_config.h
-        PATH_SUFFIXES lib/mrnet-${MRNet_VERSION_STRING}/include lib64/mrnet-${MRNet_VERSION_STRING}/include HINTS ENV MRNET_ROOT
-        )
-
-    if(NOT MRNet_CONFIG_INCLUDE_DIR1)
-        message(FATAL_ERROR
-          "Could NOT find the MRNet " ${MRNet_VERSION_STRING}
-          " mrnet configuration header files"
-          )
+        if(NOT MRNet_XPLAT_CONFIG_INCLUDE_DIR)
+            set(MRNET_FOUND FALSE)
+            message(STATUS
+                "Could NOT find the MRNet " ${MRNet_VERSION_STRING}
+                " xplat configuration header files"
+                )
+        endif()
+        
+        set(MRNet_INCLUDE_DIRS 
+            ${MRNet_INCLUDE_DIR}
+            ${MRNet_MRNET_CONFIG_INCLUDE_DIR}
+            ${MRNet_XPLAT_CONFIG_INCLUDE_DIR}
+            )
+        
+        mark_as_advanced(
+            MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY
+            MRNet_INCLUDE_DIR
+            MRNet_MRNET_CONFIG_INCLUDE_DIR
+            MRNet_XPLAT_CONFIG_INCLUDE_DIR
+            )
+        
     endif()
-
-    find_path(
-        MRNet_CONFIG_INCLUDE_DIR2 xplat_config.h
-        PATH_SUFFIXES lib/xplat-${MRNet_VERSION_STRING}/include lib64/xplat-${MRNet_VERSION_STRING}/include HINTS ENV MRNET_ROOT
-        )
-
-    if(NOT MRNet_CONFIG_INCLUDE_DIR2)
-        message(FATAL_ERROR
-          "Could NOT find the MRNet " ${MRNet_VERSION_STRING}
-          " xplat configuration header files"
-          )
-    endif()
-
-    set(MRNet_INCLUDE_DIRS ${MRNet_INCLUDE_DIR} ${MRNet_CONFIG_INCLUDE_DIR1} ${MRNet_CONFIG_INCLUDE_DIR2})
-
-    mark_as_advanced(
-        MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY
-        MRNet_INCLUDE_DIR MRNet_CONFIG_INCLUDE_DIR1 MRNet_CONFIG_INCLUDE_DIR2
-        )
-
+      
 endif()
-
-
-
