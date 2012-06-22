@@ -20,16 +20,17 @@ include(FindPackageHandleStandardArgs)
 
 find_library(MRNet_MRNET_LIBRARY NAMES libmrnet.so
     HINTS $ENV{MRNET_ROOT}
-    PATH_SUFFIXES lib64
+    PATH_SUFFIXES lib lib64
     )
 
 find_library(MRNet_XPLAT_LIBRARY NAMES libxplat.so 
     HINTS $ENV{MRNET_ROOT}
-    PATH_SUFFIXES lib64
+    PATH_SUFFIXES lib lib64
     )
 
 find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h 
     HINTS $ENV{MRNET_ROOT}
+    PATH_SUFFIXES include
     )
 
 find_package_handle_standard_args(

@@ -20,11 +20,12 @@ include(FindPackageHandleStandardArgs)
 
 find_library(XercesC_LIBRARY NAMES libxerces-c.so
     HINTS $ENV{XERCESC_ROOT}
-    PATH_SUFFIXES lib64
+    PATH_SUFFIXES lib lib64
     )
 
 find_path(XercesC_INCLUDE_DIR xercesc/util/XercesVersion.hpp
     HINTS $ENV{XERCESC_ROOT}
+    PATH_SUFFIXES include
     )
 
 find_package_handle_standard_args(
