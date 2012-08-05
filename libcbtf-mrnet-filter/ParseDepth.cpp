@@ -76,6 +76,26 @@ namespace {
     {
         selected = !currently_selected;
     }
+    
+    /**
+     * Wrapper around the std::min<int>(). The only reason this exists is that
+     * GCC 4.3.4 was having trouble compiling the boost::bind of std::min<int>
+     * later in this file within the depth parser.
+     */
+    int minWrapper(int a, int b)
+    {
+        return std::min<int>(a, b);
+    }
+
+    /**
+     * Wrapper around the std::max<int>(). The only reason this exists is that
+     * GCC 4.3.4 was having trouble compiling the boost::bind of std::max<int>
+     * later in this file within the depth parser.
+     */
+    int maxWrapper(int a, int b)
+    {
+        return std::max<int>(a, b);
+    }
 
     /** Boost.Spirit (classic) closure containing a boolean value. */
     struct BooleanClosure :
@@ -191,12 +211,12 @@ namespace {
                     (as_lower_d["min"] >> '(' >> 
                      additive[integer.value = arg1] >> ',' >>
                      additive[integer.value =
-                              bind(&std::min<int>)(integer.value, arg1)] >>
+                              bind(&minWrapper)(integer.value, arg1)] >>
                      ')') ||
                     (as_lower_d["max"] >> '(' >>
                      additive[integer.value = arg1] >> ',' >>
                      additive[integer.value =
-                              bind(&std::max<int>)(integer.value, arg1)] >>
+                              bind(&maxWrapper)(integer.value, arg1)] >>
                      ')');
             }
             
