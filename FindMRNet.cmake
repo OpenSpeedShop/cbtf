@@ -54,6 +54,30 @@ find_path(MRNet_INCLUDE_DIR mrnet/MRNet.h
     PATH_SUFFIXES include
     )
 
+if(DEFINED $ENV{SYSROOT_DIR})
+  find_library(ALPS_EXTRA_LIBRARY1 NAMES libalps.so libalpslli.so libalpsutil.so
+      HINTS "$ENV{SYSROOT_DIR}"
+      PATH_SUFFIXES  usr/lib/alps
+      )
+
+  find_library(ALPS_EXTRA_LIBRARY2 NAMES libxmlrpc-epi.so libexpat.so
+      HINTS "$ENV{SYSROOT_DIR}"
+      PATH_SUFFIXES  usr/lib64
+      )
+else ()
+  if(DEFINED /usr/lib/alps)
+    find_library(ALPS_EXTRA_LIBRARY1 NAMES libalps.so libalpslli.so libalpsutil.so
+        HINTS /usr/lib
+        PATH_SUFFIXES  alps
+        )
+
+    find_library(ALPS_EXTRA_LIBRARY2 NAMES libxmlrpc-epi.so 
+        HINTS /usr
+        PATH_SUFFIXES lib64
+        )
+  endif()
+endif()
+
 find_package_handle_standard_args(
     MRNet DEFAULT_MSG
     MRNet_MRNET_LIBRARY MRNet_XPLAT_LIBRARY
@@ -62,7 +86,16 @@ find_package_handle_standard_args(
     MRNet_INCLUDE_DIR
     )
 
-set(MRNet_LIBRARIES ${MRNet_MRNET_LIBRARY} ${MRNet_XPLAT_LIBRARY})
+if((DEFINED $ENV{SYSROOT_DIR}) OR (DEFINED /usr/lib/alps))
+  find_package_handle_standard_args(
+      ALPS DEFAULT_MSG
+      ALPS_EXTRA_LIBRARY1
+      ALPS_EXTRA_LIBRARY2
+      )
+  set(MRNet_LIBRARIES ${MRNet_MRNET_LIBRARY} ${MRNet_XPLAT_LIBRARY} ${ALPS_EXTRA_LIBRARY1} ${ALPS_EXTRA_LIBRARY2})
+else ()
+ set(MRNet_LIBRARIES ${MRNet_MRNET_LIBRARY} ${MRNet_XPLAT_LIBRARY})
+endif()
 
 set(MRNet_LW_SHARED_LIBRARIES ${MRNet_MRNET_LW_SHARED_LIBRARY} ${MRNet_XPLAT_LW_SHARED_LIBRARY})
 
@@ -184,3 +217,5 @@ if(MRNET_FOUND AND DEFINED MRNet_INCLUDE_DIR)
     endif()
       
 endif()
+
+
