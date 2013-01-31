@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <boost/assert.hpp>
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -144,6 +145,7 @@ namespace KrellInstitute { namespace CBTF {
         /** Custom deleter function for shared pointers to XDR types. */
         static void xdr_deleter(T* ptr, const xdrproc_t xdr_proc)
         {
+            BOOST_ASSERT((ptr != NULL) && (xdr_proc != NULL));
             xdr_free(xdr_proc, reinterpret_cast<char*>(ptr));
             delete ptr;
         }
