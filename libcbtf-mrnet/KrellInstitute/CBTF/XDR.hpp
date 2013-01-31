@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2011-2013 Krell Institute. All Rights Reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -106,7 +106,7 @@ namespace KrellInstitute { namespace CBTF {
                 }
                 
                 xdr_destroy(&xdrs);
-            }            
+            }
         }
         
         /** XDR procedure for the specified XDR type. */
@@ -140,6 +140,13 @@ namespace KrellInstitute { namespace CBTF {
         }
         
     private:
+
+        /** Custom deleter for shared pointers to XDR types. */
+        static void xdr_deleter(T* ptr, const xdrproc_t xdr_proc)
+        {
+            xdr_free(xdr_proc, reinterpret_cast<char*>(ptr));
+            delete ptr;
+        }
 
         /** Constructor from the XDR procedure for the specified XDR type. */
         ConvertMRNetToXDR(const xdrproc_t& xdr_proc) :
@@ -180,7 +187,9 @@ namespace KrellInstitute { namespace CBTF {
                 &xdrs, reinterpret_cast<char*>(contents), size, XDR_DECODE
                 );
 
-            boost::shared_ptr<T> value(new T());
+            boost::shared_ptr<T> value(
+                new T(), boost::bind(&xdr_deleter, _1, _xdr_proc)
+                );
             if ((*_xdr_proc)(&xdrs, value.get()) == FALSE)
             {
                 throw std::runtime_error(
