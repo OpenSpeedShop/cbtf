@@ -141,7 +141,7 @@ namespace KrellInstitute { namespace CBTF {
         
     private:
 
-        /** Custom deleter for shared pointers to XDR types. */
+        /** Custom deleter function for shared pointers to XDR types. */
         static void xdr_deleter(T* ptr, const xdrproc_t xdr_proc)
         {
             xdr_free(xdr_proc, reinterpret_cast<char*>(ptr));
