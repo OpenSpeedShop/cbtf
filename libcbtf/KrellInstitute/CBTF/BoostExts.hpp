@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2013 Krell Institute. All Rights Reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -23,8 +23,11 @@
 #include <boost/bind.hpp>
 #include <boost/pointer_cast.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/version.hpp>
 
 namespace boost {
+
+#if BOOST_VERSION < 105300
 
     /**
      * Deleter used by the specialization of reinterpret_pointer_cast<> for
@@ -53,5 +56,7 @@ namespace boost {
             reinterpret_cast<T*>(r.get()), bind(&_rpc_sp_deleter<T, U>, _1, r)
             );
     }
-    
+
+#endif
+
 } // namespace boost
