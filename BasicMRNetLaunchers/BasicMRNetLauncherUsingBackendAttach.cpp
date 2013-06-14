@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2011 Krell Institute. All Rights Reserved.
+// Copyright (c) 2011-2013 Krell Institute. All Rights Reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -122,9 +122,9 @@ private:
 
 	if (not mypath.empty() and mypath[0] == '~') {
 	    assert(mypath.size() == 1 or mypath[1] == '/');
-	    char const* home = getenv("HOME");
-	    if (home) {
-		mypath.replace(0, 1, home);
+	    char const* connections_dir = getenv("PWD");
+	    if (connections_dir) {
+		mypath.replace(0, 1, connections_dir);
 	    }
 
             boost::filesystem::path newpath(mypath);
