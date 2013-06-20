@@ -238,7 +238,7 @@ void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
     }
 
     // Default to WAITFORALL.
-    MRN::FilterId mode = MRN::SFILTER_WAITFORALL;
+    MRN::FilterId mode = MRN::SFILTER_DONTWAIT;
 
     std::string filter_mode = xercesc::selectValue(dm_root, "./FilterMode");
     if (filter_mode == "DontWait")
