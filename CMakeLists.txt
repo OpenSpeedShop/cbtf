@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2013 Krell Institute. All Rights Reserved.
 # Copyright (c) 2012 Argo Navis Technologies. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -55,3 +55,5 @@ endif()
 
 add_subdirectory(examples)
 add_subdirectory(test)
+
+install(FILES FindCBTF.cmake DESTINATION share/KrellInstitute/cmake)
