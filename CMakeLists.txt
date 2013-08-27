@@ -56,4 +56,7 @@ endif()
 add_subdirectory(examples)
 add_subdirectory(test)
 
-install(FILES FindCBTF.cmake DESTINATION share/KrellInstitute/cmake)
+install(
+    FILES FindCBTF.cmake FindMRNet.cmake FindXercesC.cmake 
+    DESTINATION share/KrellInstitute/cmake
+    )
