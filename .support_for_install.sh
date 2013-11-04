@@ -119,9 +119,9 @@ make
 make install
 
 if [ -f $CBTF_PREFIX/$LIBDIR/libcbtf.so -a -f $CBTF_PREFIX/$LIBDIR/libcbtf-xml.so -a -f $CBTF_PREFIX/$LIBDIR/libcbtf-mrnet.so ]; then
-   echo "CBTF SERVICES BUILT SUCCESSFULLY into $CBTF_PREFIX."
+   echo "CBTF (base) BUILT SUCCESSFULLY into $CBTF_PREFIX."
 else
-   echo "CBTF SERVICES FAILED TO BUILD - TERMINATING BUILD SCRIPT.  Please check for errors."
+   echo "CBTF (base) FAILED TO BUILD - TERMINATING BUILD SCRIPT.  Please check for errors."
    exit
 fi
 
