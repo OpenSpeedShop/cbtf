@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2013 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ target_link_libraries(cbtf-xml
     ${XercesC_LIBRARIES}
     )
 
-set_target_properties(cbtf-xml PROPERTIES VERSION 0.0.0)
+set_target_properties(cbtf-xml PROPERTIES VERSION 1.1.0)
 
 install(FILES Network.xsd DESTINATION share/KrellInstitute/CBTF)
 

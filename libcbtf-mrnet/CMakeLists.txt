@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2013 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -55,7 +55,7 @@ target_link_libraries(cbtf-mrnet
     ${XercesC_LIBRARIES}
     )
 
-set_target_properties(cbtf-mrnet PROPERTIES VERSION 0.0.0)
+set_target_properties(cbtf-mrnet PROPERTIES VERSION 1.1.0)
 
 install(FILES MRNet.xsd DESTINATION share/KrellInstitute/CBTF)
 install(FILES LLNLrsh DESTINATION share/KrellInstitute/CBTF)
