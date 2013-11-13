@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010 Krell Institute. All Rights Reserved.
+// Copyright (c) 2010,2013 Krell Institute. All Rights Reserved.
 //
 // This program is free software; you can redistribute it and/or modify it under
 // the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <mrnet/MRNet.h>
+#include <KrellInstitute/CBTF/Impl/MessageTags.h>
 
 namespace KrellInstitute { namespace CBTF { namespace Impl {
 
@@ -36,13 +36,16 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * Sent by the frontend in order to establish the stream used
          * by the backends to send data to the frontend.
          */
-        const int EstablishUpstream = FirstApplicationTag + 0;
+        const int EstablishUpstream =
+            KRELL_INSTITUTE_CBTF_IMPL_ESTABLISH_UPSTREAM;
         
         /** Sent by the frontend to request shutdown of the backends. */
-        const int RequestShutdown = FirstApplicationTag + 1;
+        const int RequestShutdown =
+            KRELL_INSTITUTE_CBTF_IMPL_REQUEST_SHUTDOWN;
 
         /** Sent by a backend to acknowledge it is about to shutdown. */
-        const int AcknowledgeShutdown = FirstApplicationTag + 2;
+        const int AcknowledgeShutdown =
+            KRELL_INSTITUTE_CBTF_IMPL_ACKNOWLEDGE_SHUTDOWN;
 
         /**
          * Sent by the frontend in order to specify the named streams used
@@ -50,33 +53,38 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
          * used for communication between the local component networks on the
          * backends, filters, and frontend.
          */
-        const int SpecifyNamedStreams = FirstApplicationTag + 3;
+        const int SpecifyNamedStreams =
+            KRELL_INSTITUTE_CBTF_IMPL_SPECIFY_NAMED_STREAMS;
         
         /**
          * Sent by the frontend in order to specify the local component network
          * used by the backends for a given distributed component network.
          */
-        const int SpecifyBackend = FirstApplicationTag + 4;
+        const int SpecifyBackend =
+            KRELL_INSTITUTE_CBTF_IMPL_SPECIFY_BACKEND;
         
         /**
          * Sent by the frontend in order to specify the local component network
          * used by filters at one or more levels within the MRNet tree for a
          * given distributed component network.
          */
-        const int SpecifyFilter = FirstApplicationTag + 5;
+        const int SpecifyFilter =
+            KRELL_INSTITUTE_CBTF_IMPL_SPECIFY_FILTER;
 
         /**
          * Sent by the frontend in order to request the destruction of all the
          * local component networks for a given distributed component network.
          */
-        const int DestroyNetwork = FirstApplicationTag + 6;
+        const int DestroyNetwork =
+            KRELL_INSTITUTE_CBTF_IMPL_DESTROY_NETWORK;
 
         /**
          * First message tag assigned to a named stream used for communication
          * between the local component networks on the backends, filters, and
          * frontend.
          */
-        const int FirstNamedStreamTag = FirstApplicationTag + 99;
+        const int FirstNamedStreamTag =
+            KRELL_INSTITUTE_CBTF_IMPL_FIRST_NAMED_STREAM_TAG;
         
     } // namespace MessageTags
 

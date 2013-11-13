@@ -23,6 +23,7 @@ add_library(cbtf-mrnet SHARED
     LocalComponentNetwork.cpp LocalComponentNetwork.hpp
     MessageHandler.hpp
     MessageHandlers.cpp MessageHandlers.hpp
+    KrellInstitute/CBTF/Impl/MessageTags.h
     MessageTags.hpp
     KrellInstitute/CBTF/Impl/MRNet.hpp MRNet.cpp MRNet.hpp
     NamedStreams.cpp NamedStreams.hpp
