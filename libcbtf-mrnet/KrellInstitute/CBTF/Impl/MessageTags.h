@@ -20,7 +20,9 @@
 
 #pragma once
 
-#include <mrnet/MRNet.h>
+#if !defined(FirstApplicationTag)
+#include <mrnet_lightweight/Types.h>
+#endif
 
 
 
