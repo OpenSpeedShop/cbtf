@@ -71,8 +71,15 @@ namespace {
 //------------------------------------------------------------------------------
 boost::filesystem::path Impl::getMRNetBackendPath()
 {
-    boost::filesystem::path backend_path = 
+    const char* cbtf_be_path = getenv("CBTF_MRNET_BACKEND_PATH");
+    boost::filesystem::path backend_path;
+    if (cbtf_be_path != NULL) {
+	backend_path = 
+        resolvePath(kExecutableFileType, cbtf_be_path);
+    } else {
+	backend_path = 
         resolvePath(kExecutableFileType, BACKEND_FILE);
+    }
     
     if (backend_path.empty())
     {
