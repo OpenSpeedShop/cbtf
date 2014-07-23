@@ -72,6 +72,13 @@
     (FirstApplicationTag + 6)
 
 /**
+ * Sent by the frontend in order to notify readiness of all the local
+ * component networks for a given distributed component network.
+ */
+#define KRELL_INSTITUTE_CBTF_IMPL_NETWORK_READY \
+    (FirstApplicationTag + 7)
+
+/**
  * First message tag assigned to a named stream used for communication between
  * the local component networks on the backends, filters, and frontend.
  */

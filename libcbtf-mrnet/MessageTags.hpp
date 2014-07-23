@@ -79,6 +79,13 @@ namespace KrellInstitute { namespace CBTF { namespace Impl {
             KRELL_INSTITUTE_CBTF_IMPL_DESTROY_NETWORK;
 
         /**
+         * Sent by the frontend in order to notify the readiness of all the
+         * local component networks for a given distributed component network.
+         */
+        const int NetworkReady =
+            KRELL_INSTITUTE_CBTF_IMPL_NETWORK_READY;
+
+        /**
          * First message tag assigned to a named stream used for communication
          * between the local component networks on the backends, filters, and
          * frontend.

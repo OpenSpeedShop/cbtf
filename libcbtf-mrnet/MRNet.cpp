@@ -281,8 +281,22 @@ void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
     xercesc::selectNodes(
         dm_root, "./Backend", boost::bind(&MRNet::parseBackend, this, _1)
         );
-}
 
+    // The ordering of the calls above ensure a tool that launches
+    // backends will see a completely populated distributed component
+    // network before any backend starts generating messages from
+    // the backends described in the xml.  For tools that attach to
+    // backends, the following NetworkReady tag can be used in the
+    // backend connection code as a sync condition to wait until
+    // all xml has been parsed for the Filters.  Without it, the
+    // backends (which are not defined by any xml) can start streaming
+    // messages before all levels of the filter network are populated
+    // with filter components.
+    dm_frontend->sendToBackends(MRN::PacketPtr(new MRN::Packet(
+            0, MessageTags::NetworkReady, "%d",
+            dm_local_component_network.named_streams()->uid()
+            )));
+}
 
 
 //------------------------------------------------------------------------------
