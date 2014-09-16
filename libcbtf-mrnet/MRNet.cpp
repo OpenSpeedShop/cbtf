@@ -272,6 +272,15 @@ void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
     
     dm_frontend->sendToBackends(*dm_local_component_network.named_streams());
 
+    //
+    // The first "./Filter" node selection below sends all filter specifications
+    // whose depth is not "AllOther". The second sends those whose depth is that
+    // value. This insures the "AllOther" specification(s) are always last, and
+    // that allows libcbtf-mrnet-filter, when an "AllOther" is received, to only
+    // test "Have I been previously selected?" in order to determine whether or
+    // not the "AllOther" should apply to it.
+    //
+
     xercesc::selectNodes(
         dm_root, "./Filter", boost::bind(&MRNet::parseFilter, this, _1, false)
         );
@@ -282,6 +291,7 @@ void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
         dm_root, "./Backend", boost::bind(&MRNet::parseBackend, this, _1)
         );
 
+    //
     // The ordering of the calls above ensure a tool that launches
     // backends will see a completely populated distributed component
     // network before any backend starts generating messages from
@@ -292,6 +302,8 @@ void MRNet::handleNetwork(const boost::shared_ptr<MRN::Network>& network)
     // backends (which are not defined by any xml) can start streaming
     // messages before all levels of the filter network are populated
     // with filter components.
+    //
+
     dm_frontend->sendToBackends(MRN::PacketPtr(new MRN::Packet(
             0, MessageTags::NetworkReady, "%d",
             dm_local_component_network.named_streams()->uid()
