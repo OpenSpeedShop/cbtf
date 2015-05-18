@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011-2013 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2015 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -21,8 +21,6 @@ add_library(cbtf-mrnet-filter SHARED
     main.cpp
     )
 
-add_definitions(${MRNet_DEFINES})
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/libcbtf
@@ -41,6 +39,7 @@ target_link_libraries(cbtf-mrnet-filter
     )
 
 set_target_properties(cbtf-mrnet-filter PROPERTIES VERSION 1.1.0)
+set_target_properties(cbtf-mrnet-filter PROPERTIES COMPILE_DEFINITIONS ${MRNet_DEFINES})
 
 install(TARGETS cbtf-mrnet-filter
     RUNTIME DESTINATION bin

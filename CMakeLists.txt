@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011-2013 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2015 Krell Institute. All Rights Reserved.
 # Copyright (c) 2012 Argo Navis Technologies. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -17,11 +17,14 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-cmake_minimum_required(VERSION 2.8.0)
+# Dyninst requires 2.8.11 and we are now using cmake features that became available
+# at that same minimum version.
+#
+cmake_minimum_required(VERSION 2.8.11)
 
 project(CBTF)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
 find_package(Boost 1.39.0 REQUIRED
     COMPONENTS date_time filesystem system thread unit_test_framework
@@ -56,7 +59,11 @@ endif()
 add_subdirectory(examples)
 add_subdirectory(test)
 
-install(
-    FILES FindCBTF.cmake FindMRNet.cmake FindXercesC.cmake 
-    DESTINATION share/KrellInstitute/cmake
-    )
+install(FILES cmake/FindMRNet.cmake cmake/FindXercesC.cmake 
+        DESTINATION share/KrellInstitute/cmake
+)
+
+# 
+install(FILES cmake/FindCBTF.cmake cmake/CBTFConfig.cmake 
+        DESTINATION share/CBTF/cmake
+)

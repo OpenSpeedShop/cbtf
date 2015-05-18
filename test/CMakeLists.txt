@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011,2012 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2015 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,6 @@ add_library(plugin-xml MODULE plugin-xml.cpp)
 
 if(XERCESC_FOUND AND MRNET_FOUND)
     add_library(plugin-mrnet MODULE plugin-mrnet.cpp)
-    add_definitions(${MRNet_DEFINES})
 endif()
 
 add_executable(test
@@ -96,6 +95,7 @@ set_target_properties(plugin-xml PROPERTIES PREFIX "")
 
 if(XERCESC_FOUND AND MRNET_FOUND)
     set_target_properties(plugin-mrnet PROPERTIES PREFIX "")
+    set_target_properties(plugin-mrnet PROPERTIES COMPILE_DEFINITIONS "${MRNet_DEFINES}")
 endif()
 
 file(COPY TestMessage.x DESTINATION .)

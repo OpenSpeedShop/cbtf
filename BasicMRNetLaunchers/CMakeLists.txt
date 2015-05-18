@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2015 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -21,8 +21,6 @@ add_library(BasicMRNetLaunchers SHARED
     BasicMRNetLauncherUsingBackendCreate.cpp
     )
 
-add_definitions(${MRNet_DEFINES})
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/libcbtf
@@ -39,6 +37,7 @@ target_link_libraries(BasicMRNetLaunchers
     )
 
 set_target_properties(BasicMRNetLaunchers PROPERTIES PREFIX "")
+set_target_properties(BasicMRNetLaunchers PROPERTIES COMPILE_DEFINITIONS "${MRNet_DEFINES}")
 
 install(TARGETS BasicMRNetLaunchers
     RUNTIME DESTINATION bin/KrellInstitute/CBTF

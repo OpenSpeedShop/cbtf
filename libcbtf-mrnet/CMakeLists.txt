@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011-2013 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2015 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -35,7 +35,6 @@ add_library(cbtf-mrnet SHARED
 add_definitions(
     -DBACKEND_FILE="libcbtf-mrnet-backend"
     -DFILTER_FILE="libcbtf-mrnet-filter.so"
-    ${MRNet_DEFINES}
     )
 
 include_directories(
@@ -57,6 +56,8 @@ target_link_libraries(cbtf-mrnet
     )
 
 set_target_properties(cbtf-mrnet PROPERTIES VERSION 1.1.0)
+set_target_properties(cbtf-mrnet PROPERTIES COMPILE_DEFINITIONS "${MRNet_DEFINES}")
+
 
 install(FILES MRNet.xsd DESTINATION share/KrellInstitute/CBTF)
 install(FILES LLNLrsh DESTINATION share/KrellInstitute/CBTF)

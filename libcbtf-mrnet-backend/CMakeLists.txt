@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (c) 2011 Krell Institute. All Rights Reserved.
+# Copyright (c) 2011-2015 Krell Institute. All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -21,8 +21,6 @@ add_executable(libcbtf-mrnet-backend
     main.cpp
     )
 
-add_definitions(${MRNet_DEFINES})
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/libcbtf
@@ -43,5 +41,7 @@ target_link_libraries(libcbtf-mrnet-backend
     ${MRNet_LIBRARIES}
     ${XercesC_LIBRARIES}
     )
+
+set_target_properties(libcbtf-mrnet-backend PROPERTIES COMPILE_DEFINITIONS "${MRNet_DEFINES}")
 
 install(TARGETS libcbtf-mrnet-backend RUNTIME DESTINATION bin)
