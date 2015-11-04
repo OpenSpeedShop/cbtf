@@ -349,7 +349,14 @@ namespace {
             return;
         }
 
-        bool selected = i->second->network();
+        /* 
+          Replace this line with the 4 lines below to avert a gcc/g++ 5.1 compiler error
+          bool selected = i->second->network();
+        */
+        bool selected = false;
+        if (i->second->network()) {
+           selected = true;
+        }
         
         xercesc::selectNodes(
             document.get()->getDocumentElement(), "./Depth",
