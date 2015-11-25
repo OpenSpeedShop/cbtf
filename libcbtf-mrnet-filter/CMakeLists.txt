@@ -32,6 +32,7 @@ include_directories(
     )
 
 target_link_libraries(cbtf-mrnet-filter
+    -Wl,--no-as-needed
     cbtf-mrnet
     ${Boost_THREAD_LIBRARY}
     ${MRNet_LIBRARIES}

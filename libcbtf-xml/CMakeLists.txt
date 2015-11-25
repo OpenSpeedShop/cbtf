@@ -33,6 +33,7 @@ include_directories(
     )
   
 target_link_libraries(cbtf-xml
+    -Wl,--no-as-needed
     cbtf
     ${Boost_FILESYSTEM_LIBRARY}
     ${XercesC_LIBRARIES}

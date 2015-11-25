@@ -32,6 +32,7 @@ include_directories(
     )
 
 target_link_libraries(libcbtf-mrnet-backend
+    -Wl,--no-as-needed
     cbtf-mrnet
     ${Boost_DATETIME_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}

@@ -48,6 +48,7 @@ include_directories(
     )
 
 target_link_libraries(cbtf
+    -Wl,--no-as-needed
     ${CMAKE_DL_LIBS}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}

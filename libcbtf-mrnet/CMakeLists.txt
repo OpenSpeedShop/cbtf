@@ -47,6 +47,7 @@ include_directories(
     )
 
 target_link_libraries(cbtf-mrnet
+    -Wl,--no-as-needed
     cbtf cbtf-xml
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}

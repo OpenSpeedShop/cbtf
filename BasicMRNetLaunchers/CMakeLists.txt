@@ -31,6 +31,7 @@ include_directories(
     )
 
 target_link_libraries(BasicMRNetLaunchers
+    -Wl,--no-as-needed
     cbtf-mrnet
     ${Boost_FILESYSTEM_LIBRARY}
     ${MRNet_LIBRARIES}
