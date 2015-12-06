@@ -433,7 +433,7 @@ void MRNet::parseOutput(const xercesc::DOMNode* node)
             boost::bind(
                 (void (Component::*)(
                     const std::string&, const Type&, const boost::any&
-                    ))(&Component::emitOutput),
+                    ))(&MRNet::emitOutput),
                 this, name, i->second, _1
                 )
             )

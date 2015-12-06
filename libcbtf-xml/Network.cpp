@@ -383,7 +383,7 @@ void Network::parseOutput(const xercesc::DOMNode* node)
             boost::bind(
                 (void (Component::*)(
                     const std::string&, const Type&, const boost::any&
-                    ))(&Component::emitOutput),
+                    ))(&Network::emitOutput),
                 this, output_name, i->second, _1
                 )
             )
