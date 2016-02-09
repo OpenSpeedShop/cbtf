@@ -205,7 +205,7 @@ Component::Instance ComponentImpl::instantiate(
         raise<std::runtime_error>(
             "There is no factory function registered "
             "for the specified component version (%1%).",
-            version
+            *version
             );
     }
     
