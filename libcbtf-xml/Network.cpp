@@ -21,6 +21,7 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 #include <boost/ref.hpp>
 #include <boost/spirit/home/classic.hpp>
 #include <cstdlib>
