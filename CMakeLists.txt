@@ -26,6 +26,21 @@ project(CBTF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
+# NOTE related to the following C++11 feature checks:
+#    This include: CheckCXX11Features.cmake is projected to be in a future version of CMake. 
+#    When this does get included into the new CMake version, we will update our 
+#    required CMake version and remove cmake/CheckCXX11Features* files from the cbtf repository.
+#
+
+include(cmake/CheckCXX11Features.cmake)
+if(NOT HAS_CXX11_AUTO)
+  message(STATUS "No support for C++11 found.")
+else()
+  message(STATUS "C++11 support found, required flags are: ${CXX11_COMPILER_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_COMPILER_FLAGS}")
+endif()
+
+
 # If targetted build, only install the include files needed by cbtf-krell
 # Currently this only applies to the Intel MIC platform, where we do not
 # need all of cbtf, like we do when targetting the Cray platform.
