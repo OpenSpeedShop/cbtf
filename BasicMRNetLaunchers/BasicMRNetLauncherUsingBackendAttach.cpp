@@ -23,6 +23,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+
 #include <mrnet/MRNet.h>
 #include <stdexcept>
 #include <typeinfo>
@@ -37,20 +40,8 @@ using namespace KrellInstitute::CBTF;
 using namespace KrellInstitute::CBTF::Impl;
 
 
-
-/** Anonymous namespace hiding implementation details. */
-namespace {
-
-    /** Handler for MRNet backend-added topology events. */
-    void handleBackendAdded(MRN::Event* event, void* data)
-    {
-        int* count = reinterpret_cast<int*>(data);
-        BOOST_ASSERT(count != NULL);
-        ++(*count);
-    }
-    
-} // namespace <anonymous>
-
+/** Forward definition of the MRNet event handler callback */
+void handleBackendAdded(MRN::Event* event, void* data);
 
 
 /**
@@ -63,7 +54,9 @@ class __attribute__ ((visibility ("hidden")))
 BasicMRNetLauncherUsingBackendAttach :
     public Component
 {
-    
+
+friend void handleBackendAdded(MRN::Event* event, void* data);
+
 public:
 
     /** Factory function for this component type. */
@@ -140,7 +133,8 @@ private:
     /** Handler for the "TopologyFile" input. */
     void handleTopologyFile(const boost::filesystem::path& path)
     {
-        int added_backends = 0;
+	// initialize backend added count whenever this handler is called.
+	dm_backend_added_count = 0;
         
         // Create the MRNet network
         boost::shared_ptr<MRN::Network> network(MRN::Network::CreateNetworkFE(
@@ -154,7 +148,7 @@ private:
         // Register a handler for backend-added events
         network->register_EventCallback(
             MRN::Event::TOPOLOGY_EVENT, MRN::TopologyEvent::TOPOL_ADD_BE,
-            handleBackendAdded, &added_backends
+            handleBackendAdded, this
             );
         
         // Access the topology of this network
@@ -188,11 +182,12 @@ private:
         }
         stream.close();
         
-        // Wait for the expected number of backends
-        while (added_backends < dm_backend_attach_count)
-        {
-            sleep(1);
-        }
+	// Wait for the expected number of backends.
+	boost::unique_lock<boost::mutex> backend_added_lock(dm_backend_added_count_mutex);
+	while (dm_backend_added_count < dm_backend_attach_count)
+	{
+	    dm_backend_added_count_condition.wait(backend_added_lock);
+	}
 
         // Emit the MRNet network on this component's "Network" output
         emitOutput("Network", network);
@@ -200,11 +195,30 @@ private:
     
     /** Number of backends connecting via MRNet's backend-attach mode. */
     unsigned int dm_backend_attach_count;
+    /** Number of backends added by handleBackendAdded MRNet event handler callback. */
+    unsigned int dm_backend_added_count;
     
     /** Path of the connection file for MRNet's backend-attach mode. */
     boost::filesystem::path dm_backend_attach_file;
+
+    /** mutex and condition for backend added count */
+    boost::mutex dm_backend_added_count_mutex;
+    boost::condition_variable dm_backend_added_count_condition;
+
+
     
 }; // class BasicMRNetLauncherUsingBackendAttach
+
+/** Handler for MRNet backend-added topology events. */
+void handleBackendAdded(MRN::Event* event, void* data)
+{		
+    BasicMRNetLauncherUsingBackendAttach* launcher =
+		reinterpret_cast<BasicMRNetLauncherUsingBackendAttach*>(data);
+    unsigned int* count = &launcher->dm_backend_added_count;
+    BOOST_ASSERT(count != NULL);
+    ++(*count);
+    launcher->dm_backend_added_count_condition.notify_one();
+}
 
 KRELL_INSTITUTE_CBTF_REGISTER_FACTORY_FUNCTION(
     BasicMRNetLauncherUsingBackendAttach
