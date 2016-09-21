@@ -5,11 +5,11 @@ pushd build
 export CC=gcc
 export CXX=g++
 
-export KRELL_ROOT=/opt/DEVEL4/krellroot_v2.2.3
-export CBTF_ROOT=/opt/DEVEL4/cbtf_v2.2.4
-export MRNET_ROOT=/opt/DEVEL4/krellroot_v2.2.3
+export KRELL_ROOT=/opt/DEVEL/krellroot_v2.2.3
+export CBTF_ROOT=/opt/DEVEL/cbtf_v2.2.4
+export MRNET_ROOT=/opt/DEVEL/krellroot_v2.2.3
 
-cmake3 .. \
+cmake .. \
         -DCMAKE_BUILD_TYPE=None \
         -DCMAKE_CXX_FLAGS="-g -O2" \
         -DCMAKE_C_FLAGS="-g -O2" \
