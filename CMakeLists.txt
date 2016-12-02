@@ -40,11 +40,23 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_COMPILER_FLAGS}")
 endif()
 
+set(CBTF_FILTERS_RUN_ON "" CACHE STRING "Set up cbtf for cbtf-krell filters run on native compute node or on host processor on compute node: [native or host]")
+
+message(STATUS "RUNTIME_PLATFORM=${RUNTIME_PLATFORM}.")
+if (RUNTIME_PLATFORM MATCHES "mic")
+    add_definitions(-DRUNTIME_PLATFORM=mic)
+    set(RUNTIME_PLATFORM_MIC 1)
+    set(CBTF_FILTERS_RUN_ON "host")
+    message(STATUS "Build runtimes for target mic platform.")
+else()
+    message(STATUS "Build runtimes for localhost.")
+    set(CBTF_FILTERS_RUN_ON "native")
+endif()
 
 # If targetted build, only install the include files needed by cbtf-krell
 # Currently this only applies to the Intel MIC platform, where we do not
 # need all of cbtf, like we do when targetting the Cray platform.
-if (RUNTIME_ONLY MATCHES "true")
+if (RUNTIME_ONLY MATCHES "true" AND CBTF_FILTERS_RUN_ON MATCHES "host")
     # Install include files targetted platform builds. Install only the
     # includes for libcbtf-mrnet
     add_subdirectory(libcbtf-mrnet)

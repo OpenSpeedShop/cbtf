@@ -16,7 +16,7 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
-if (RUNTIME_ONLY)
+if (RUNTIME_ONLY MATCHES "true" AND CBTF_FILTERS_RUN_ON MATCHES "host")
     # Install this include file for target compute node builds (currently the Intel MIC)
     install(FILES KrellInstitute/CBTF/Impl/MessageTags.h DESTINATION include/KrellInstitute/CBTF/Impl)
 else()
