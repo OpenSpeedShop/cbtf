@@ -8,7 +8,7 @@ export CC=gcc
 export CXX=g++
 
 export KRELL_ROOT=/opt/STABLE/krellroot_v2.3.0
-export CBTF_ROOT=/opt/TEST/cbtf_v2.3.x
+export CBTF_ROOT=/opt/DEVEL3-TEST/cbtf_v2.3.1
 export MRNET_ROOT=/opt/STABLE/krellroot_v2.3.0
 export BOOST_ROOT=/opt/boost-1.59.0
 
