@@ -35,6 +35,7 @@ target_link_libraries(BasicMRNetLaunchers
     cbtf-mrnet
     ${Boost_FILESYSTEM_LIBRARY}
     ${MRNet_LIBRARIES}
+    ${ICU_LIBRARIES}
     )
 
 set_target_properties(BasicMRNetLaunchers PROPERTIES PREFIX "")

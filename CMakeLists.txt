@@ -68,6 +68,8 @@ else()
     find_package(MRNet 4.0.0)
     find_package(Threads)
     find_package(XercesC 3.0)
+    set(ICU_LIBRARY "-L/nasa/pkgsrc/2016Q2/lib -licui18n -licuuc -licudata")
+    find_package(ICU COMPONENTS data i18n uc)
 
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc64*")
         set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64)
@@ -93,7 +95,7 @@ else()
     endif()
 
     add_subdirectory(examples)
-    add_subdirectory(test)
+    #add_subdirectory(test)
 
     install(FILES cmake/FindMRNet.cmake cmake/FindXercesC.cmake 
         DESTINATION share/KrellInstitute/cmake

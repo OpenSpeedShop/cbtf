@@ -41,6 +41,7 @@ target_link_libraries(libcbtf-mrnet-backend
     ${CMAKE_THREAD_LIBS_INIT}
     ${MRNet_LIBRARIES}
     ${XercesC_LIBRARIES}
+    ${ICU_LIBRARIES}
     )
 
 set_target_properties(libcbtf-mrnet-backend PROPERTIES COMPILE_DEFINITIONS "${MRNet_DEFINES}")

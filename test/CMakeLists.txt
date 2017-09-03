@@ -16,6 +16,8 @@
 # Place, Suite 330, Boston, MA  02111-1307  USA
 ################################################################################
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0")
+
 if(XERCESC_FOUND)
     set(XML_SOURCES "test-xml.cpp")
     set(XML_LIBRARIES "cbtf-xml")
@@ -85,9 +87,11 @@ endif()
 target_link_libraries(test
     cbtf
     ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+    ${Boost_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     ${MRNET_LIBRARIES}
     ${XML_LIBRARIES}
+    ${ICU_LIBRARIES}
     )
 
 set_target_properties(plugin PROPERTIES PREFIX "")
