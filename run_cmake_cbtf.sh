@@ -7,10 +7,10 @@ pushd build
 export CC=gcc
 export CXX=g++
 
-export KRELL_ROOT=/opt/STABLE/krellroot_v2.3.0
-export CBTF_ROOT=/opt/DEVEL3-TEST/cbtf_v2.3.1
-export MRNET_ROOT=/opt/STABLE/krellroot_v2.3.0
-export BOOST_ROOT=/opt/boost-1.59.0
+export KRELL_ROOT=~/OSS/krellroot_v2.3.1
+export CBTF_ROOT=~/OSS/cbtf_v2.3.1
+export MRNET_ROOT=~/OSS/krellroot_v2.3.1
+export BOOST_ROOT=~/OSS/krellroot_v2.3.1
 
 cmake .. \
         -DCMAKE_BUILD_TYPE=None \

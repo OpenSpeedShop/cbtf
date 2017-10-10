@@ -93,7 +93,7 @@ else()
     endif()
 
     add_subdirectory(examples)
-    add_subdirectory(test)
+#    add_subdirectory(test)
 
     install(FILES cmake/FindMRNet.cmake cmake/FindXercesC.cmake 
         DESTINATION share/KrellInstitute/cmake
