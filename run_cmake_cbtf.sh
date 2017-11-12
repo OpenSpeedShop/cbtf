@@ -7,11 +7,12 @@ pushd build
 export CC=gcc
 export CXX=g++
 
-export KRELL_ROOT=/u/glschult/OSS/osscbtf_v2.3.1
+export KRELL_ROOT=/u/glschult/OSS/krellroot_v2.3.1
 export CBTF_ROOT=/u/glschult/OSS/osscbtf_v2.3.1
 export MRNET_ROOT=/u/glschult/OSS/osscbtf_v2.3.1
 export BOOST_ROOT=/u/glschult/OSS/osscbtf_v2.3.1
 #export BOOST_ROOT=/nasa/pkgsrc/sles12/2016Q4/views/boost/1.62
+export ICU_PATH=/nasa/pkgsrc/sles12/2016Q4
 #export ICU_PATH=/nasa/pkgsrc/2016Q2
 
 cmake .. \
