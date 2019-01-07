@@ -68,6 +68,7 @@ else()
     find_package(MRNet 4.0.0)
     find_package(Threads)
     find_package(XercesC 3.0)
+    find_package(Libtirpc)
 
     if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc64*")
         set(CMAKE_LIBRARY_PATH ${CMAKE_INSTALL_PREFIX}/lib64)

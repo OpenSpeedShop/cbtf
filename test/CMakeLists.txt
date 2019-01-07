@@ -66,6 +66,7 @@ add_definitions(
     )
 
 include_directories(
+    ${Libtirpc_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}/libcbtf
     ${Boost_INCLUDE_DIRS}
@@ -88,6 +89,7 @@ target_link_libraries(test
     ${CMAKE_THREAD_LIBS_INIT}
     ${MRNET_LIBRARIES}
     ${XML_LIBRARIES}
+    ${Libtirpc_LIBRARIES}
     )
 
 set_target_properties(plugin PROPERTIES PREFIX "")
